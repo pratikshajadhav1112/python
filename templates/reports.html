@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Exam Leak Reports</h2>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>Report Id</th>
+        <th>Exam Name</th>
+        <th>Subject Name</th>
+        <th>College Name</th>
+        <th>Status</th>
+        <th>Report Date</th>
+    </tr>
+
+
+    {% for r in reports %}
+    <tr>
+        <td>{{ r.report_id }}</td>
+        <td>{{ r.exam_name }}</td>
+        <td>{{ r.subject_name }}</td>
+        <td>{{ r.college_name }}</td>
+        <td class="{{ r.status }}">{{ r.status }}</td>
+        <td>{{ r.report_date }}</td>
+    </tr>
+    {% endfor %}
+
+</table
+
+{% endblock %}
