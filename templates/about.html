@@ -1,23 +1,302 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<h2>About Us</h2>
+<style>
+.about-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
-<p>
-Exam Leak Detection & Transparency Platform is designed to
-improve fairness and transparency in examinations.
-Users can report exam-related issues, track reports,
-and help maintain integrity in the examination process.
-</p>
+/* Hero Section */
+.about-hero {
+    text-align: center;
+    padding: 20px 0 60px 0;
+}
+.about-hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+}
+.about-hero h1::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #0d6efd, #3b82f6);
+    border-radius: 2px;
+}
+.about-hero p {
+    font-size: 18px;
+    color: #64748b;
+    max-width: 700px;
+    margin: 30px auto 0;
+    line-height: 1.8;
+}
 
-<h3>Project Features</h3>
+/* Mission Card */
+.mission-card {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    padding: 50px;
+    border-radius: 20px;
+    margin: 50px 0;
+    box-shadow: 0 20px 60px rgba(13, 110, 253, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+.mission-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+.mission-card h3 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    position: relative;
+}
+.mission-card p {
+    font-size: 17px;
+    line-height: 1.8;
+    opacity: 0.95;
+    position: relative;
+}
 
-<ul>
-    <li>Report Exam Issues</li>
-    <li>Track Report Status</li>
-    <li>Maintain Transparency</li>
-    <li>Secure Record Management</li>
-</ul>
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin: 60px 0;
+}
+.feature-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #0d6efd, #3b82f6);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+}
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    border-color: #0d6efd;
+}
+.feature-card:hover::before {
+    transform: scaleX(1);
+}
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    font-size: 36px;
+    color: #0d6efd;
+    transition: all 0.3s;
+}
+.feature-card:hover .feature-icon {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    transform: rotateY(360deg);
+}
+.feature-card h4 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+.feature-card p {
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Stats Section */
+.stats-section {
+    background: #f8fafc;
+    padding: 60px 40px;
+    border-radius: 20px;
+    margin: 60px 0;
+    border: 1px solid #e2e8f0;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    text-align: center;
+}
+.stat-item h2 {
+    font-size: 48px;
+    font-weight: 800;
+    color: #0d6efd;
+    margin: 0 0 10px 0;
+}
+.stat-item p {
+    color: #64748b;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* CTA Section */
+.cta-section {
+    text-align: center;
+    padding: 60px 40px;
+    background: white;
+    border-radius: 20px;
+    border: 2px solid #e2e8f0;
+    margin: 60px 0;
+}
+.cta-section h3 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 15px;
+}
+.cta-section p {
+    color: #64748b;
+    font-size: 17px;
+    margin-bottom: 30px;
+}
+.cta-btn {
+    background: #0d6efd;
+    color: white;
+    padding: 16px 40px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+}
+.cta-btn:hover {
+    background: #0a58ca;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+}
+
+@media (max-width: 768px) {
+    .about-hero h1 { font-size: 36px; }
+    .mission-card { padding: 35px 25px; }
+    .features-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="about-wrapper">
+    <!-- Hero -->
+    <div class="about-hero">
+        <h1>About Us</h1>
+        <p>
+            Exam Leak Detection & Transparency Platform is designed to improve fairness and transparency in examinations 
+            using advanced AI technology and community participation.
+        </p>
+    </div>
+
+    <!-- Mission -->
+    <div class="mission-card">
+        <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
+        <p>
+            We are committed to creating a corruption-free examination ecosystem where every student gets equal opportunity. 
+            Our platform empowers citizens to report exam irregularities anonymously while leveraging AI to detect patterns, 
+            prevent future leaks, and ensure complete transparency in the education system.
+        </p>
+    </div>
+
+    <!-- Features -->
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-file-shield"></i>
+            </div>
+            <h4>Report Exam Issues</h4>
+            <p>Submit detailed reports about exam leaks or irregularities with complete anonymity and security.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h4>Track Report Status</h4>
+            <p>Monitor your submitted reports in real-time from Pending to Resolved with full transparency.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-magnifying-glass-chart"></i>
+            </div>
+            <h4>Maintain Transparency</h4>
+            <p>AI-powered analytics detect patterns and help authorities take preventive measures against leaks.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h4>Secure Record Management</h4>
+            <p>All data is encrypted and stored securely. Your identity remains completely confidential.</p>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h2>500+</h2>
+                <p>Reports Submitted</p>
+            </div>
+            <div class="stat-item">
+                <h2>95%</h2>
+                <p>Resolution Rate</p>
+            </div>
+            <div class="stat-item">
+                <h2>24/7</h2>
+                <p>Monitoring System</p>
+            </div>
+            <div class="stat-item">
+                <h2>100%</h2>
+                <p>Anonymous & Secure</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <h3>Ready to Make a Difference?</h3>
+        <p>Join thousands of students fighting for fair examinations</p>
+        <a href="{{ url_for('form') }}" class="cta-btn">
+            <i class="fas fa-rocket"></i> Submit Your First Report
+        </a>
+    </div>
+</div>
 
 {% endblock %}

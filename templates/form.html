@@ -1,50 +1,153 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container">
-    <h2>Report an Exam Leak</h2>
-    <p class="subtitle">Your identity will remain anonymous. Help us maintain exam integrity.</p>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <form class="report-form" method="POST" action="{{ url_for('submit') }}">
-        <div class="form-group">
-            <label for="exam_name">Exam Name *</label>
-            <input type="text" id="exam_name" name="exam_name" required 
-                   
+<style>
+.form-wrapper {
+    max-width: 850px;
+    margin: 0 auto;
+}
+.form-card {
+    background: white;
+    border-radius: 16px;
+    padding: 45px 50px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+}
+.form-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+.form-header h2 {
+    font-size: 32px;
+    color: #0f172a;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+.subtitle {
+    color: #64748b;
+    font-size: 15px;
+}
+.form-group {
+    margin-bottom: 24px;
+}
+.form-group label {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+    font-size: 14px;
+    display: block;
+}
+.form-control, .form-select {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    width: 100%;
+    transition: all 0.2s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #1e3a8a;
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    outline: none;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0d6efd 100%);
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    width: 100%;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    cursor: pointer;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+}
+.security-note {
+    background: #ecfdf5;
+    color: #059669;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    text-align: center;
+}
+@media (max-width: 768px) {
+    .form-card { padding: 30px 25px; }
+}
+</style>
+
+<div class="form-wrapper">
+    <div class="form-card">
+        <div class="form-header">
+            <h2><i class="fas fa-shield-halved" style="color:#1e3a8a;"></i> Report an Exam Leak</h2>
+            <p class="subtitle">Your identity will remain anonymous. Help us maintain exam integrity.</p>
         </div>
 
-        <div class="form-group">
-            <label for="subject_name">Subject Name *</label>
-            <input type="text" id="subject_name" name="subject_name" required
-                
+        <div class="security-note">
+            <i class="fas fa-lock"></i> All submissions are encrypted & 100% anonymous
         </div>
 
-        <div class="form-group">
-            <label for="college_name">College Name *</label>
-            <input type="text" id="college_name" name="college_name" required
-                   
-        </div>
+        <form class="report-form" method="POST" action="{{ url_for('submit') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="exam_name"><i class="fas fa-book"></i> Exam Name *</label>
+                        <input type="text" id="exam_name" name="exam_name" class="form-control" required placeholder="Enter exam name">
+                    </div>
+                </div>
 
-        <div class="form-group">
-            <label for="status">Status *</label>
-            <select id="status" name="status" required>
-                <option value="">Select Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Investigating">Investigating</option>
-                <option value="Resolved">Resolved</option>
-            </select>
-        </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="subject_name"><i class="fas fa-bookmark"></i> Subject Name *</label>
+                        <input type="text" id="subject_name" name="subject_name" class="form-control" required placeholder="Enter subject/course name">
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="report_date">Report Date *</label>
-            <input type="date" id="report_date" name="report_date" required>
-        </div>
+            <div class="form-group">
+                <label for="college_name"><i class="fas fa-university"></i> College Name *</label>
+                <input type="text" id="college_name" name="college_name" class="form-control" required placeholder="Enter college/institute name">
+            </div>
 
-        <div class="form-group">
-            <label for="description">Leak Details *</label>
-            <textarea id="description" name="description" rows="5" required
-                      placeholder="Describe how/where you found the leak..."></textarea>
-        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="status"><i class="fas fa-circle-exclamation"></i> Status *</label>
+                        <select id="status" name="status" class="form-select" required>
+                            <option value="">Select Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Investigating">Investigating</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                    </div>
+                </div>
 
-        <button type="submit" class="btn btn-primary">Submit Report Anonymously</button>
-    </form>
+                <div class="col-md-6">required placeholder="Enter college/institute
+                    <div class="form-group">
+                        <label for="report_date"><i class="fas fa-calendar"></i> Report Date *</label>
+                        <input type="date" id="report_date" name="report_date" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description"><i class="fas fa-file-lines"></i> Leak Details *</label>
+                <textarea id="description" name="description" class="form-control" rows="5" required placeholder="Describe how/where you found the leak. Include time, location, source..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Submit Report Anonymously
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}

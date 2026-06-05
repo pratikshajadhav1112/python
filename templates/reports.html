@@ -1,31 +1,187 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<h2>Exam Leak Reports</h2>
+<style>
+.reports-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.reports-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.reports-header h2 {
+    font-size: 32px;
+    color: #0f172a;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+.reports-header p {
+    color: #64748b;
+    font-size: 15px;
+}
+.table-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+    overflow-x: auto;
+}
+.table {
+    margin-bottom: 0;
+}
+.table thead th {
+    background: #1e3a8a;
+    color: white;
+    font-weight: 600;
+    padding: 16px 12px;
+    border: none;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.table tbody td {
+    padding: 16px 12px;
+    vertical-align: middle;
+    color: #334155;
+    border-color: #f1f5f9;
+}
+.table tbody tr:hover {
+    background: #f8fafc;
+}
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+.status-investigating {
+    background: #dbeafe;
+    color: #1e40af;
+}
+.status-resolved, .status-solved {
+    background: #d1fae5;
+    color: #065f46;
+}
+.report-id {
+    font-weight: 700;
+    color: #1e3a8a;
+    font-family: monospace;
+}
+.stats-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.stat-box {
+    flex: 1;
+    min-width: 200px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-left: 4px solid #1e3a8a;
+}
+.stat-box h4 {
+    font-size: 28px;
+    color: #0f172a;
+    margin: 0;
+    font-weight: 800;
+}
+.stat-box p {
+    color: #64748b;
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+.empty-state i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+</style>
 
-<table border="1" cellpadding="5" cellspacing="0">
-    <tr>
-        <th>Report Id</th>
-        <th>Exam Name</th>
-        <th>Subject Name</th>
-        <th>College Name</th>
-        <th>Status</th>
-        <th>Report Date</th>
-    </tr>
+<div class="reports-wrapper">
+    <div class="reports-header">
+        <h2><i class="fas fa-clipboard-list" style="color:#1e3a8a;"></i> All Submitted Reports</h2>
+        <p>Track all exam leak reports submitted to the platform</p>
+    </div>
 
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-box">
+            <h4>{{ reports|length }}</h4>
+            <p><i class="fas fa-file-alt"></i> Total Reports</p>
+        </div>
+        <div class="stat-box" style="border-left-color: #f59e0b;">
+            <h4>{{ reports|selectattr('status', 'equalto', 'Pending')|list|length }}</h4>
+            <p><i class="fas fa-clock"></i> Pending</p>
+        </div>
+        <div class="stat-box" style="border-left-color: #10b981;">
+            <h4>{{ reports|selectattr('status', 'in', ['Resolved', 'Solved'])|list|length }}</h4>
+            <p><i class="fas fa-check-circle"></i> Resolved</p>
+        </div>
+    </div>
 
-    {% for r in reports %}
-    <tr>
-        <td>{{ r.report_id }}</td>
-        <td>{{ r.exam_name }}</td>
-        <td>{{ r.subject_name }}</td>
-        <td>{{ r.college_name }}</td>
-        <td class="{{ r.status }}">{{ r.status }}</td>
-        <td>{{ r.report_date }}</td>
-    </tr>
-    {% endfor %}
+    <div class="table-card">
+        <h4 style="margin-bottom: 25px; color: #1e293b; font-weight: 700;">
+            <i class="fas fa-table"></i> Exam Leak Reports
+        </h4>
 
-</table
-
+        {% if reports %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Exam Name</th>
+                    <th>Subject Name</th>
+                    <th>College Name</th>
+                    <th>Status</th>
+                    <th>Report Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                <tr>
+                    <td><span class="report-id">{{ report.report_id }}</span></td>
+                    <td>{{ report.exam_name }}</td>
+                    <td>{{ report.subject_name }}</td>
+                    <td>{{ report.college_name }}</td>
+                    <td>
+                        {% if report.status == 'Pending' %}
+                            <span class="status-badge status-pending">{{ report.status }}</span>
+                        {% elif report.status == 'Investigating' %}
+                            <span class="status-badge status-investigating">{{ report.status }}</span>
+                        {% else %}
+                            <span class="status-badge status-resolved">{{ report.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ report.report_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h5>No Reports Yet</h5>
+            <p>No exam leak reports have been submitted yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
