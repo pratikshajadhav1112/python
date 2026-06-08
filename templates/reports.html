@@ -60,15 +60,15 @@
     font-weight: 700;
     text-transform: uppercase;
 }
-.status-pending {
+.status-Pending {
     background: #fef3c7;
     color: #92400e;
 }
-.status-investigating {
+.status-Investigating {
     background: #dbeafe;
     color: #1e40af;
 }
-.status-resolved, .status-solved {
+.status-Resolved, .status-Solved {
     background: #d1fae5;
     color: #065f46;
 }
@@ -157,20 +157,22 @@
             <tbody>
                 {% for report in reports %}
                 <tr>
-                    <td><span class="report-id">{{ report.report_id }}</span></td>
-                    <td>{{ report.exam_name }}</td>
-                    <td>{{ report.subject_name }}</td>
-                    <td>{{ report.college_name }}</td>
                     <td>
-                        {% if report.status == 'Pending' %}
-                            <span class="status-badge status-pending">{{ report.status }}</span>
-                        {% elif report.status == 'Investigating' %}
-                            <span class="status-badge status-investigating">{{ report.status }}</span>
-                        {% else %}
-                            <span class="status-badge status-resolved">{{ report.status }}</span>
-                        {% endif %}
+                        <span class="report-id">
+                            {% if report['id'] is string %}
+                                {{ report['id'] }}  <!-- Dummy: ELD-001, ELD-002 -->
+                            {% else %}
+                                ELD-{{ "%03d"|format(report['id']) }}  <!-- DB: 1 -> ELD-001 -->
+                            {% endif %}
+                        </span>
                     </td>
-                    <td>{{ report.report_date }}</td>
+                    <td>{{ report['exam_name'] }}</td>
+                    <td>{{ report['subject_name'] }}</td>
+                    <td>{{ report['college_name'] }}</td>
+                    <td>
+                        <span class="status-badge status-{{ report['status'] }}">{{ report['status'] }}</span>
+                    </td>
+                    <td>{{ report['report_date'] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
