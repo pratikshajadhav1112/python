@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "base.html" %}   #base template extend karta hai
 
-{% block content %}
+{% block content %}  
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-.about-wrapper {
-    max-width: 1200px;
+.about-wrapper {        
+    max-width: 1200px;      
     margin: 0 auto;
 }
 
@@ -81,6 +81,7 @@
     gap: 30px;
     margin: 60px 0;
 }
+/* animation */
 .feature-card {
     background: white;
     padding: 40px 30px;
@@ -168,7 +169,7 @@
     margin: 0;
 }
 
-/* CTA Section */
+/* CTA Section  */
 .cta-section {
     text-align: center;
     padding: 60px 40px;
@@ -188,6 +189,7 @@
     font-size: 17px;
     margin-bottom: 30px;
 }
+/* submit your first report button*/
 .cta-btn {
     background: #0d6efd;
     color: white;
@@ -202,12 +204,13 @@
     transition: all 0.3s;
     box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
 }
+
 .cta-btn:hover {
     background: #0a58ca;
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
 }
-
+/* mobile media ouery*/
 @media (max-width: 768px) {
     .about-hero h1 { font-size: 36px; }
     .mission-card { padding: 35px 25px; }

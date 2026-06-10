@@ -16,7 +16,7 @@ def home():
 def about():
     return render_template('about.html')
 
-# Form page - sirf form dikhao, submit alag route pe hoga
+# Form page -
 @app.route('/form')
 def form():
     return render_template('form.html')
@@ -48,12 +48,16 @@ def submit():
     
     flash('Report Submitted Successfully!', 'success')
     return redirect(url_for('report'))
+    
+    
 
-# Report page - Dummy data + DB ka real data dono
+# Report page - 
+
+from datetime import datetime
 @app.route('/report')
 def report():
-    # 1. Tera purana dummy dictionary data
-    dummy_reports = [
+    
+    reports = [
         {
             "id": "ELD-001",
             "exam_name": "MSBTE Summer 2026",
@@ -71,6 +75,7 @@ def report():
             "college_name": "Government Polytechnic Khamgaon",
             "status": "Resolved",
             "report_date": "02-06-2026",
+
             "description": "Sample resolved case",
             "created_at": "2026-06-02 11:00:00"
         }
@@ -79,12 +84,24 @@ def report():
     # 2. Database se naye submitted reports
     conn = get_db()
     db_reports = conn.execute(
-        'SELECT * FROM entries ORDER BY created_at DESC'
+        'SELECT * FROM entries ORDER BY id asc'
     ).fetchall()
     conn.close()
+    formatted_db_reports = []
+    start_num = len(reports) + 1
+    for i, row in enumerate(db_reports):
+        report_dict = dict(row)
+        report_dict['id'] = f"ELD-{start_num + i:03d}"
+        # date formatting fix
+        if report_dict['report_date']:
+            try:
+                date_obj = datetime.strptime(report_dict['report_date'], '%Y-%m-%d')
+                report_dict['report_date'] = date_obj.strftime('%d-%m-%Y')
+            except:
+                pass
+        formatted_db_reports.append(report_dict)
     
-    # 3. Dono merge - pehle dummy, fir DB data
-    all_reports = dummy_reports + list(db_reports)
+    all_reports = reports + formatted_db_reports
     
     return render_template("reports.html", reports=all_reports)
 
