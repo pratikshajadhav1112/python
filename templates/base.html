@@ -6,17 +6,20 @@
     <title>Exam Integrity Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Reset default browser spacing and use border-box sizing */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        /* Base page font and background color */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f8fafc;
         }
         
-        /* Navbar */
+        /* Navbar container styles: dark background, shadow, sticky top */
         .navbar {
             background: #0f172a;
             padding: 0;
@@ -25,12 +28,16 @@
             top: 0;
             z-index: 1000;
         }
+
+        /* Center navbar content and align items horizontally */
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
             display: flex;
             align-items: center;
         }
+
+        /* Brand text and icon styling */
         .nav-brand {
             color: white;
             font-size: 22px;
@@ -40,12 +47,16 @@
             align-items: center;
             gap: 10px;
         }
+
+        /* Navigation link list styling */
         .nav-links {
             display: flex;
             list-style: none;
             margin: 0;
             padding: 0;
         }
+
+        /* Link styling for normal nav items */
         .nav-links li a {
             color: #cbd5e1;
             text-decoration: none;
@@ -56,22 +67,29 @@
             transition: all 0.3s;
             border-bottom: 3px solid transparent;
         }
+
+        /* Hover effect for nav links */
         .nav-links li a:hover {
             background: #1e293b;
             color: white;
         }
+
+        /* Active page indicator styling */
         .nav-links li a.active {
             background: #0d6efd;
             color: white;
             border-bottom: 3px solid #60a5fa;
         }
-        /* Main Content */
+
+        /* Main content wrapper with padding and minimum height */
         .main-content {
             max-width: 1400px;
             margin: 40px auto;
             padding: 0 30px;
             min-height: calc(100vh - 200px);
         }
+
+        /* Command box styling for preformatted output or highlights */
         .command-box {
             background: #e2e8f0;
             border-radius: 12px;
@@ -81,11 +99,15 @@
             font-family: 'Courier New', Courier, monospace;
             overflow-x: auto;
         }
+
+        /* Header styles inside command box */
         .command-box h2 {
             margin-bottom: 12px;
             font-size: 18px;
             color: #1e293b;
         }
+
+        /* Preformatted text block styling */
         .command-box pre {
             margin: 0;
             white-space: pre-wrap;
@@ -96,7 +118,7 @@
             border: 1px solid #cbd5e1;
         }
 
-        /* Back Button */
+        /* Back button style to appear as clickable pill */
         .back-btn {
             background: #64748b;
             color: white;
@@ -110,12 +132,14 @@
             font-weight: 600;
             transition: all 0.3s;
         }
+
+        /* Hover transform effect for back button */
         .back-btn:hover {
             background: #475569;
             transform: translateX(-3px);
         }
 
-        /* Footer */
+        /* Footer styling at bottom of the page */
         .footer {
             background: #0f172a;
             color: #94a3b8;
@@ -124,7 +148,7 @@
             margin-top: 60px;
         }
 
-        /* Mobile Responsive */
+        /* Responsive layout rules for screens narrower than 768px */
         @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;

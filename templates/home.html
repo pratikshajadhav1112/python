@@ -1,26 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Home page content for reporting exam leaks -->
 <style>
+/* Hero section styles */
 .hero-section {
+    /* section background gradient and layout */
     background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-    color: white;
+    color: white; /* text color for contrast */
     padding: 100px 20px;
     text-align: center;
     border-radius: 12px;
     margin-bottom: 60px;
 }
 .hero-section h1 {
+    /* main hero heading styling */
     font-size: 48px;
     font-weight: 800;
     margin-bottom: 20px;
 }
 .hero-section p {
+    /* hero description text styling */
     font-size: 18px;
     opacity: 0.9;
     margin-bottom: 30px;
 }
 .hero-btn {
+    /* button style in hero section */
     background: white;
     color: #0d6efd;
     padding: 14px 32px;
@@ -31,30 +37,38 @@
     transition: all 0.3s;
 }
 .hero-btn:hover {
+    /* hover effect for hero button */
     background: #f8f9fa;
     color: #0a58ca;
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
+
+/* Features section styles */
 .features {
+    /* spacing around feature cards */
     padding: 20px 0 60px 0;
 }
 .feature-box {
+    /* individual feature card container */
     text-align: center;
     padding: 30px 20px;
 }
 .feature-icon {
+    /* icon style for features */
     font-size: 56px; 
     color: #0d6efd; 
     margin-bottom: 20px;
 }
 .feature-box h4 {
+    /* feature title styling */
     font-size: 22px;
     font-weight: 700;
     color: #0f172a;
     margin-bottom: 12px;
 }
 .feature-box p {
+    /* feature description text styling */
     color: #64748b;
     font-size: 15px;
     line-height: 1.6;

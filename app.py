@@ -1,27 +1,31 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from database import get_db, init_db
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'Linkkiwi2026'
 
+# Initialize the SQLite database file if it does not already exist
 if not os.path.exists('myproject.db'):
     init_db()
 
 @app.route('/')
 def home():
+    # Render the home page template
     return render_template('home.html')
 
 @app.route('/about')
 def about():
+    # Render the about page template
     return render_template('about.html')
 
-# Form page -
+# Render the submission form page
 @app.route('/form')
 def form():
     return render_template('form.html')
 
-# Form submit handler - yahan data DB me save hoga
+# Handle form submission and save data into the database
 @app.route('/submit', methods=['POST'])
 def submit():
     exam_name = request.form.get('exam_name')
@@ -31,11 +35,12 @@ def submit():
     report_date = request.form.get('report_date')
     description = request.form.get('description')
     
+    # Validate required fields before saving
     if not exam_name or not subject_name or not college_name:
         flash('Exam Name, Subject Name and College Name are required!', 'error')
         return redirect(url_for('form'))
     
-    # DB me save karo
+    # Save the submitted report into the database
     conn = get_db()
     conn.execute(
         '''INSERT INTO entries 
@@ -45,9 +50,24 @@ def submit():
     )
     conn.commit()
     conn.close()
-    
+
     flash('Report Submitted Successfully!', 'success')
-    return redirect(url_for('report'))
+
+    @app.route('/delete/<string:id>',methods=['POST'])
+    def delete_report(id):
+        conn = get_db()
+        student = conn.execute('SELECT * FROM reports WHERE id = ?', (id,)).fetchone()
+        if student is None:
+            flash('Report not found!', 'error')
+            return redirect(url_for('reports'))
+        
+
+        conn.execute("DELETE FROM reports WHERE id = ?", (id,))
+        conn.commit()
+        conn.close()
+
+    flash('Report deleted Successfully!', 'success')
+    return redirect(url_for('reports'))
     
     
 

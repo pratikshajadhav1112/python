@@ -1,3 +1,4 @@
+# Import sqlite3 library for database operations
 import sqlite3
 
 def get_db():
@@ -5,7 +6,9 @@ def get_db():
     Create and return database connection
     Uses Row factory to access columns by name
     """
+    # Connect to the database file
     conn = sqlite3.connect('myproject.db')
+    # Set row factory to return Row objects instead of tuples for easier column access
     conn.row_factory = sqlite3.Row
     return conn
 
