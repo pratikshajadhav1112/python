@@ -101,7 +101,7 @@ def view_report(id):
     
     return render_template('detail.html', report=report_dict)
 
-@app.route('/report/dummy/<int:id>')  # 👈 int kela, string nako
+@app.route('/report/dummy/<int:id>') 
 def view_dummy_report(id):
     dummy = next((r for r in DUMMY_REPORTS if r['id'] == id), None)
     
@@ -110,7 +110,7 @@ def view_dummy_report(id):
         return redirect(url_for('report_list'))
     
     report_dict = dummy.copy()
-    report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"  # 👈 ELD-001, ELD-002 fix
+    report_dict['display_id'] = f"ELD-{report_dict['id']:03d}" 
     
     return render_template('detail.html', report=report_dict)
 
