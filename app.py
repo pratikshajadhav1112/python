@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = 'Linkkiwi2026'
 
 if not os.path.exists('myproject.db'):
-    init_db():
+    init_db()
 
 DUMMY_REPORTS = [
     {
@@ -32,7 +32,7 @@ DUMMY_REPORTS = [
         "is_dummy": True
     }
 ]
-DUMMY_COUNT = len(DUMMY_REPORTS) 
+DUMMY_COUNT = len(DUMMY_REPORTS)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -51,13 +51,20 @@ def form():
     return render_template('form.html')
 
 @app.route('/submit', methods=['POST'])
-def submit():
-    exam_name = request.form.get('exam_name')
-    subject_name = request.form.get('subject_name')
-    college_name = request.form.get('college_name')
-    status = request.form.get('status')
-    report_date = request.form.get('report_date')
-    description = request.form.get('description')
+def submit_report():
+    exam_name = request.form.get('exam_name','').strip()
+    subject_name = request.form.get('subject_name','').strip()
+    college_name = request.form.get('college_name','').strip()
+    status = request.form.get('status','').strip()
+    report_date = request.form.get('report_date','').strip()
+    description = request.form.get('description','').strip()
+
+    print("=== FORM DATA ===")  # 👈 Debug line
+    print(f"Exam: {exam_name}, Subject: {subject_name}")
+    print(f"College: {college_name}, Date: {report_date}")
+    print(f"Status: {status}, Desc Length: {len(description)}")
+
+
     
     if not exam_name or not subject_name or not college_name:
         flash('Exam Name, Subject Name and College Name are required!', 'error')
@@ -88,7 +95,6 @@ def view_report(id):
         return redirect(url_for('report_list'))
     
     report_dict = dict(report)
-    # 👇 FIX: DB id=1 asel tar ELD-003, id=2 asel tar ELD-004
     report_dict['display_id'] = f"ELD-{report_dict['id'] + DUMMY_COUNT:03d}"
     report_dict['is_dummy'] = False
     
@@ -110,7 +116,8 @@ def view_dummy_report(id):
         return redirect(url_for('report_list'))
     
     report_dict = dummy.copy()
-    report_dict['display_id'] = f"ELD-{report_dict['id']:03d}" 
+    report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"
+    report_dict['is_dummy'] = True
     
     return render_template('detail.html', report=report_dict)
 
@@ -139,8 +146,8 @@ def report_list():
     order = request.args.get('order', 'asc')
     
     all_reports = []
-    
-    # 1. Dummy - Fix ID
+
+    # 1. Dummy Reports Filter
     filtered_dummy = []
     for dummy in DUMMY_REPORTS:
         if search:
@@ -153,8 +160,10 @@ def report_list():
     
     for dummy in filtered_dummy:
         dummy_copy = dummy.copy()
-        dummy_copy['display_id'] = f"ELD-{dummy['id']:03d}"  # 👈 Fix: ELD-001, ELD-002
+        dummy_copy['display_id'] = f"ELD-{dummy['id']:03d}"
         dummy_copy['view_url'] = url_for('view_dummy_report', id=dummy['id'])
+        dummy_copy['delete_url'] = None
+        dummy_copy['is_dummy'] = True
         all_reports.append(dummy_copy)
     
     # 2. Database Query
@@ -182,12 +191,17 @@ def report_list():
     
     conn.close()
     
-    # DB reports - Fix ID
+    # DB reports Process
+    db_index = 1
     for row in db_reports:
         report_dict = dict(row)
-        report_dict['display_id'] = f"ELD-{report_dict['id'] + DUMMY_COUNT:03d}"
+        report_dict['display_id'] = f"ELD-{db_index+ DUMMY_COUNT:03d}"
+        db_index +=1
         report_dict['is_dummy'] = False
         report_dict['view_url'] = url_for('view_report', id=report_dict['id'])
+        report_dict['delete_url'] = url_for('delete_report', id=report_dict['id'])
+        
+
         
         if report_dict['report_date']:
             try:
@@ -197,7 +211,7 @@ def report_list():
                 pass
         all_reports.append(report_dict)
     
-    # Sort by display_id
+    # Final Sort by display_id
     if sort_by == 'display_id':
         reverse = True if order == 'desc' else False
         all_reports.sort(key=lambda x: x['display_id'], reverse=reverse)
