@@ -12,7 +12,7 @@ if not os.path.exists('myproject.db'):
 
 DUMMY_REPORTS = [
     {
-        "id": 1,  
+        "id": 1,
         "exam_name": "MSBTE Summer 2026",
         "subject_name": "MICROPROCESSOR PROGRAMMING",
         "college_name": "Government Polytechnic Hingoli",
@@ -22,7 +22,7 @@ DUMMY_REPORTS = [
         "is_dummy": True
     },
     {
-        "id": 2,  
+        "id": 2,
         "exam_name": "MSBTE Summer 2026",
         "subject_name": "Data Structure",
         "college_name": "Government Polytechnic Khamgaon",
@@ -40,7 +40,12 @@ def page_not_found(e):
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    conn = get_db()
+    total = conn.execute('SELECT COUNT(*) FROM entries').fetchone()[0]
+    pending = conn.execute("SELECT COUNT(*) FROM entries WHERE status='Pending'").fetchone()[0]
+    resolved = conn.execute("SELECT COUNT(*) FROM entries WHERE status='Resolved'").fetchone()[0]
+    conn.close()
+    return render_template('home.html', total=total, pending=pending, resolved=resolved)
 
 @app.route('/about')
 def about():
@@ -48,94 +53,96 @@ def about():
 
 @app.route('/form')
 def form():
-    return render_template('form.html')
+    today = datetime.now().strftime('%Y-%m-%d')
+    return render_template('form.html', today=today)
 
 @app.route('/submit', methods=['POST'])
 def submit_report():
-    exam_name = request.form.get('exam_name','').strip()
-    subject_name = request.form.get('subject_name','').strip()
-    college_name = request.form.get('college_name','').strip()
-    status = request.form.get('status','').strip()
-    report_date = request.form.get('report_date','').strip()
-    description = request.form.get('description','').strip()
+    try:
+        exam_name = request.form.get('exam_name','').strip()
+        subject_name = request.form.get('subject_name','').strip()
+        college_name = request.form.get('college_name','').strip()
+        status = request.form.get('status','Pending').strip()
+        report_date = request.form.get('report_date','').strip()
+        description = request.form.get('description','').strip()
 
-    print("=== FORM DATA ===")  # 👈 Debug line
-    print(f"Exam: {exam_name}, Subject: {subject_name}")
-    print(f"College: {college_name}, Date: {report_date}")
-    print(f"Status: {status}, Desc Length: {len(description)}")
+        if not exam_name or not subject_name or not college_name:
+          flash('Exam Name, Subject Name and College Name are required!', 'error')
+          return redirect(url_for('form'))
 
-
-    
-    if not exam_name or not subject_name or not college_name:
-        flash('Exam Name, Subject Name and College Name are required!', 'error')
-        return redirect(url_for('form'))
-    
-    conn = get_db()
-    conn.execute(
-        '''INSERT INTO entries 
-           (exam_name, subject_name, college_name, status, report_date, description) 
-           VALUES (?, ?, ?, ?, ?, ?)''',
+        conn = get_db()
+        conn.execute(
+        '''INSERT INTO entries
+           (exam_name, subject_name, college_name, status, report_date, description)
+           VALUES (?,?,?,?,?,?)''',
         (exam_name, subject_name, college_name, status, report_date, description)
     )
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
-    flash('Report Submitted Successfully!', 'success')
-    return redirect(url_for('report_list'))
+        flash('Report Submitted Successfully!', 'success')
+        return redirect(url_for('report_list'))
+    except Exception as e:
+        print("ERROR :", e)
+    return f"error :{e}"
+# 👇 EXTENSION TASK: search.html Route
+@app.route('/search')
+def search_page():
+    conn = get_db()
+    # DISTINCT use karun unique values kadh - Challenge complete
+    statuses = [row[0] for row in conn.execute('SELECT DISTINCT status FROM entries WHERE status IS NOT NULL AND status!= "" ORDER BY status').fetchall()]
+    colleges = [row[0] for row in conn.execute('SELECT DISTINCT college_name FROM entries WHERE college_name IS NOT NULL AND college_name!= "" ORDER BY college_name').fetchall()]
+    exams = [row[0] for row in conn.execute('SELECT DISTINCT exam_name FROM entries WHERE exam_name IS NOT NULL AND exam_name!= "" ORDER BY exam_name').fetchall()]
+    conn.close()
+    return render_template('search.html', statuses=statuses, colleges=colleges, exams=exams)
 
 @app.route('/report/<int:id>')
 def view_report(id):
     conn = get_db()
     conn.row_factory = sqlite3.Row
-    report = conn.execute('SELECT * FROM entries WHERE id = ?', (id,)).fetchone()
+    report = conn.execute('SELECT * FROM entries WHERE id =?', (id,)).fetchone()
     conn.close()
-    
+
     if report is None:
         flash('Report not found!', 'error')
         return redirect(url_for('report_list'))
-    
+
     report_dict = dict(report)
-    report_dict['display_id'] = f"ELD-{report_dict['id'] + DUMMY_COUNT:03d}"
+    # Fix: DUMMY_COUNT add karu naka ithe
+    report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"
     report_dict['is_dummy'] = False
-    
+
     if report_dict['report_date']:
         try:
             date_obj = datetime.strptime(report_dict['report_date'], '%Y-%m-%d')
             report_dict['report_date'] = date_obj.strftime('%d-%m-%Y')
         except:
             pass
-    
+
     return render_template('detail.html', report=report_dict)
 
-@app.route('/report/dummy/<int:id>') 
+@app.route('/report/dummy/<int:id>')
 def view_dummy_report(id):
     dummy = next((r for r in DUMMY_REPORTS if r['id'] == id), None)
-    
+
     if dummy is None:
         flash('Dummy report not found!', 'error')
         return redirect(url_for('report_list'))
-    
+
     report_dict = dummy.copy()
     report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"
     report_dict['is_dummy'] = True
-    
+
     return render_template('detail.html', report=report_dict)
+
+
 
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete_report(id):
     conn = get_db()
-    conn.row_factory = sqlite3.Row
-    report = conn.execute('SELECT * FROM entries WHERE id = ?', (id,)).fetchone()
-    
-    if report is None:
-        flash('Report not found!', 'error')
-        conn.close()
-        return redirect(url_for('report_list'))
-    
-    conn.execute("DELETE FROM entries WHERE id = ?", (id,))
+    conn.execute("DELETE FROM entries WHERE id =?", (id,))
     conn.commit()
     conn.close()
-    
     flash('Report deleted Successfully!', 'success')
     return redirect(url_for('report_list'))
 
@@ -144,65 +151,81 @@ def report_list():
     search = request.args.get('search', '').strip()
     sort_by = request.args.get('sort', 'display_id')
     order = request.args.get('order', 'asc')
-    
+
+    # Filter parameters - Challenge ke liye
+    status_filter = request.args.get('status', '').strip()
+    college_filter = request.args.get('college', '').strip()
+    exam_filter = request.args.get('exam', '').strip()
+
     all_reports = []
 
-    # 1. Dummy Reports Filter
-    filtered_dummy = []
-    for dummy in DUMMY_REPORTS:
-        if search:
-            search_lower = search.lower()
-            if any(search_lower in str(dummy.get(field, '')).lower() 
-                   for field in ['exam_name', 'subject_name', 'college_name', 'status', 'description']):
-                filtered_dummy.append(dummy)
-        else:
-            filtered_dummy.append(dummy)
-    
-    for dummy in filtered_dummy:
-        dummy_copy = dummy.copy()
-        dummy_copy['display_id'] = f"ELD-{dummy['id']:03d}"
-        dummy_copy['view_url'] = url_for('view_dummy_report', id=dummy['id'])
-        dummy_copy['delete_url'] = None
-        dummy_copy['is_dummy'] = True
-        all_reports.append(dummy_copy)
-    
-    # 2. Database Query
+    # 1. Check DB count - FIX: Dummy fakt DB empty asel tar
     conn = get_db()
     conn.row_factory = sqlite3.Row
-    
+    db_count = conn.execute('SELECT COUNT(*) FROM entries').fetchone()[0]
+
+    # Dummy Reports - Fakt DB empty asel tarach dakhav
+    if db_count == 0:
+        filtered_dummy = []
+        for dummy in DUMMY_REPORTS:
+            if search:
+                search_lower = search.lower()
+                if any(search_lower in str(dummy.get(field, '')).lower()
+                       for field in ['exam_name', 'subject_name', 'college_name', 'status', 'description']):
+                    filtered_dummy.append(dummy)
+            else:
+                filtered_dummy.append(dummy)
+
+        for dummy in filtered_dummy:
+            dummy_copy = dummy.copy()
+            dummy_copy['display_id'] = f"ELD-{dummy['id']:03d}"
+            dummy_copy['view_url'] = url_for('view_dummy_report', id=dummy['id'])
+            dummy_copy['delete_url'] = None
+            dummy_copy['is_dummy'] = True
+            all_reports.append(dummy_copy)
+
+    # 2. Database Query with Filters
     valid_sorts = ['id', 'exam_name', 'subject_name', 'college_name', 'status', 'report_date']
     sort_column = 'id' if sort_by == 'display_id' else sort_by
     if sort_column not in valid_sorts:
         sort_column = 'id'
-    
+
     sort_order = 'DESC' if order == 'desc' else 'ASC'
-    
+
+    # Dynamic Query with all filters
+    query = 'SELECT * FROM entries WHERE 1=1'
+    params = []
+
     if search:
-        query = f'''
-            SELECT * FROM entries 
-            WHERE exam_name LIKE ? OR subject_name LIKE ? OR college_name LIKE ? 
-               OR status LIKE ? OR description LIKE ?
-            ORDER BY {sort_column} {sort_order}
-        '''
-        db_reports = conn.execute(query, (f'%{search}%',) * 5).fetchall()
-    else:
-        query = f'SELECT * FROM entries ORDER BY {sort_column} {sort_order}'
-        db_reports = conn.execute(query).fetchall()
-    
+        query += ' AND (exam_name LIKE? OR subject_name LIKE? OR college_name LIKE? OR status LIKE? OR description LIKE?)'
+        search_term = f'%{search}%'
+        params.extend([search_term] * 5)
+
+    if status_filter:
+        query += ' AND status =?'
+        params.append(status_filter)
+
+    if college_filter:
+        query += ' AND college_name =?'
+        params.append(college_filter)
+
+    if exam_filter:
+        query += ' AND exam_name =?'
+        params.append(exam_filter)
+
+    query += f' ORDER BY {sort_column} {sort_order}'
+
+    db_reports = conn.execute(query, params).fetchall()
     conn.close()
-    
+
     # DB reports Process
-    db_index = 1
-    for row in db_reports:
+    for i, row in enumerate(db_reports, 1):
         report_dict = dict(row)
-        report_dict['display_id'] = f"ELD-{db_index+ DUMMY_COUNT:03d}"
-        db_index +=1
+        report_dict['display_id'] = f"ELD-{i:03d}"
         report_dict['is_dummy'] = False
         report_dict['view_url'] = url_for('view_report', id=report_dict['id'])
         report_dict['delete_url'] = url_for('delete_report', id=report_dict['id'])
-        
 
-        
         if report_dict['report_date']:
             try:
                 date_obj = datetime.strptime(report_dict['report_date'], '%Y-%m-%d')
@@ -210,16 +233,11 @@ def report_list():
             except:
                 pass
         all_reports.append(report_dict)
-    
-    # Final Sort by display_id
-    if sort_by == 'display_id':
-        reverse = True if order == 'desc' else False
-        all_reports.sort(key=lambda x: x['display_id'], reverse=reverse)
-    
-    return render_template("reports.html", 
-                         reports=all_reports, 
-                         search=search, 
-                         sort_by=sort_by, 
+
+    return render_template("reports.html",
+                         reports=all_reports,
+                         search=search,
+                         sort_by=sort_by,
                          order=order)
 
 if __name__ == '__main__':

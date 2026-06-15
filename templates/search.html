@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Search & Filter Reports{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fa-solid fa-filter"></i> Search & Filter Reports</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="GET" action="{{ url_for('report_list') }}">
+                        <div class="row g-3">
+                            <!-- Search Box -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Search Keyword</label>
+                                <input type="text" name="search" class="form-control form-control-lg"
+                                       placeholder="Search by exam, subject, college..." value="{{ request.args.get('search', '') }}">
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="">All Status</option>
+                                    {% for s in statuses %}
+                                    <option value="{{ s }}" {% if request.args.get('status') == s %}selected{% endif %}>
+                                        {{ s }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- College Filter -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">College</label>
+                                <select name="college" class="form-select">
+                                    <option value="">All Colleges</option>
+                                    {% for c in colleges %}
+                                    <option value="{{ c }}" {% if request.args.get('college') == c %}selected{% endif %}>
+                                        {{ c }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Exam Filter -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Exam</label>
+                                <select name="exam" class="form-select">
+                                    <option value="">All Exams</option>
+                                    {% for e in exams %}
+                                    <option value="{{ e }}" {% if request.args.get('exam') == e %}selected{% endif %}>
+                                        {{ e }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fa-solid fa-search"></i> Apply Filters
+                                </button>
+                                <a href="{{ url_for('report_list') }}" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fa-solid fa-xmark"></i> Clear All
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -25,7 +25,7 @@
 }
 .table-card {
     background: white;
-    border-radius: 16px;
+    border-radius: 10px;
     padding: 30px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.06);
     border: 1px solid #e2e8f0;
@@ -55,7 +55,7 @@
 }
 .status-badge {
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 10px;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
@@ -146,31 +146,81 @@
             <p><i class="fas fa-check-circle"></i> Resolved</p>
         </div>
     </div>
+    <div class="stat-box" style="border-left-color: #33352c;">
+            <h4>{{ reports|selectattr('status', 'equalto',  'Investigating')|list|length }}</h4>
+            <p><i class="fas fa-check-circle"></i> Investigating</p>
+        </div>
+    </div>
 
-    <!-- 👇 Search Box Add Kela - HE NAVIN AAHE -->
     <div class="search-box">
         <form method="GET" action="{{ url_for('report_list') }}" class="row g-3 align-items-end">
-            <div class="col-md-10">
-                <label class="form-label fw-bold text-muted">Search Reports</label>
-                <input 
-                    type="text" 
-                    name="search" 
-                    class="form-control form-control-lg" 
-                    placeholder="Search by Exam, Subject, College, Status..." 
-                    value="{{ search or '' }}"
-                >
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-muted">Search</label>
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Exam, Subject, College..." 
+                       value="{{ search or '' }}">
             </div>
+
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary btn-lg w-100">
-                    <i class="fas fa-search"></i> Search
+                <label class="form-label fw-bold text-muted">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="Pending" {% if request.args.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Resolved" {% if request.args.get('status') == 'Resolved' %}selected{% endif %}>Resolved</option>
+                    <option value="Investigating" {% if request.args.get('status') == 'Investigating' %}selected{% endif %}>Investigating</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted">College</label>
+                <input type="text" name="college" class="form-control" 
+                       placeholder="College name" 
+                       value="{{ request.args.get('college', '') }}">
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted">Exam</label>
+                <input type="text" name="exam" class="form-control" 
+                       placeholder="Exam name" 
+                       value="{{ request.args.get('exam', '') }}">
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label fw-bold text-muted">Sort</label>
+                <select name="sort" class="form-select">
+                    <option value="id" {% if sort_by == 'id' or sort_by == 'display_id' %}selected{% endif %}>ID</option>
+                    <option value="exam_name" {% if sort_by == 'exam_name' %}selected{% endif %}>Exam</option>
+                    <option value="report_date" {% if sort_by == 'report_date' %}selected{% endif %}>Date</option>
+                    <option value="status" {% if sort_by == 'status' %}selected{% endif %}>Status</option>
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label fw-bold text-muted">Order</label>
+                <select name="order" class="form-select">
+                    <option value="asc" {% if order == 'asc' %}selected{% endif %}>ASC</option>
+                    <option value="desc" {% if order == 'desc' %}selected{% endif %}>DESC</option>
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i>
                 </button>
             </div>
-            {% if search %}
+
+            {% if search or request.args.get('status') or request.args.get('college') or request.args.get('exam') %}
             <div class="col-12">
                 <div class="alert alert-info mb-0 d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-info-circle"></i> Showing results for: <b>"{{ search }}"</b></span>
+                    <span>
+                        <i class="fas fa-filter"></i> Active Filters: 
+                        {% if search %}<span class="badge bg-primary">Search: "{{ search }}"</span>{% endif %}
+                        {% if request.args.get('status') %}<span class="badge bg-warning text-dark">Status: {{ request.args.get('status') }}</span>{% endif %}
+                        {% if request.args.get('college') %}<span class="badge bg-success">College: {{ request.args.get('college') }}</span>{% endif %}
+                        {% if request.args.get('exam') %}<span class="badge bg-info">Exam: {{ request.args.get('exam') }}</span>{% endif %}
+                    </span>
                     <a href="{{ url_for('report_list') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-times"></i> Clear Search
+                        <i class="fas fa-times"></i> Clear All
                     </a>
                 </div>
             </div>
