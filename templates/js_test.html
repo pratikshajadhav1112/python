@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1 id ="myHeading">Hello Pratiksha</h1>
+        <p>Click the button to change the heading text after 2 seconds.</p>
+        <button id = "myButton">Click Me</button>
+        <script>
+            const heading = document.getElementById("myHeading");
+            const button = document.getElementById("myButton");
+            button.addEventListener("click", function() {
+                setTimeout(function() {
+                    heading.textContent = "Welcome to JavaScript!";
+                }, 2000);
+            });
+        </script>
+    </body>
+</html>

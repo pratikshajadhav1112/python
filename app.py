@@ -7,6 +7,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'Linkkiwi2026'
 
+# DB initialize karo agar exist nahi karti
 if not os.path.exists('myproject.db'):
     init_db()
 
@@ -32,11 +33,6 @@ DUMMY_REPORTS = [
         "is_dummy": True
     }
 ]
-DUMMY_COUNT = len(DUMMY_REPORTS)
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
 
 @app.route('/')
 def home():
@@ -59,24 +55,24 @@ def form():
 @app.route('/submit', methods=['POST'])
 def submit_report():
     try:
-        exam_name = request.form.get('exam_name','').strip()
-        subject_name = request.form.get('subject_name','').strip()
-        college_name = request.form.get('college_name','').strip()
-        status = request.form.get('status','Pending').strip()
-        report_date = request.form.get('report_date','').strip()
-        description = request.form.get('description','').strip()
+        exam_name = request.form.get('exam_name', '').strip()
+        subject_name = request.form.get('subject_name', '').strip()
+        college_name = request.form.get('college_name', '').strip()
+        status = request.form.get('status', 'Pending').strip()
+        report_date = request.form.get('report_date', '').strip()
+        description = request.form.get('description', '').strip()
 
         if not exam_name or not subject_name or not college_name:
-          flash('Exam Name, Subject Name and College Name are required!', 'error')
-          return redirect(url_for('form'))
+            flash('Exam Name, Subject Name and College Name are required!', 'error')
+            return redirect(url_for('form'))
 
         conn = get_db()
         conn.execute(
-        '''INSERT INTO entries
-           (exam_name, subject_name, college_name, status, report_date, description)
-           VALUES (?,?,?,?,?,?)''',
-        (exam_name, subject_name, college_name, status, report_date, description)
-    )
+            '''INSERT INTO entries
+               (exam_name, subject_name, college_name, status, report_date, description)
+               VALUES (?,?,?,?,?,?)''',
+            (exam_name, subject_name, college_name, status, report_date, description)
+        )
         conn.commit()
         conn.close()
 
@@ -84,15 +80,21 @@ def submit_report():
         return redirect(url_for('report_list'))
     except Exception as e:
         print("ERROR :", e)
-    return f"error :{e}"
-# 👇 EXTENSION TASK: search.html Route
+        flash(f'Error: {e}', 'error')
+        return redirect(url_for('form'))
+
 @app.route('/search')
 def search_page():
     conn = get_db()
-    # DISTINCT use karun unique values kadh - Challenge complete
-    statuses = [row[0] for row in conn.execute('SELECT DISTINCT status FROM entries WHERE status IS NOT NULL AND status!= "" ORDER BY status').fetchall()]
-    colleges = [row[0] for row in conn.execute('SELECT DISTINCT college_name FROM entries WHERE college_name IS NOT NULL AND college_name!= "" ORDER BY college_name').fetchall()]
-    exams = [row[0] for row in conn.execute('SELECT DISTINCT exam_name FROM entries WHERE exam_name IS NOT NULL AND exam_name!= "" ORDER BY exam_name').fetchall()]
+    statuses = [row[0] for row in conn.execute(
+        'SELECT DISTINCT status FROM entries WHERE status IS NOT NULL AND status!= "" ORDER BY status'
+    ).fetchall()]
+    colleges = [row[0] for row in conn.execute(
+        'SELECT DISTINCT college_name FROM entries WHERE college_name IS NOT NULL AND college_name!= "" ORDER BY college_name'
+    ).fetchall()]
+    exams = [row[0] for row in conn.execute(
+        'SELECT DISTINCT exam_name FROM entries WHERE exam_name IS NOT NULL AND exam_name!= "" ORDER BY exam_name'
+    ).fetchall()]
     conn.close()
     return render_template('search.html', statuses=statuses, colleges=colleges, exams=exams)
 
@@ -108,7 +110,6 @@ def view_report(id):
         return redirect(url_for('report_list'))
 
     report_dict = dict(report)
-    # Fix: DUMMY_COUNT add karu naka ithe
     report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"
     report_dict['is_dummy'] = False
 
@@ -135,8 +136,6 @@ def view_dummy_report(id):
 
     return render_template('detail.html', report=report_dict)
 
-
-
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete_report(id):
     conn = get_db()
@@ -152,19 +151,17 @@ def report_list():
     sort_by = request.args.get('sort', 'display_id')
     order = request.args.get('order', 'asc')
 
-    # Filter parameters - Challenge ke liye
     status_filter = request.args.get('status', '').strip()
-    college_filter = request.args.get('college', '').strip()
     exam_filter = request.args.get('exam', '').strip()
+    college_filter = request.args.get('college', '').strip()
 
     all_reports = []
 
-    # 1. Check DB count - FIX: Dummy fakt DB empty asel tar
     conn = get_db()
     conn.row_factory = sqlite3.Row
     db_count = conn.execute('SELECT COUNT(*) FROM entries').fetchone()[0]
 
-    # Dummy Reports - Fakt DB empty asel tarach dakhav
+    # Dummy Reports - Sirf DB empty ho to dikhao
     if db_count == 0:
         filtered_dummy = []
         for dummy in DUMMY_REPORTS:
@@ -184,7 +181,7 @@ def report_list():
             dummy_copy['is_dummy'] = True
             all_reports.append(dummy_copy)
 
-    # 2. Database Query with Filters
+    # Database Query with Filters
     valid_sorts = ['id', 'exam_name', 'subject_name', 'college_name', 'status', 'report_date']
     sort_column = 'id' if sort_by == 'display_id' else sort_by
     if sort_column not in valid_sorts:
@@ -192,7 +189,6 @@ def report_list():
 
     sort_order = 'DESC' if order == 'desc' else 'ASC'
 
-    # Dynamic Query with all filters
     query = 'SELECT * FROM entries WHERE 1=1'
     params = []
 
@@ -205,13 +201,16 @@ def report_list():
         query += ' AND status =?'
         params.append(status_filter)
 
+    if exam_filter:
+        query += ' AND exam_name =?'
+        params.append(exam_filter)
+        
+
     if college_filter:
         query += ' AND college_name =?'
         params.append(college_filter)
 
-    if exam_filter:
-        query += ' AND exam_name =?'
-        params.append(exam_filter)
+    
 
     query += f' ORDER BY {sort_column} {sort_order}'
 
@@ -239,6 +238,10 @@ def report_list():
                          search=search,
                          sort_by=sort_by,
                          order=order)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 if __name__ == '__main__':
     print("STARTING FLASK APP...")
