@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width: 400px; margin-top: 100px;">
+    <div class="card shadow">
+        <div class="card-body p-5">
+            <h2 class="text-center mb-4">Login</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+            <p class="text-center mt-3">No account? <a href="{{ url_for('register') }}">Register</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

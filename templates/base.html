@@ -3,230 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Integrity Platform</title>
+    <title>{% block title %}Exam Integrity Platform{% endblock %}</title>
+    
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6.4.0 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Reset default browser spacing and use border-box sizing */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Base page font and background color */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f8fafc;
         }
-        
-        /* Navbar container styles: dark background, shadow, sticky top */
         .navbar {
-            background: #0f172a;
-            padding: 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            padding: 12px 0;
         }
-
-        /* Center navbar content and align items horizontally */
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Brand text and icon styling */
-        .nav-brand {
-            color: white;
-            font-size: 22px;
+        .navbar-brand {
+            font-size: 20px;
             font-weight: 800;
-            padding: 18px 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
-
-        /* Navigation link list styling */
-        .nav-links {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Link styling for normal nav items */
-        .nav-links li a {
-            color: #cbd5e1;
-            text-decoration: none;
-            padding: 20px 30px;
-            display: block;
-            font-weight: 600;
-            font-size: 15px;
+        .nav-link {
+            font-weight: 500;
+            margin: 0 5px;
+            border-radius: 6px;
             transition: all 0.3s;
-            border-bottom: 3px solid transparent;
         }
-
-        /* Hover effect for nav links */
-        .nav-links li a:hover {
-            background: #1e293b;
-            color: white;
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
         }
-
-        /* Active page indicator styling */
-        .nav-links li a.active {
-            background: #0d6efd;
-            color: white;
-            border-bottom: 3px solid #60a5fa;
-        }
-
-        /* Main content wrapper with padding and minimum height */
-        .main-content {
-            max-width: 1400px;
-            margin: 40px auto;
-            padding: 0 30px;
-            min-height: calc(100vh - 200px);
-        }
-
-        /* Command box styling for preformatted output or highlights */
-        .command-box {
-            background: #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 30px;
-            color: #0f172a;
-            font-family: 'Courier New', Courier, monospace;
-            overflow-x: auto;
-        }
-
-        /* Header styles inside command box */
-        .command-box h2 {
-            margin-bottom: 12px;
-            font-size: 18px;
-            color: #1e293b;
-        }
-
-        /* Preformatted text block styling */
-        .command-box pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            background: #f8fafc;
-            padding: 15px;
+        .btn {
+            font-weight: 600;
             border-radius: 8px;
-            border: 1px solid #cbd5e1;
+            transition: all 0.3s;
         }
-
-        /* Back button style to appear as clickable pill */
-        .back-btn {
-            background: #64748b;
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        .search-input {
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
             color: white;
+        }
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        .search-input:focus {
+            background: white;
+            color: #1e3a8a;
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+        }
+        .dropdown-menu {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            margin-top: 10px;
+        }
+        .dropdown-item {
             padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 30px;
-            font-weight: 600;
-            transition: all 0.3s;
+            font-weight: 500;
         }
-
-        /* Hover transform effect for back button */
-        .back-btn:hover {
-            background: #475569;
-            transform: translateX(-3px);
+        .dropdown-item:hover {
+            background: #f1f5f9;
         }
-
-        /* Footer styling at bottom of the page */
-        .footer {
-            background: #0f172a;
-            color: #94a3b8;
-            text-align: center;
-            padding: 30px;
-            margin-top: 60px;
-        }
-
-        /* Responsive layout rules for screens narrower than 768px */
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .nav-links {
-                width: 100%;
-                flex-direction: column;
-            }
-            .nav-links li a {
-                padding: 15px 30px;
-            }
-            .main-content {
-                padding: 0 15px;
-            }
+        .alert {
+            border-radius: 10px;
+            border: none;
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <i class="fas fa-shield-halved"></i>
-                Exam Platform
-            </div>
-            <ul class="nav-links">
-                <li>
-                    <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">
+
+<!-- NAVBAR - SAME FOR ALL PAGES -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+    <div class="container-fluid" style="max-width: 1400px;">
+        <a class="navbar-brand" href="{{ url_for('home') }}">
+            <i class="fas fa-shield-alt"></i> Exam Platform
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- Left Menu -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">
                         <i class="fas fa-home"></i> Home
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'about' %}active{% endif %}" href="{{ url_for('about') }}">
                         <i class="fas fa-info-circle"></i> About
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url_for('form') }}" class="{% if request.endpoint == 'form' %}active{% endif %}">
-                        <i class="fas fa-file-alt"></i> Form
+                
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'form' %}active{% endif %}" href="{{ url_for('form') }}">
+                        <i class="fas fa-file-alt"></i> Submit Report
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url_for('report_list') }}" class="{% if request.endpoint == 'reports' %}active{% endif %}">
-                        <i class="fas fa-chart-bar"></i> Report
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'report_list' %}active{% endif %}" href="{{ url_for('report_list') }}">
+                        <i class="fas fa-clipboard-list"></i> All Reports
                     </a>
                 </li>
-
-            <!-- 👇 Navbar Search Bar -->
-            <form class="d-flex" method="GET" action="{{ url_for('report_list') }}">
-                <input class="form-control me-2" type="search" name="search"
-                       placeholder="Quick Search..." value="{{ request.args.get('search', '') }}">
-                <button class="btn btn-outline-light" type="submit">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-
+                {% endif %}
             </ul>
-        </div>
-    </nav>
 
-    <!-- Main Content Area -->
-    <div class="main-content">
-        {% block content %}{% endblock %}
-        
-        <!-- Back Button - saglya pages la dishel -->
-        <div>
-            <a href="{{ url_for('home') }}" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back to Home
-            </a>
+            <!-- Right Side: Search + Auth -->
+            <div class="d-flex align-items-center gap-2">
+                <!-- Universal Quick Search - Works on all pages -->
+                {% if current_user.is_authenticated %}
+                <form class="d-flex" action="{{ url_for('report_list') }}" method="GET">
+                    <input class="form-control form-control-sm search-input me-2" 
+                           type="search" 
+                           name="search" 
+                           placeholder="Quick Search..." 
+                           style="min-width: 200px;">
+                    <button class="btn btn-light btn-sm" type="submit" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- Auth Section - PERFECT LOGOUT PLACEMENT -->
+                {% if current_user.is_authenticated %}
+                    <!-- User Dropdown with Logout -->
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> {{ current_user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('home') }}">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <!-- Show Login/Register when not logged in -->
+                    <a href="{{ url_for('login') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
+</nav>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2026 Exam Integrity Platform. All rights reserved. | <i class="fas fa-lock"></i> 100% Secure & Anonymous</p>
-    </footer>
+<!-- Flash Messages -->
+<div class="container mt-3" style="max-width: 1400px;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<!-- Main Content -->
+<main class="container-fluid py-4" style="max-width: 1400px;">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-4 mt-5">
+    <div class="container">
+        <p class="mb-0">&copy; 2026 Exam Integrity Platform. All rights reserved.</p>
+        <p class="text-muted small mb-0">Built with Flask & Bootstrap</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

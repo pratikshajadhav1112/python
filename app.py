@@ -1,15 +1,53 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db, init_db
 import os
 import sqlite3
 from datetime import datetime
+from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = 'Linkkiwi2026'
+app.secret_key = 'Linkkiwi2026_Secret_Key_Change_This'
+
+# Flask-Login setup
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please login to access this page'
 
 # DB initialize karo agar exist nahi karti
 if not os.path.exists('myproject.db'):
     init_db()
+
+# Users table banao agar nahi hai
+def init_users_table():
+    conn = get_db()
+    conn.execute('''CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )''')
+    conn.commit()
+    conn.close()
+
+init_users_table()
+
+# User class for Flask-Login
+class User(UserMixin):
+    def __init__(self, id, username):
+        self.id = id
+        self.username = username
+
+@login_manager.user_loader
+def load_user(user_id):
+    conn = get_db()
+    user = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
+    conn.close()
+    if user:
+        return User(id=user['id'], username=user['username'])
+    return None
 
 DUMMY_REPORTS = [
     {
@@ -34,7 +72,76 @@ DUMMY_REPORTS = [
     }
 ]
 
+# ============ AUTH ROUTES ============
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+
+        if not username or not password:
+            flash('Username and Password required!', 'error')
+            return redirect(url_for('register'))
+
+        if len(password) < 6:
+            flash('Password must be at least 6 characters!', 'error')
+            return redirect(url_for('register'))
+
+        conn = get_db()
+        existing = conn.execute('SELECT * FROM users WHERE username =?', (username,)).fetchone()
+
+        if existing:
+            flash('Username already exists!', 'error')
+            conn.close()
+            return redirect(url_for('register'))
+
+        hashed_pw = generate_password_hash(password)
+        conn.execute('INSERT INTO users (username, password) VALUES (?,?)', (username, hashed_pw))
+        conn.commit()
+        conn.close()
+
+        flash('Registration successful! Please login.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+
+        conn = get_db()
+        user = conn.execute('SELECT * FROM users WHERE username =?', (username,)).fetchone()
+        conn.close()
+
+        if user and check_password_hash(user['password'], password):
+            user_obj = User(id=user['id'], username=user['username'])
+            login_user(user_obj)
+            flash(f'Welcome back, {username}!', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('home'))
+        else:
+            flash('Invalid username or password!', 'error')
+
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out successfully!', 'success')
+    return redirect(url_for('login'))
+
+# ============ PROTECTED ROUTES ============
 @app.route('/')
+@login_required
 def home():
     conn = get_db()
     total = conn.execute('SELECT COUNT(*) FROM entries').fetchone()[0]
@@ -48,11 +155,13 @@ def about():
     return render_template('about.html')
 
 @app.route('/form')
+@login_required
 def form():
     today = datetime.now().strftime('%Y-%m-%d')
     return render_template('form.html', today=today)
 
 @app.route('/submit', methods=['POST'])
+@login_required
 def submit_report():
     try:
         exam_name = request.form.get('exam_name', '').strip()
@@ -84,6 +193,7 @@ def submit_report():
         return redirect(url_for('form'))
 
 @app.route('/search')
+@login_required
 def search_page():
     conn = get_db()
     statuses = [row[0] for row in conn.execute(
@@ -99,6 +209,7 @@ def search_page():
     return render_template('search.html', statuses=statuses, colleges=colleges, exams=exams)
 
 @app.route('/report/<int:id>')
+@login_required
 def view_report(id):
     conn = get_db()
     conn.row_factory = sqlite3.Row
@@ -123,6 +234,7 @@ def view_report(id):
     return render_template('detail.html', report=report_dict)
 
 @app.route('/report/dummy/<int:id>')
+@login_required
 def view_dummy_report(id):
     dummy = next((r for r in DUMMY_REPORTS if r['id'] == id), None)
 
@@ -137,6 +249,7 @@ def view_dummy_report(id):
     return render_template('detail.html', report=report_dict)
 
 @app.route('/delete/<int:id>', methods=['POST'])
+@login_required
 def delete_report(id):
     conn = get_db()
     conn.execute("DELETE FROM entries WHERE id =?", (id,))
@@ -146,6 +259,7 @@ def delete_report(id):
     return redirect(url_for('report_list'))
 
 @app.route('/report')
+@login_required
 def report_list():
     search = request.args.get('search', '').strip()
     sort_by = request.args.get('sort', 'display_id')
@@ -204,13 +318,10 @@ def report_list():
     if exam_filter:
         query += ' AND exam_name =?'
         params.append(exam_filter)
-        
 
     if college_filter:
         query += ' AND college_name =?'
         params.append(college_filter)
-
-    
 
     query += f' ORDER BY {sort_column} {sort_order}'
 
