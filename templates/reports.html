@@ -129,7 +129,7 @@
         <p>Track all exam leak reports submitted to the platform</p>
     </div>
 
-    <!-- Stats Cards - FIX: Sab ek row me -->
+    <!-- Stats Cards -->
     <div class="stats-row">
         <div class="stat-box">
             <h4>{{ reports|length }}</h4>
@@ -149,6 +149,7 @@
         </div>
     </div>
 
+    <!-- Python Server-Side Filter -->
     <div class="search-box">
         <form method="GET" action="{{ url_for('report_list') }}" class="row g-3 align-items-end">
             <div class="col-md-3">
@@ -225,6 +226,29 @@
         </form>
     </div>
 
+    <!-- JavaScript Live Search Box -->
+    <div class="search-box" style="margin-top: -15px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #bae6fd;">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <label class="form-label fw-bold text-primary mb-2">
+                    <i class="fas fa-bolt"></i> Live Search - Instant Filter
+                </label>
+                <input type="text" 
+                       id="liveSearchInput" 
+                       class="form-control form-control-lg" 
+                       placeholder="⚡ Type here to instantly filter to search reports..."
+                       style="border: 2px solid #3b82f6;">
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="mt-4">
+                    <span id="rowCount" class="badge bg-primary fs-6 px-3 py-2">
+                        <i class="fas fa-list"></i> {{ reports|length }} Reports
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="table-card">
         <h4 style="margin-bottom: 25px; color: #1e293b; font-weight: 700;">
             <i class="fas fa-table"></i> Exam Leak Reports
@@ -244,7 +268,7 @@
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody id="reportTableBody">
                 {% for report in reports %}
                 <tr>
                     <td>
@@ -308,4 +332,42 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Live Search JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const liveSearchInput = document.getElementById('liveSearchInput');
+    const tableBody = document.getElementById('reportTableBody');
+    const allRows = tableBody ? tableBody.getElementsByTagName('tr') : [];
+    const rowCountSpan = document.getElementById('rowCount');
+    const totalRows = allRows.length;
+
+    if (liveSearchInput && tableBody) {
+        liveSearchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            for (let row of allRows) {
+                const rowText = row.textContent.toLowerCase();
+                
+                if (rowText.includes(query)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+
+            // Update counter badge
+            if (query === '') {
+                rowCountSpan.innerHTML = `<i class="fas fa-list"></i> ${totalRows} Reports`;
+                rowCountSpan.className = 'badge bg-primary fs-6 px-3 py-2';
+            } else {
+                rowCountSpan.innerHTML = `<i class="fas fa-filter"></i> ${visibleCount} / ${totalRows}`;
+                rowCountSpan.className = 'badge bg-success fs-6 px-3 py-2';
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
