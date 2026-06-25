@@ -33,6 +33,12 @@ def init_db():
                     password TEXT NOT NULL
                  )
                     ''')
+    try:
+        conn.execute("ALTER TABLE entries ADD COLUMN report_date TEXT")
+    except sqlite3.OperationalError:
+        # Column already exists, ignore the error
+        pass
+               
 
     conn.commit()
     conn.close()

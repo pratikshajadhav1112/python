@@ -256,8 +256,9 @@
 
         {% if reports %}
         <table class="table table-hover">
-            <thead>
+                     <thead>
                 <tr>
+                    <th>Sr. No</th>
                     <th>Report ID</th>
                     <th>Exam Name</th>
                     <th>Subject Name</th>
@@ -271,8 +272,9 @@
             <tbody id="reportTableBody">
                 {% for report in reports %}
                 <tr>
+                    <td>{{ loop.index }}</td>
                     <td>
-                        <span class="report-id">{{ report.display_id }}</span>
+                        <span class="report-id">ELD-{{ '%03d'| format (report.id)}}</span>
                         {% if report.is_dummy %}
                         <span class="badge bg-secondary" style="font-size:10px;">DEMO</span>
                         {% endif %}
