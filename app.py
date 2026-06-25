@@ -124,6 +124,8 @@ def login():
         if user and check_password_hash(user['password'], password):
             user_obj = User(id=user['id'], username=user['username'])
             login_user(user_obj)
+            session['username']= username
+            session['role']= user['role']
             flash(f'Welcome back, {username}!', 'success')
             next_page = request.args.get('next')
             return redirect(next_page or url_for('home'))
@@ -135,6 +137,8 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    session.pop('username',None)
+    session.pop('role',None)
     logout_user()
     flash('Logged out successfully!', 'success')
     return redirect(url_for('login'))
@@ -211,6 +215,8 @@ def search_page():
 @app.route('/report/<int:id>')
 @login_required
 def view_report(id):
+    if session.get('role') != 'admin':
+        flash('You do not have permission to view this report.', 'error')
     conn = get_db()
     conn.row_factory = sqlite3.Row
     report = conn.execute('SELECT * FROM entries WHERE id =?', (id,)).fetchone()
@@ -233,24 +239,11 @@ def view_report(id):
 
     return render_template('detail.html', report=report_dict)
 
-@app.route('/report/dummy/<int:id>')
-@login_required
-def view_dummy_report(id):
-    dummy = next((r for r in DUMMY_REPORTS if r['id'] == id), None)
-
-    if dummy is None:
-        flash('Dummy report not found!', 'error')
-        return redirect(url_for('report_list'))
-
-    report_dict = dummy.copy()
-    report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"
-    report_dict['is_dummy'] = True
-
-    return render_template('detail.html', report=report_dict)
-
 @app.route('/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_report(id):
+    if session.get('role') != 'admin':
+        flash('You do not have permission to delete reports.', 'error')
     conn = get_db()
     conn.execute("DELETE FROM entries WHERE id =?", (id,))
     conn.commit()

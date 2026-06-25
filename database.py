@@ -34,8 +34,8 @@ def init_db():
                  )
                     ''')
     try:
-        conn.execute("ALTER TABLE entries ADD COLUMN report_date TEXT")
-    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE users add column  role TEXT default 'student'")
+    except Exception:
         # Column already exists, ignore the error
         pass
                
