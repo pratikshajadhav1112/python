@@ -3,7 +3,7 @@
 <div class="container" style="max-width: 400px; margin-top: 100px;">
     <div class="card shadow">
         <div class="card-body p-5">
-            <h2 class="text-center mb-4">Login</h2>
+            <h2 class="text-center mb-4">Login Page</h2>
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -14,11 +14,11 @@
             <form method="POST">
                 <div class="mb-3">
                     <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" required>
+                    <input type="text" name="username" class="form-control"  required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" class="form-control"paceholder="Enter password" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Login</button>
             </form>

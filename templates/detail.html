@@ -103,6 +103,45 @@
         margin-bottom: 20px;
         font-weight: 600;
     }
+    /* NAVIN CSS - Files sathi */
+    .files-section {
+        margin-top: 20px;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .file-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 15px;
+    }
+    .file-item {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+    }
+    .file-item img {
+        max-width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 8px;
+    }
+    .file-item .file-icon {
+        font-size: 48px;
+        color: #dc2626;
+        margin-bottom: 8px;
+    }
+    .file-name {
+        font-size: 13px;
+        color: #475569;
+        word-break: break-all;
+        margin-bottom: 8px;
+    }
 </style>
 
 <div class="detail-wrapper">
@@ -163,6 +202,36 @@
                 <div class="description-box">{{ report.description or 'No description provided' }}</div>
             </div>
         </div>
+
+        <!-- HE NAVIN SECTION - Attached Files -->
+        {% if report.files %}
+        <div class="files-section">
+            <div class="detail-label" style="margin-bottom: 10px;">
+                <i class="fas fa-paperclip"></i> Attached Files
+            </div>
+            <div class="file-grid">
+                {% for file in report.files %}
+                <div class="file-item">
+                    {% if 'image' in file.file_type %}
+                        <a href="/{{ file.file_path }}" target="_blank">
+                            <img src="/{{ file.file_path }}" alt="{{ file.file_name }}">
+                        </a>
+                    {% elif file.file_name.endswith('.pdf') %}
+                        <div class="file-icon"><i class="fas fa-file-pdf"></i></div>
+                        <a href="/{{ file.file_path }}" target="_blank" class="btn btn-sm btn-danger">
+                            <i class="fas fa-download"></i> View PDF
+                        </a>
+                    {% else %}
+                        <div class="file-icon"><i class="fas fa-file"></i></div>
+                        <a href="/{{ file.file_path }}" target="_blank" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    {% endif %}
+                    <div class="file-name">{{ file.file_name }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div class="action-buttons">
             <a href="{{ url_for('report_list') }}" class="btn btn-secondary">

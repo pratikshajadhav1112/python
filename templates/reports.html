@@ -5,122 +5,77 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-    .reports-wrapper {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-    .reports-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-    .reports-header h2 {
-        font-size: 32px;
-        color: #0f172a;
-        font-weight: 800;
-        margin-bottom: 10px;
-    }
-    .reports-header p {
-        color: #64748b;
-        font-size: 15px;
-    }
-    .table-card {
-        background: white;
-        border-radius: 10px;
-        padding: 30px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-        border: 1px solid #e2e8f0;
-        overflow-x: auto;
-    }
-    .table {
-        margin-bottom: 0;
-    }
-    .table thead th {
-        background: #1e3a8a;
-        color: white;
-        font-weight: 600;
-        padding: 16px 12px;
-        border: none;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .table tbody td {
-        padding: 16px 12px;
-        vertical-align: middle;
-        color: #334155;
-        border-color: #f1f5f9;
-    }
-    .table tbody tr:hover {
-        background: #f8fafc;
-    }
-    .status-badge {
-        padding: 6px 14px;
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-    .status-Pending {
-        background: #fef3c7;
-        color: #92400e;
-    }
-    .status-Investigating {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-    .status-Resolved, .status-Solved {
-        background: #d1fae5;
-        color: #065f46;
-    }
-    .report-id {
-        font-weight: 700;
-        color: #1e3a8a;
-        font-family: monospace;
-    }
-    .stats-row {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-    }
-    .stat-box {
-        flex: 1;
-        min-width: 200px;
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        border-left: 4px solid #1e3a8a;
-    }
-    .stat-box h4 {
-        font-size: 28px;
-        color: #0f172a;
-        margin: 0;
-        font-weight: 800;
-    }
-    .stat-box p {
-        color: #64748b;
-        margin: 5px 0 0;
-        font-size: 14px;
-    }
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #94a3b8;
-    }
-    .empty-state i {
-        font-size: 64px;
-        margin-bottom: 20px;
-        opacity: 0.3;
-    }
-    .search-box {
-        background: white;
-        border-radius: 16px;
-        padding: 20px 30px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-        border: 1px solid #e2e8f0;
-        margin-bottom: 30px;
-    }
+.reports-wrapper {
+    padding: 20px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+.reports-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.reports-header h2 {
+    color: #1e293b;
+    font-weight: 700;
+}
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.stat-box {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    border-left: 4px solid #3b82f6;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.stat-box h4 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+.stat-box p {
+    color: #64748b;
+    margin: 5px 0 0 0;
+    font-weight: 500;
+}
+.search-box {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 30px;
+}
+.table-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+.status-Pending { background: #fef3c7; color: #92400e; }
+.status-Investigating { background: #dbeafe; color: #1e40af; }
+.status-Resolved,.status-Solved { background: #d1fae5; color: #065f46; }
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+}
+.empty-state i {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
 </style>
 
 <div class="reports-wrapper">
@@ -149,104 +104,56 @@
         </div>
     </div>
 
-    <!-- Python Server-Side Filter -->
+    <!-- Search + Filter Box -->
     <div class="search-box">
-        <form method="GET" action="{{ url_for('report_list') }}" class="row g-3 align-items-end">
+        <form method="GET" action="{{ url_for('report_list') }}" class="row g-3">
             <div class="col-md-3">
-                <label class="form-label fw-bold text-muted">Search</label>
-                <input type="text" name="search" class="form-control" 
-                       placeholder="Exam, Subject, College..." 
-                       value="{{ search or '' }}">
+                <label class="form-label fw-bold text-muted">Quick Search</label>
+                <input type="text" name="search" class="form-control" placeholder="Exam, Subject, College..." value="{{ search or '' }}">
             </div>
-
             <div class="col-md-2">
                 <label class="form-label fw-bold text-muted">Status</label>
                 <select name="status" class="form-select">
                     <option value="">All Status</option>
-                    <option value="Pending" {% if request.args.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
-                    <option value="Resolved" {% if request.args.get('status') == 'Resolved' %}selected{% endif %}>Resolved</option>
-                    <option value="Investigating" {% if request.args.get('status') == 'Investigating' %}selected{% endif %}>Investigating</option>
+                    <option value="Pending" {% if status_filter=='Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Investigating" {% if status_filter=='Investigating' %}selected{% endif %}>Investigating</option>
+                    <option value="Resolved" {% if status_filter=='Resolved' %}selected{% endif %}>Resolved</option>
                 </select>
             </div>
-
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-muted">Exam Name</label>
+                <input type="text" name="exam" class="form-control" placeholder="SSC CGL, JEE..." value="{{ exam_filter or '' }}">
+            </div>
             <div class="col-md-2">
                 <label class="form-label fw-bold text-muted">College</label>
-                <input type="text" name="college" class="form-control" 
-                       placeholder="College name" 
-                       value="{{ request.args.get('college', '') }}">
+                <input type="text" name="college" class="form-control" placeholder="VJTI..." value="{{ college_filter or '' }}">
             </div>
-
-            <div class="col-md-2">
-                <label class="form-label fw-bold text-muted">Exam</label>
-                <input type="text" name="exam" class="form-control" 
-                       placeholder="Exam name" 
-                       value="{{ request.args.get('exam', '') }}">
-            </div>
-
-            <div class="col-md-1">
-                <label class="form-label fw-bold text-muted">Sort</label>
-                <select name="sort" class="form-select">
-                    <option value="id" {% if sort_by == 'id' or sort_by == 'display_id' %}selected{% endif %}>ID</option>
-                    <option value="exam_name" {% if sort_by == 'exam_name' %}selected{% endif %}>Exam</option>
-                    <option value="report_date" {% if sort_by == 'report_date' %}selected{% endif %}>Date</option>
-                    <option value="status" {% if sort_by == 'status' %}selected{% endif %}>Status</option>
-                </select>
-            </div>
-
-            <div class="col-md-1">
-                <label class="form-label fw-bold text-muted">Order</label>
-                <select name="order" class="form-select">
-                    <option value="asc" {% if order == 'asc' %}selected{% endif %}>ASC</option>
-                    <option value="desc" {% if order == 'desc' %}selected{% endif %}>DESC</option>
-                </select>
-            </div>
-
-            <div class="col-md-1">
+            <div class="col-md-2 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-filter"></i>
+                    <i class="fas fa-filter"></i> Filter
                 </button>
+                <a href="{{ url_for('report_list') }}" class="btn btn-outline-secondary" title="Clear">
+                    <i class="fas fa-times"></i>
+                </a>
             </div>
 
-            {% if search or request.args.get('status') or request.args.get('college') or request.args.get('exam') %}
+            {% if search or status_filter or exam_filter or college_filter %}
             <div class="col-12">
-                <div class="alert alert-info mb-0 d-flex justify-content-between align-items-center">
-                    <span>
-                        <i class="fas fa-filter"></i> Active Filters: 
-                        {% if search %}<span class="badge bg-primary">Search: "{{ search }}"</span>{% endif %}
-                        {% if request.args.get('status') %}<span class="badge bg-warning text-dark">Status: {{ request.args.get('status') }}</span>{% endif %}
-                        {% if request.args.get('college') %}<span class="badge bg-success">College: {{ request.args.get('college') }}</span>{% endif %}
-                        {% if request.args.get('exam') %}<span class="badge bg-info">Exam: {{ request.args.get('exam') }}</span>{% endif %}
-                    </span>
-                    <a href="{{ url_for('report_list') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-times"></i> Clear All
+                <div class="alert alert-info mb-0 d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <i class="fas fa-info-circle"></i> <b>Active:</b>
+                        {% if search %}<span class="badge bg-primary ms-2">Search: "{{ search }}"</span>{% endif %}
+                        {% if status_filter %}<span class="badge bg-warning text-dark ms-2">Status: {{ status_filter }}</span>{% endif %}
+                        {% if exam_filter %}<span class="badge bg-success ms-2">Exam: {{ exam_filter }}</span>{% endif %}
+                        {% if college_filter %}<span class="badge bg-info text-dark ms-2">College: {{ college_filter }}</span>{% endif %}
+                    </div>
+                    <a href="{{ url_for('report_list') }}" class="btn btn-sm btn-outline-danger">
+                        Clear All
                     </a>
                 </div>
             </div>
             {% endif %}
         </form>
-    </div>
-
-    <!-- JavaScript Live Search Box -->
-    <div class="search-box" style="margin-top: -15px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #bae6fd;">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <label class="form-label fw-bold text-primary mb-2">
-                    <i class="fas fa-bolt"></i> Live Search - Instant Filter
-                </label>
-                <input type="text" 
-                       id="liveSearchInput" 
-                       class="form-control form-control-lg" 
-                       placeholder="⚡ Type here to instantly filter reports..."
-                       style="border: 2px solid #3b82f6;">
-            </div>
-            <div class="col-md-4 text-end">
-                <div class="mt-4">
-                    <span id="rowCount" class="badge bg-primary fs-6 px-3 py-2">
-                        <i class="fas fa-list"></i> {{ reports|length }} Reports
-                    </span>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="table-card">
@@ -255,123 +162,69 @@
         </h4>
 
         {% if reports %}
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Sr. No</th>
-                    <th>Report ID</th>
-                    <th>Exam Name</th>
-                    <th>Subject Name</th>
-                    <th>College Name</th>
-                    <th>Status</th>
-                    <th>Report Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-
-            <tbody id="reportTableBody">
-                {% for report in reports %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>
-                        <span class="report-id">ELD-{{ '%03d'|format(report.id) }}</span>
-                        {% if report.is_dummy %}
-                        <span class="badge bg-secondary" style="font-size:10px;">DEMO</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ report['exam_name'] }}</td>
-                    <td>{{ report['subject_name'] }}</td>
-                    <td>{{ report['college_name'] }}</td>
-                    <td>
-                        <span class="status-badge status-{{ report['status'] }}">{{ report['status'] }}</span>
-                    </td>
-                    <td>{{ report['report_date'] }}</td>
-                    <td>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <!-- View: Admin + Swatachi entry -->
-                            {% if session.get('role') == 'admin' or report.user_id == session.get('user_id') %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Exam Name</th>
+                        <th>Subject Name</th>
+                        <th>College Name</th>
+                        <th>Status</th>
+                        <th>Report Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td><span class="report-id">{{ report.display_id }}</span></td>
+                        <td>{{ report['subject_name'] }}</td>
+                        <td>{{ report['exam_name'] }}</td>
+                        <td>{{ report['college_name'] }}</td>
+                        <td><span class="status-badge status-{{ report['status'] }}">{{ report['status'] }}</span></td>
+                        <td>{{ report['report_date'] }}</td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
                                 <a href="{{ report.view_url }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-eye"></i> View
                                 </a>
-                            {% endif %}
-                            
-                            <!-- Delete: Faqta Admin -->
-                            {% if session.get('role') == 'admin' %}
                                 {% if not report.is_dummy and report.delete_url %}
                                 <form action="{{ report.delete_url }}" method="POST" style="margin:0;">
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Are you sure you want to delete this report?');">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this report?');">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </form>
+                                {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
                                 {% endif %}
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
-            <h5>{% if search or request.args.get('status') or request.args.get('college') or request.args.get('exam') %}No Results Found{% else %}No Reports Yet{% endif %}</h5>
+            <h5>{% if search or status_filter or exam_filter or college_filter %}No Results Found{% else %}No Reports Yet{% endif %}</h5>
             <p>
-                {% if search or request.args.get('status') or request.args.get('college') or request.args.get('exam') %}
+                {% if search or status_filter or exam_filter or college_filter %}
                     No reports match your filters. Try different keywords.
                 {% else %}
                     No exam leak reports have been submitted yet.
                 {% endif %}
             </p>
-            {% if search or request.args.get('status') or request.args.get('college') or request.args.get('exam') %}
+            {% if search or status_filter or exam_filter or college_filter %}
             <a href="{{ url_for('report_list') }}" class="btn btn-primary mt-3">
                 <i class="fas fa-times"></i> Clear Filters
-            </a>
-            {% else %}
-            <a href="{{ url_for('form') }}" class="btn btn-primary mt-3">
-                <i class="fas fa-plus"></i> Add First Report
             </a>
             {% endif %}
         </div>
         {% endif %}
     </div>
 </div>
-
-<!-- Live Search JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const liveSearchInput = document.getElementById('liveSearchInput');
-    const tableBody = document.getElementById('reportTableBody');
-    const allRows = tableBody ? tableBody.getElementsByTagName('tr') : [];
-    const rowCountSpan = document.getElementById('rowCount');
-    const totalRows = allRows.length;
-
-    if (liveSearchInput && tableBody) {
-        liveSearchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            for (let row of allRows) {
-                const rowText = row.textContent.toLowerCase();
-                
-                if (rowText.includes(query)) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-
-            // Update counter badge
-            if (query === '') {
-                rowCountSpan.innerHTML = `<i class="fas fa-list"></i> ${totalRows} Reports`;
-                rowCountSpan.className = 'badge bg-primary fs-6 px-3 py-2';
-            } else {
-                rowCountSpan.innerHTML = `<i class="fas fa-filter"></i> ${visibleCount} / ${totalRows}`;
-                rowCountSpan.className = 'badge bg-success fs-6 px-3 py-2';
-            }
-        });
-    }
-});
-</script>
 {% endblock %}
