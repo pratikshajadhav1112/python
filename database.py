@@ -1,15 +1,17 @@
 import sqlite3
+import os
+
+# PythonAnywhere sathi full path
+DB_PATH = '/home/Pratikshajadhav1112/python/myproject.db'
 
 def get_db():
     """Create and return database connection"""
-    conn = sqlite3.connect('myproject.db')
+    conn = sqlite3.connect(DB_PATH)  # Ithe DB_PATH vapraycha
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
     conn = get_db()
-
-    # FIX 1: entries table madhe user_id ani is_dummy add kela
     conn.execute('''
         CREATE TABLE IF NOT EXISTS entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,8 +26,6 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
-
-    # Users table - FIX 2: role chya pudhcha extra comma kadhla
     conn.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,8 +34,6 @@ def init_db():
             role TEXT DEFAULT 'student'
         )
     ''')
-
-    # entry_files table pan pahije view_report sathi
     conn.execute('''
         CREATE TABLE IF NOT EXISTS entry_files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,14 +42,13 @@ def init_db():
             FOREIGN KEY (entry_id) REFERENCES entries (id)
         )
     ''')
-
     conn.commit()
     conn.close()
     print("✅ Database ready!")
 
 def drop_table():
     """entries table delete karnyasathi"""
-    conn = sqlite3.connect('myproject.db')
+    conn = get_db()  # Ithe pan get_db() vapraycha
     cursor = conn.cursor()
     cursor.execute('DROP TABLE IF EXISTS entries')
     cursor.execute('DROP TABLE IF EXISTS reports')
