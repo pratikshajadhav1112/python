@@ -191,6 +191,7 @@
                                 </a>
                                 {% if not report.is_dummy and report.delete_url %}
                                 <form action="{{ report.delete_url }}" method="POST" style="margin:0;">
+                                    <input type="hidden" name="csrf-token" value="{{ csrf_token()}}">
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this report?');">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>

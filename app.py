@@ -1,15 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db, init_db
 import os
 import sqlite3
 from datetime import datetime
-from functools import wraps
-from flask import Flask,render_template, send_from_directory
 
 app = Flask(__name__)
-app.secret_key = 'Linkkiwi2026_Secret_Key_Change_This'
+app.secret_key = 'Linkkiwi2026'
+csrf = CSRFProtect(app)
 
 # Flask-Login setup
 login_manager = LoginManager()
@@ -34,7 +34,7 @@ def load_user(user_id):
     user_row = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
     conn.close()
     if user_row:
-        user = dict(user_row) # FIX #1: user_id nahi, user ahe
+        user = dict(user_row)
         return User(id=user['id'], username=user['username'], role=user.get('role', 'student'))
     return None
 
@@ -98,6 +98,7 @@ def register():
 
     return render_template('register.html')
 
+# ✅ FIX 1: Function nav 'login' pahije, 'login_required' nahi
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -112,7 +113,7 @@ def login():
         conn.close()
 
         if user_row:
-            user = dict(user_row) # FIX #2: Row la dict banavla
+            user = dict(user_row)
             if check_password_hash(user['password'], password):
                 user_obj = User(id=user['id'], username=user['username'], role=user.get('role', 'student'))
                 login_user(user_obj)
@@ -135,15 +136,14 @@ def logout():
     flash('Logged out successfully!', 'success')
     return redirect(url_for('login'))
 
-# ============ PROTECTED ROUTES - Simple entries table ============
+# ============ PROTECTED ROUTES ============
 @app.route('/')
 @login_required
-
 def home():
     conn = get_db()
     total = conn.execute('SELECT COUNT(*) FROM entries').fetchone()[0]
-    pending = conn.execute("SELECT COUNT(*) FROM entries WHERE status='Pending'").fetchone()[0]
-    resolved = conn.execute("SELECT COUNT(*) FROM entries WHERE status='Resolved'").fetchone()[0]
+    pending = conn.execute("SELECT COUNT(*) FROM entries WHERE status = 'Pending'").fetchone()[0]
+    resolved = conn.execute("SELECT COUNT(*) FROM entries WHERE status = 'Resolved'").fetchone()[0]
     conn.close()
     return render_template('home.html', total=total, pending=pending, resolved=resolved)
 
@@ -175,9 +175,9 @@ def submit_report():
         conn = get_db()
         conn.execute(
             '''INSERT INTO entries
-               (user_id,exam_name, subject_name, college_name, status, report_date, description)
-               VALUES (?,?,?,?,?,?)''',
-            (current_user_id, exam_name, subject_name, college_name, status, report_date, description)
+               (user_id, exam_name, subject_name, college_name, status, report_date, description)
+               VALUES (?,?,?,?,?,?,?)''',
+            (current_user.id, exam_name, subject_name, college_name, status, report_date, description)
         )
         conn.commit()
         conn.close()
@@ -208,22 +208,24 @@ def search_page():
 @app.route('/report/<int:id>')
 @login_required
 def view_report(id):
-    if session.get('role')!= 'admin':
+    if current_user.role!= 'admin':
         flash('You do not have permission to view this report.', 'error')
         return redirect(url_for('report_list'))
 
     conn = get_db()
     conn.row_factory = sqlite3.Row
     report = conn.execute('SELECT * FROM entries WHERE id =?', (id,)).fetchone()
-    files  = conn.execute('SELECT * FROM entry_files WHERE entry_id =?', (id,)).fetchone()
-    report_dict['files'] = [dict(f) for f in files]
-    conn.close()
+    files = conn.execute('SELECT * FROM entry_files WHERE entry_id =?', (id,)).fetchall()
 
     if report is None:
+        conn.close()
         flash('Report not found!', 'error')
         return redirect(url_for('report_list'))
 
     report_dict = dict(report)
+    report_dict['files'] = [dict(f) for f in files]
+    conn.close()
+
     report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"
     report_dict['is_dummy'] = False
 
@@ -235,10 +237,11 @@ def view_report(id):
             pass
 
     return render_template('detail.html', report=report_dict)
+
 @app.route('/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_report(id):
-    if session.get('role')!= 'admin':
+    if current_user.role!= 'admin':
         flash('You do not have permission to delete reports.', 'error')
         return redirect(url_for('report_list'))
 
@@ -263,12 +266,14 @@ def report_list():
     conn = get_db()
     conn.row_factory = sqlite3.Row
 
-    # FIX 1: current_user vapra, session nako
     base_query = 'SELECT * FROM entries WHERE 1=1'
     params = []
 
-    # Admin nasel tar fakt tyachech reports ghe
-    
+    # ✅ FIX 2: AND chya adhi space pahije
+    if current_user.role!= 'admin':
+        base_query += ' AND user_id =?'
+        params.append(current_user.id)
+
     # Count sathi same query vapra
     count_query = base_query.replace('SELECT *', 'SELECT COUNT(*)')
     db_count = conn.execute(count_query, params).fetchone()[0]
@@ -292,25 +297,25 @@ def report_list():
         sort_column = 'id'
     sort_order = 'DESC' if order == 'desc' else 'ASC'
 
-    # Filters
+    # ✅ FIX 3: LIKE? aani =? madhe space pahije
     if search:
-        base_query += ' AND (exam_name LIKE? OR subject_name LIKE? OR college_name LIKE? OR status LIKE? OR description LIKE?)'
+        base_query += ' AND (exam_name LIKE ? OR subject_name LIKE ? OR college_name LIKE ? OR status LIKE ? OR description LIKE ?)'
         search_term = f'%{search}%'
         params.extend([search_term] * 5)
     if status_filter:
-        base_query += ' AND status =?'
+        base_query += ' AND status = ?'
         params.append(status_filter)
     if exam_filter:
-        base_query += ' AND exam_name =?'
+        base_query += ' AND exam_name = ?'
         params.append(exam_filter)
     if college_filter:
-        base_query += ' AND college_name =?'
+        base_query += ' AND college_name = ?'
         params.append(college_filter)
 
     base_query += f' ORDER BY {sort_column} {sort_order}'
 
     db_reports = conn.execute(base_query, params).fetchall()
-    conn.close() # Shevti ekdach close kar
+    conn.close()
 
     for row in db_reports:
         report_dict = dict(row)
@@ -331,13 +336,6 @@ def report_list():
                          search=search,
                          sort_by=sort_by,
                          order=order)
-@app.route('/manifest.json')
-def manifest():
-    return send_from_directory('.', 'manifest.json')
-
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('static', filename)
 
 @app.errorhandler(404)
 def page_not_found(e):
