@@ -54,9 +54,9 @@ def load_user(user_id):
           )
     return None
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.',1)[1].lower() in {'png' , 'jpg' ,'jpeg' 'gif'}
+    return '.' in filename and filename.rsplit('.',1)[1].lower() in {'png' , 'jpg' ,'jpeg' ,'gif'}
 def generate_otp():
-    return str(random.randint(100000,999999))   
+    return str(random.randint(100000,999999))
 DUMMY_REPORTS = [
     {
         "id": 1,
@@ -116,7 +116,7 @@ def register():
             return redirect(url_for('register'))
 
         conn = get_db()
-        existing_user = conn.execute('SELECT * FROM users WHERE username =? OR email =? OR mobile =?',
+        existing_user = conn.execute('SELECT * FROM users WHERE username = ? OR email =? OR mobile = ?',
                                      (username, email, mobile)).fetchone()
 
         if existing_user:
@@ -204,7 +204,7 @@ def login():
 
         if user_row:
             user = dict(user_row)
-            if user['is_blocked']:
+            if user.get('is_blocked', 0):
                 flash('Your account has been blocked. Contact admin.', 'danger')
                 return redirect(url_for('login'))
             if not user['is_mobile_verified']:
