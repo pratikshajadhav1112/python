@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name ="csrf_token" content="{{ csrf_token()}}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Exam Leak Detection and Transperency Platform{% endblock %}</title>
+    <title>{% block title %}Exam Leak Detection and Transparency Platform{% endblock %}</title>
     
-    <!-- PWA Setup - Head madhe saglyat var -->
+    <!-- PWA Setup -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="/static/icon-192.png">
     <link rel="apple-touch-icon" href="/static/icon-192.png">
@@ -126,7 +126,7 @@
 </head>
 <body>
 
-<!-- NAVBAR - SAME FOR ALL PAGES -->
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
     <div class="container-fluid" style="max-width: 1400px;">
         <a class="navbar-brand" href="{{ url_for('home') }}">
@@ -240,8 +240,6 @@
 <footer class="bg-dark text-white text-center py-4 mt-5">
     <div class="container">
         <p class="mb-0">&copy; 2026 Exam Integrity Platform. All rights reserved. | <i class="fas fa-lock"></i> 100% Secure & Anonymous</p>
-</p>
-
     </div>
 </footer>
 
