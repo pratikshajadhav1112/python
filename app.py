@@ -169,7 +169,7 @@ def register():
 @app.route('/verify_otp/<int:user_id>', methods=['GET', 'POST'])
 def verify_otp(user_id):
     conn = get_db()
-    user = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
     if not user:
         conn.close()
         flash('User not found!', 'error')
@@ -178,7 +178,7 @@ def verify_otp(user_id):
     if request.method == 'POST':
         entered_otp = request.form['otp']
         if user['mobile_otp'] == entered_otp:
-            conn.execute('UPDATE users SET is_mobile_verified = 1, mobile_otp = NULL WHERE id =?', (user_id,))
+            conn.execute('UPDATE users SET is_mobile_verified = 1, mobile_otp = NULL WHERE id = ?', (user_id,))
             conn.commit()
             conn.close()
             flash('Mobile verified! Now you can login.', 'success')
@@ -199,7 +199,7 @@ def login():
         password = request.form.get('password', '').strip()
 
         conn = get_db()
-        user_row = conn.execute('SELECT * FROM users WHERE username =?', (username,)).fetchone()
+        user_row = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         conn.close()
 
         if user_row:
@@ -311,8 +311,8 @@ def view_report(id):
 
     conn = get_db()
     conn.row_factory = sqlite3.Row
-    report = conn.execute('SELECT * FROM entries WHERE id =?', (id,)).fetchone()
-    files = conn.execute('SELECT * FROM entry_files WHERE entry_id =?', (id,)).fetchall()
+    report = conn.execute('SELECT * FROM entries WHERE id = ?', (id,)).fetchone()
+    files = conn.execute('SELECT * FROM entry_files WHERE entry_id = ?', (id,)).fetchall()
 
     if report is None:
         conn.close()
@@ -343,7 +343,7 @@ def delete_report(id):
         return redirect(url_for('report_list'))
 
     conn = get_db()
-    conn.execute("DELETE FROM entries WHERE id =?", (id,))
+    conn.execute("DELETE FROM entries WHERE id = ?", (id,))
     conn.commit()
     conn.close()
     flash('Report deleted Successfully!', 'success')
