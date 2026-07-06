@@ -2,15 +2,23 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from database import get_db, init_db
 import os
 import sqlite3
+import random
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'Linkkiwi2026'
 csrf = CSRFProtect(app)
 
+# Upload folders
+UPLOAD_FOLDER_PROFILE = 'static/uploads/profile_photos'
+UPLOAD_FOLDER_ID = 'static/uploads/id_proofs'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+os.makedirs(UPLOAD_FOLDER_PROFILE, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER_ID, exist_ok=True)
 # Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -23,21 +31,32 @@ if not os.path.exists('myproject.db'):
 
 # User class for Flask-Login
 class User(UserMixin):
-    def __init__(self, id, username, role='student'):
+    def __init__(self, id, username, role='student', is_mobile_varified=0, is_blocked=0):
         self.id = id
         self.username = username
         self.role = role
+        self.is_mobile_varified = is_mobile_varified
+        self.is_blocked = is_blocked
 
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db()
-    user_row = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
+    user_row = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
     conn.close()
     if user_row:
         user = dict(user_row)
-        return User(id=user['id'], username=user['username'], role=user.get('role', 'student'))
+        return User(
+            id=user['id'],
+            username=user['username'],
+            role=user.get('role', 'student'),
+            is_mobile_varified=user.get('is_mobile_varified',0),
+            is_blocked=user.get('is_blocked,0')
+          )
     return None
-
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.',1)[1].lower() in {'png' , 'jpg' ,'jpeg' 'gif'}
+def generate_otp():
+    return str(random.randint(100000,999999))   
 DUMMY_REPORTS = [
     {
         "id": 1,
@@ -61,44 +80,115 @@ DUMMY_REPORTS = [
     }
 ]
 
-# ============ AUTH ROUTES ============
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
     if request.method == 'POST':
+        # Basic fields
+        name = request.form.get('name', '').strip()
         username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        mobile = request.form.get('mobile', '').strip()
         password = request.form.get('password', '').strip()
 
-        if not username or not password:
-            flash('Username and Password required!', 'error')
+        # Location fields
+        state = request.form.get('state', '').strip()
+        district = request.form.get('district', '').strip()
+        city = request.form.get('city', '').strip()
+        village = request.form.get('village', '').strip()
+
+        # ID Proof
+        id_proof_type = request.form.get('id_proof_type', '').strip()
+        id_proof_number = request.form.get('id_proof_number', '').strip()
+
+        if not all([name, username, email, mobile, password, state, district, city]):
+            flash('All * marked fields are required!', 'error')
             return redirect(url_for('register'))
 
         if len(password) < 6:
             flash('Password must be at least 6 characters!', 'error')
             return redirect(url_for('register'))
 
-        conn = get_db()
-        existing = conn.execute('SELECT * FROM users WHERE username =?', (username,)).fetchone()
+        if len(mobile)!= 10 or not mobile.isdigit():
+            flash('Mobile number must be 10 digits!', 'error')
+            return redirect(url_for('register'))
 
-        if existing:
-            flash('Username already exists!', 'error')
+        conn = get_db()
+        existing_user = conn.execute('SELECT * FROM users WHERE username =? OR email =? OR mobile =?',
+                                     (username, email, mobile)).fetchone()
+
+        if existing_user:
+            flash('Username, Email or Mobile already exists!', 'error')
             conn.close()
             return redirect(url_for('register'))
 
+        # Handle file uploads
+        profile_photo = request.files.get('profile_photo')
+        id_proof_photo = request.files.get('id_proof_photo')
+
+        if not profile_photo or not id_proof_photo:
+            flash('Profile photo and ID proof photo are required.', 'error')
+            return redirect(url_for('register'))
+
+        profile_path = ''
+        id_path = ''
+        if profile_photo and allowed_file(profile_photo.filename):
+            profile_filename = secure_filename(f"{datetime.now().timestamp()}_{profile_photo.filename}")
+            profile_path = os.path.join(UPLOAD_FOLDER_PROFILE, profile_filename)
+            profile_photo.save(profile_path)
+
+        if id_proof_photo and allowed_file(id_proof_photo.filename):
+            id_filename = secure_filename(f"{datetime.now().timestamp()}_{id_proof_photo.filename}")
+            id_path = os.path.join(UPLOAD_FOLDER_ID, id_filename)
+            id_proof_photo.save(id_path)
+
         hashed_pw = generate_password_hash(password)
-        conn.execute('INSERT INTO users (username, password, role) VALUES (?,?,?)',
-                     (username, hashed_pw, 'student'))
+        otp = generate_otp()
+
+        conn.execute('''INSERT INTO users
+                     (name, username, email, mobile, password, state, district, city, village,
+                      profile_photo, id_proof_type, id_proof_number, id_proof_photo,
+                      signup_ip, signup_user_agent, mobile_otp, otp_generated_at, role)
+                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                     (name, username, email, mobile, hashed_pw, state, district, city, village,
+                      profile_path, id_proof_type, id_proof_number, id_path,
+                      request.remote_addr, request.headers.get('User-Agent'),
+                      otp, datetime.now(), 'student'))
+        user_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
         conn.commit()
         conn.close()
 
-        flash('Registration successful! Please login.', 'success')
-        return redirect(url_for('login'))
+        print(f"OTP for {mobile} is: {otp}") # SMS API aalyavar he kadh
+        flash(f'Registration successful! OTP sent to {mobile}.', 'success')
+        return redirect(url_for('verify_otp', user_id=user_id))
 
     return render_template('register.html')
 
-# ✅ FIX 1: Function nav 'login' pahije, 'login_required' nahi
+@app.route('/verify_otp/<int:user_id>', methods=['GET', 'POST'])
+def verify_otp(user_id):
+    conn = get_db()
+    user = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
+    if not user:
+        conn.close()
+        flash('User not found!', 'error')
+        return redirect(url_for('register'))
+
+    if request.method == 'POST':
+        entered_otp = request.form['otp']
+        if user['mobile_otp'] == entered_otp:
+            conn.execute('UPDATE users SET is_mobile_verified = 1, mobile_otp = NULL WHERE id =?', (user_id,))
+            conn.commit()
+            conn.close()
+            flash('Mobile verified! Now you can login.', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash('Invalid OTP. Try again.', 'danger')
+
+    conn.close()
+    return render_template('verify_otp.html', mobile=user['mobile'])
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -114,6 +204,12 @@ def login():
 
         if user_row:
             user = dict(user_row)
+            if user['is_blocked']:
+                flash('Your account has been blocked. Contact admin.', 'danger')
+                return redirect(url_for('login'))
+            if not user['is_mobile_verified']:
+                flash('Please verify your mobile number first.', 'warning')
+                return redirect(url_for('verify_otp', user_id=user['id']))
             if check_password_hash(user['password'], password):
                 user_obj = User(id=user['id'], username=user['username'], role=user.get('role', 'student'))
                 login_user(user_obj)
@@ -126,6 +222,7 @@ def login():
         flash('Invalid username or password!', 'error')
 
     return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
@@ -271,7 +368,7 @@ def report_list():
 
     # ✅ FIX 2: AND chya adhi space pahije
     if current_user.role!= 'admin':
-        base_query += ' AND user_id =?'
+        base_query += ' AND user_id = ?'
         params.append(current_user.id)
 
     # Count sathi same query vapra
