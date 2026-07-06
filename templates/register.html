@@ -11,20 +11,69 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            <form method="POST">
-                <input type="hidden" name="csrf-token" value="{{ csrf_token()}}">
-                <div class="mb-3">
-                    <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required minlength="6">
-                </div>
-                <button type="submit" class="btn btn-success w-100">Register</button>
-            </form>
-            <p class="text-center mt-3">Already have account? <a href="{{ url_for('login') }}">Login</a></p>
-        </div>
+            <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    
+    <div class="mb-3">
+        <label class="form-label">Full Name *</label>
+        <input type="text" name="name" class="form-control" required>
     </div>
+    <div class="mb-3">
+        <label class="form-label">Username *</label>
+        <input type="text" name="username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email *</label>
+        <input type="email" name="email" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Mobile *</label>
+        <input type="text" name="mobile" class="form-control" required pattern="[0-9]{10}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Password *</label>
+        <input type="password" name="password" class="form-control" required minlength="6">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">State *</label>
+        <input type="text" name="state" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">District *</label>
+        <input type="text" name="district" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">City *</label>
+        <input type="text" name="city" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Village</label>
+        <input type="text" name="village" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Profile Photo</label>
+        <input type="file" name="profile_photo" class="form-control" accept="image/*">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">ID Proof Type</label>
+        <select name="id_proof_type" class="form-control">
+            <option value="">Select</option>
+            <option value="College ID">College ID</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">ID Proof Number</label>
+        <input type="text" name="id_proof_number" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">ID Proof Photo</label>
+        <input type="file" name="id_proof_photo" class="form-control" accept="image/*">
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">Register</button>
+</form>
+<p class="text-center mt-3">Already have account? <a href="{{ url_for('login') }}">Login</a></p>
 </div>
 {% endblock %}
