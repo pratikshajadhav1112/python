@@ -31,11 +31,11 @@ if not os.path.exists('myproject.db'):
 
 # User class for Flask-Login
 class User(UserMixin):
-    def __init__(self, id, username, role='student', is_mobile_varified=0, is_blocked=0):
+    def __init__(self, id, username, role='student', is_mobile_verified=0, is_blocked=0):
         self.id = id
         self.username = username
         self.role = role
-        self.is_mobile_varified = is_mobile_varified
+        self.is_mobile_verified = is_mobile_verified
         self.is_blocked = is_blocked
 
 @login_manager.user_loader
@@ -49,8 +49,8 @@ def load_user(user_id):
             id=user['id'],
             username=user['username'],
             role=user.get('role', 'student'),
-            is_mobile_varified=user.get('is_mobile_varified',0),
-            is_blocked=user.get('is_blocked,0')
+            is_mobile_verified=user.get('is_mobile_verified', 0),
+            is_blocked=user.get('is_blocked', 0)
           )
     return None
 def allowed_file(filename):
