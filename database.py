@@ -32,13 +32,6 @@ def init_db():
             mobile_otp TEXT,
             otp_generated_at TEXT,
 
-            -- Location
-            state TEXT,
-            district TEXT,
-            city TEXT,
-            village TEXT,
-            full_address TEXT,
-
             -- Identity Proof - Aadhar/PAN nako
             profile_photo TEXT,
             id_proof_type TEXT,

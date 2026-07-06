@@ -1,37 +1,37 @@
 {% extends "base.html" %}
-{% block title %}Verify OTP{% endblock %}
+{% block title %}Verify Email{% endblock %}
 {% block content %}
 <div class="container" style="max-width: 500px; margin: 60px auto;">
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-success text-white text-center py-4 rounded-top-4">
-            <h3 class="mb-0 fw-bold"><i class="bi bi-shield-check me-2"></i>Verify Mobile Number</h3>
-            <p class="mb-0 small opacity-75">Enter OTP sent to your mobile</p>
+            <h3 class="mb-0 fw-bold"><i class="bi bi-envelope-check me-2"></i>Verify Email Address</h3>
+            <p class="mb-0 small opacity-75">Enter OTP sent to your email</p>
         </div>
         <div class="card-body p-4 p-md-5">
-            
+
             <div class="text-center mb-4">
-                <i class="bi bi-phone-vibrate" style="font-size: 4rem; color: #198754;"></i>
+                <i class="bi bi-envelope-open" style="font-size: 4rem; color: #198754;"></i>
                 <p class="text-muted mt-3 mb-0">We've sent a 6-digit OTP to</p>
-                <h5 class="fw-bold text-primary">{{ mobile }}</h5>
+                <h5 class="fw-bold text-primary">{{ email }}</h5>
             </div>
 
             <form method="POST" class="needs-validation" novalidate>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                
+
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Enter OTP <span class="text-danger">*</span></label>
-                    <input 
-                        type="text" 
-                        name="otp" 
-                        class="form-control form-control-lg text-center" 
-                        placeholder="000000" 
-                        required 
-                        pattern="[0-9]{6}" 
+                    <input
+                        type="text"
+                        name="otp"
+                        class="form-control form-control-lg text-center"
+                        placeholder="000000"
+                        required
+                        pattern="[0-9]{6}"
                         maxlength="6"
                         style="font-size: 1.5rem; letter-spacing: 10px; font-weight: bold;"
                         autocomplete="one-time-code">
                     <div class="invalid-feedback text-center">Please enter 6 digit OTP.</div>
-                    <small class="text-muted d-block text-center mt-2">Check your SMS for OTP</small>
+                    <small class="text-muted d-block text-center mt-2">Check your email inbox & spam folder</small>
                 </div>
 
                 <div class="d-grid">
@@ -44,13 +44,13 @@
             <div class="text-center mt-4">
                 <p class="text-muted mb-2">Didn't receive OTP?</p>
                 <a href="{{ url_for('register') }}" class="text-primary text-decoration-none fw-bold">
-                    <i class="bi bi-arrow-clockwise me-1"></i>Resend / Register Again
+                    <i class="bi bi-arrow-clockwise me-1"></i>Register Again
                 </a>
             </div>
 
-            <div class="alert alert-info mt-4 mb-0">
-                <i class="bi bi-info-circle me-2"></i>
-                <small><strong>Note:</strong> OTP is printed in your Flask console for testing. Check terminal.</small>
+            <div class="alert alert-warning mt-4 mb-0">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>OTP not received?</strong> Check spam folder. Gmail sometimes blocks.
             </div>
         </div>
     </div>
@@ -71,7 +71,6 @@
   })
 })()
 
-// Auto-focus OTP input
 document.querySelector('input[name="otp"]').focus();
 </script>
 {% endblock %}

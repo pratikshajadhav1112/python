@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from database import get_db, init_db
@@ -13,19 +14,29 @@ app = Flask(__name__)
 app.secret_key = 'Linkkiwi2026'
 csrf = CSRFProtect(app)
 
+# Email Config - TUZE DETAILS ITHE BADAL
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'pratikshaj@gmail.com' # TUZHA GMAIL
+app.config['MAIL_PASSWORD'] = 'pratiksha@11' 
+
+mail = Mail(app)
+
 # Upload folders
 UPLOAD_FOLDER_PROFILE = 'static/uploads/profile_photos'
 UPLOAD_FOLDER_ID = 'static/uploads/id_proofs'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 os.makedirs(UPLOAD_FOLDER_PROFILE, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER_ID, exist_ok=True)
+
 # Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please login to access this page'
 
-# DB initialize karo agar exist nahi karti
+# DB initialize
 if not os.path.exists('myproject.db'):
     init_db()
 
@@ -41,7 +52,7 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db()
-    user_row = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    user_row = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
     conn.close()
     if user_row:
         user = dict(user_row)
@@ -51,19 +62,60 @@ def load_user(user_id):
             role=user.get('role', 'student'),
             is_mobile_verified=user.get('is_mobile_verified', 0),
             is_blocked=user.get('is_blocked', 0)
-          )
+        )
     return None
+
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.',1)[1].lower() in {'png' , 'jpg' ,'jpeg' ,'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
 def generate_otp():
-    return str(random.randint(100000,999999))
+    return str(random.randint(100000, 999999))
+
+def send_otp_email(email, otp):
+    """Email var OTP pathvato"""
+    try:
+        msg = Message(
+            subject="LinkKiwi OTP Verification",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+
+        msg.html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5;">
+            <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+                    <h1 style="color: white; margin: 0;">LinkKiwi</h1>
+                </div>
+                <div style="padding: 40px 30px;">
+                    <h2 style="color: #333; margin-top: 0;">Email Verification</h2>
+                    <p style="color: #666; font-size: 16px;">Your verification code is:</p>
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 8px; margin: 25px 0;">
+                        <h1 style="margin: 0; letter-spacing: 8px; font-size: 32px;">{otp}</h1>
+                    </div>
+                    <p style="color: #666; font-size: 14px;">This OTP is valid for 5 minutes.</p>
+                    <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                        If you didn't request this, please ignore this email. Do not share this OTP.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        mail.send(msg)
+        print(f"OTP {otp} sent to {email}")
+        return True
+    except Exception as e:
+        print(f"Email Error: {e}")
+        return False
+
 DUMMY_REPORTS = [
     {
         "id": 1,
         "exam_name": "MSBTE Summer 2026",
         "subject_name": "MICROPROCESSOR PROGRAMMING",
         "college_name": "Government Polytechnic Hingoli",
-        "status": "Pending",
         "report_date": "01-06-2026",
         "description": "Sample leak report for testing. This is a dummy entry.",
         "is_dummy": True
@@ -73,7 +125,6 @@ DUMMY_REPORTS = [
         "exam_name": "MSBTE Summer 2026",
         "subject_name": "Data Structure",
         "college_name": "Government Polytechnic Khamgaon",
-        "status": "Resolved",
         "report_date": "02-06-2026",
         "description": "Sample resolved case for testing. This is a dummy entry.",
         "is_dummy": True
@@ -86,25 +137,14 @@ def register():
         return redirect(url_for('home'))
 
     if request.method == 'POST':
-        # Basic fields
         name = request.form.get('name', '').strip()
         username = request.form.get('username', '').strip()
         email = request.form.get('email', '').strip()
         mobile = request.form.get('mobile', '').strip()
         password = request.form.get('password', '').strip()
 
-        # Location fields
-        state = request.form.get('state', '').strip()
-        district = request.form.get('district', '').strip()
-        city = request.form.get('city', '').strip()
-        village = request.form.get('village', '').strip()
-
-        # ID Proof
-        id_proof_type = request.form.get('id_proof_type', '').strip()
-        id_proof_number = request.form.get('id_proof_number', '').strip()
-
-        if not all([name, username, email, mobile, password, state, district, city]):
-            flash('All * marked fields are required!', 'error')
+        if not all([name, username, email, mobile, password]):
+            flash('All fields are required!', 'error')
             return redirect(url_for('register'))
 
         if len(password) < 6:
@@ -116,7 +156,7 @@ def register():
             return redirect(url_for('register'))
 
         conn = get_db()
-        existing_user = conn.execute('SELECT * FROM users WHERE username = ? OR email =? OR mobile = ?',
+        existing_user = conn.execute('SELECT * FROM users WHERE username = ? OR email = ? OR mobile = ?',
                                      (username, email, mobile)).fetchone()
 
         if existing_user:
@@ -124,44 +164,36 @@ def register():
             conn.close()
             return redirect(url_for('register'))
 
-        # Handle file uploads
+        # Profile photo optional
         profile_photo = request.files.get('profile_photo')
-        id_proof_photo = request.files.get('id_proof_photo')
-
-        if not profile_photo or not id_proof_photo:
-            flash('Profile photo and ID proof photo are required.', 'error')
-            return redirect(url_for('register'))
-
         profile_path = ''
-        id_path = ''
-        if profile_photo and allowed_file(profile_photo.filename):
+
+        if profile_photo and profile_photo.filename!= '' and allowed_file(profile_photo.filename):
             profile_filename = secure_filename(f"{datetime.now().timestamp()}_{profile_photo.filename}")
             profile_path = os.path.join(UPLOAD_FOLDER_PROFILE, profile_filename)
             profile_photo.save(profile_path)
-
-        if id_proof_photo and allowed_file(id_proof_photo.filename):
-            id_filename = secure_filename(f"{datetime.now().timestamp()}_{id_proof_photo.filename}")
-            id_path = os.path.join(UPLOAD_FOLDER_ID, id_filename)
-            id_proof_photo.save(id_path)
 
         hashed_pw = generate_password_hash(password)
         otp = generate_otp()
 
         conn.execute('''INSERT INTO users
-                     (name, username, email, mobile, password, state, district, city, village,
-                      profile_photo, id_proof_type, id_proof_number, id_proof_photo,
-                      signup_ip, signup_user_agent, mobile_otp, otp_generated_at, role)
-                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                     (name, username, email, mobile, hashed_pw, state, district, city, village,
-                      profile_path, id_proof_type, id_proof_number, id_path,
+                     (name, username, email, mobile, password, profile_photo,
+                      signup_ip, signup_user_agent, mobile_otp, otp_generated_at, role, is_mobile_verified)
+                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''',
+                     (name, username, email, mobile, hashed_pw, profile_path,
                       request.remote_addr, request.headers.get('User-Agent'),
-                      otp, datetime.now(), 'student'))
+                      otp, datetime.now(), 'student', 0))
+
         user_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
         conn.commit()
         conn.close()
 
-        print(f"OTP for {mobile} is: {otp}") # SMS API aalyavar he kadh
-        flash(f'Registration successful! OTP sent to {mobile}.', 'success')
+        # FIXED: send_otp_email - small letters
+        if send_otp_email(email, otp):
+            flash(f'Registration successful! OTP sent to {email}. Check inbox & spam.', 'success')
+        else:
+            flash('Registration successful but failed to send OTP. Contact admin.', 'warning')
+
         return redirect(url_for('verify_otp', user_id=user_id))
 
     return render_template('register.html')
@@ -169,7 +201,7 @@ def register():
 @app.route('/verify_otp/<int:user_id>', methods=['GET', 'POST'])
 def verify_otp(user_id):
     conn = get_db()
-    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    user = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
     if not user:
         conn.close()
         flash('User not found!', 'error')
@@ -181,13 +213,13 @@ def verify_otp(user_id):
             conn.execute('UPDATE users SET is_mobile_verified = 1, mobile_otp = NULL WHERE id = ?', (user_id,))
             conn.commit()
             conn.close()
-            flash('Mobile verified! Now you can login.', 'success')
+            flash('Email verified! Now you can login.', 'success')
             return redirect(url_for('login'))
         else:
             flash('Invalid OTP. Try again.', 'danger')
 
     conn.close()
-    return render_template('verify_otp.html', mobile=user['mobile'])
+    return render_template('verify_otp.html', email=user['email'])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -199,7 +231,7 @@ def login():
         password = request.form.get('password', '').strip()
 
         conn = get_db()
-        user_row = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+        user_row = conn.execute('SELECT * FROM users WHERE username =?', (username,)).fetchone()
         conn.close()
 
         if user_row:
@@ -208,10 +240,16 @@ def login():
                 flash('Your account has been blocked. Contact admin.', 'danger')
                 return redirect(url_for('login'))
             if not user['is_mobile_verified']:
-                flash('Please verify your mobile number first.', 'warning')
+                flash('Please verify your email first.', 'warning')
                 return redirect(url_for('verify_otp', user_id=user['id']))
             if check_password_hash(user['password'], password):
-                user_obj = User(id=user['id'], username=user['username'], role=user.get('role', 'student'))
+                user_obj = User(
+                    id=user['id'],
+                    username=user['username'],
+                    role=user.get('role', 'student'),
+                    is_mobile_verified=user.get('is_mobile_verified', 0),
+                    is_blocked=user.get('is_blocked', 0)
+                )
                 login_user(user_obj)
                 session['username'] = username
                 session['role'] = user.get('role', 'student')
@@ -223,12 +261,11 @@ def login():
 
     return render_template('login.html')
 
-
 @app.route('/logout')
 @login_required
 def logout():
-    session.pop('username',None)
-    session.pop('role',None)
+    session.pop('username', None)
+    session.pop('role', None)
     logout_user()
     flash('Logged out successfully!', 'success')
     return redirect(url_for('login'))
@@ -237,12 +274,7 @@ def logout():
 @app.route('/')
 @login_required
 def home():
-    conn = get_db()
-    total = conn.execute('SELECT COUNT(*) FROM entries').fetchone()[0]
-    pending = conn.execute("SELECT COUNT(*) FROM entries WHERE status = 'Pending'").fetchone()[0]
-    resolved = conn.execute("SELECT COUNT(*) FROM entries WHERE status = 'Resolved'").fetchone()[0]
-    conn.close()
-    return render_template('home.html', total=total, pending=pending, resolved=resolved)
+    return render_template('home.html')
 
 @app.route('/about')
 def about():
@@ -261,7 +293,6 @@ def submit_report():
         exam_name = request.form.get('exam_name', '').strip()
         subject_name = request.form.get('subject_name', '').strip()
         college_name = request.form.get('college_name', '').strip()
-        status = request.form.get('status', 'Pending').strip()
         report_date = request.form.get('report_date', '').strip()
         description = request.form.get('description', '').strip()
 
@@ -272,9 +303,9 @@ def submit_report():
         conn = get_db()
         conn.execute(
             '''INSERT INTO entries
-               (user_id, exam_name, subject_name, college_name, status, report_date, description)
-               VALUES (?,?,?,?,?,?,?)''',
-            (current_user.id, exam_name, subject_name, college_name, status, report_date, description)
+               (user_id, exam_name, subject_name, college_name, report_date, description)
+               VALUES (?,?,?,?,?,?)''',
+            (current_user.id, exam_name, subject_name, college_name, report_date, description)
         )
         conn.commit()
         conn.close()
@@ -282,7 +313,7 @@ def submit_report():
         flash('Report Submitted Successfully!', 'success')
         return redirect(url_for('report_list'))
     except Exception as e:
-        print("ERROR :", e)
+        print("ERROR:", e)
         flash(f'Error: {e}', 'error')
         return redirect(url_for('form'))
 
@@ -290,9 +321,7 @@ def submit_report():
 @login_required
 def search_page():
     conn = get_db()
-    statuses = [row[0] for row in conn.execute(
-        'SELECT DISTINCT status FROM entries WHERE status IS NOT NULL AND status!= "" ORDER BY status'
-    ).fetchall()]
+
     colleges = [row[0] for row in conn.execute(
         'SELECT DISTINCT college_name FROM entries WHERE college_name IS NOT NULL AND college_name!= "" ORDER BY college_name'
     ).fetchall()]
@@ -300,7 +329,7 @@ def search_page():
         'SELECT DISTINCT exam_name FROM entries WHERE exam_name IS NOT NULL AND exam_name!= "" ORDER BY exam_name'
     ).fetchall()]
     conn.close()
-    return render_template('search.html', statuses=statuses, colleges=colleges, exams=exams)
+    return render_template('search.html', colleges=colleges, exams=exams)
 
 @app.route('/report/<int:id>')
 @login_required
@@ -311,8 +340,8 @@ def view_report(id):
 
     conn = get_db()
     conn.row_factory = sqlite3.Row
-    report = conn.execute('SELECT * FROM entries WHERE id = ?', (id,)).fetchone()
-    files = conn.execute('SELECT * FROM entry_files WHERE entry_id = ?', (id,)).fetchall()
+    report = conn.execute('SELECT * FROM entries WHERE id =?', (id,)).fetchone()
+    files = conn.execute('SELECT * FROM entry_files WHERE entry_id =?', (id,)).fetchall()
 
     if report is None:
         conn.close()
@@ -343,7 +372,7 @@ def delete_report(id):
         return redirect(url_for('report_list'))
 
     conn = get_db()
-    conn.execute("DELETE FROM entries WHERE id = ?", (id,))
+    conn.execute("DELETE FROM entries WHERE id =?", (id,))
     conn.commit()
     conn.close()
     flash('Report deleted Successfully!', 'success')
@@ -355,7 +384,6 @@ def report_list():
     search = request.args.get('search', '').strip()
     sort_by = request.args.get('sort', 'id')
     order = request.args.get('order', 'asc')
-    status_filter = request.args.get('status', '').strip()
     exam_filter = request.args.get('exam', '').strip()
     college_filter = request.args.get('college', '').strip()
 
@@ -366,12 +394,10 @@ def report_list():
     base_query = 'SELECT * FROM entries WHERE 1=1'
     params = []
 
-    # ✅ FIX 2: AND chya adhi space pahije
     if current_user.role!= 'admin':
-        base_query += ' AND user_id = ?'
+        base_query += ' AND user_id =?'
         params.append(current_user.id)
 
-    # Count sathi same query vapra
     count_query = base_query.replace('SELECT *', 'SELECT COUNT(*)')
     db_count = conn.execute(count_query, params).fetchone()[0]
 
@@ -379,7 +405,7 @@ def report_list():
     if db_count == 0:
         for dummy in DUMMY_REPORTS:
             if not search or any(search.lower() in str(dummy.get(field, '')).lower()
-                   for field in ['exam_name', 'subject_name', 'college_name', 'status', 'description']):
+                   for field in ['exam_name', 'subject_name', 'college_name', 'description']):
                 dummy_copy = dummy.copy()
                 dummy_copy['display_id'] = f"ELD-{dummy['id']:03d}"
                 dummy_copy['view_url'] = '#'
@@ -388,25 +414,22 @@ def report_list():
                 all_reports.append(dummy_copy)
 
     # Sorting
-    valid_sorts = ['id', 'exam_name', 'subject_name', 'college_name', 'status', 'report_date']
+    valid_sorts = ['id', 'exam_name', 'subject_name', 'college_name', 'report_date']
     sort_column = 'id' if sort_by == 'display_id' else sort_by
     if sort_column not in valid_sorts:
         sort_column = 'id'
     sort_order = 'DESC' if order == 'desc' else 'ASC'
 
-    # ✅ FIX 3: LIKE? aani =? madhe space pahije
     if search:
-        base_query += ' AND (exam_name LIKE ? OR subject_name LIKE ? OR college_name LIKE ? OR status LIKE ? OR description LIKE ?)'
+        base_query += ' AND (exam_name LIKE? OR subject_name LIKE? OR college_name LIKE? OR description LIKE?)'
         search_term = f'%{search}%'
-        params.extend([search_term] * 5)
-    if status_filter:
-        base_query += ' AND status = ?'
-        params.append(status_filter)
+        params.extend([search_term] * 4)
+
     if exam_filter:
-        base_query += ' AND exam_name = ?'
+        base_query += ' AND exam_name =?'
         params.append(exam_filter)
     if college_filter:
-        base_query += ' AND college_name = ?'
+        base_query += ' AND college_name =?'
         params.append(college_filter)
 
     base_query += f' ORDER BY {sort_column} {sort_order}'
