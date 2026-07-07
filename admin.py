@@ -4,9 +4,8 @@ from werkzeug.security import generate_password_hash
 conn = get_db()
 
 username = "Pratiksha Jadhav"
-password = "pratiksha@123"     
-name = "Pratiksha Jadhav"
-email = "pratikshaj@gmail.com"
+password = "pratikshaj@123"     
+email = "pratikshaj1113@gmail.com"
 mobile = "9226630571"
 
 user = conn.execute(
@@ -19,16 +18,14 @@ if user:
 else:
     conn.execute("""
         INSERT INTO users
-        (name, username, email, mobile, password, role)
-        VALUES (?, ?, ?, ?, ?, ?)
+        ( username, email, mobile, password, role)
+        VALUES ( ?, ?, ?, ?, ?)
     """, (
-        name,
         username,
         email,
         mobile,
         generate_password_hash(password),
         "admin"
-        1
         
     ))
 

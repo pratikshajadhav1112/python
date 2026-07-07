@@ -18,8 +18,8 @@ csrf = CSRFProtect(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'pratikshaj@gmail.com' # TUZHA GMAIL
-app.config['MAIL_PASSWORD'] = 'pratiksha@11' 
+app.config['MAIL_USERNAME'] = 'pratikshaj1113@gmail.com' # TUZHA GMAIL
+app.config['MAIL_PASSWORD'] = 'ytyczdmvyvzxjnpm' 
 
 mail = Mail(app)
 
@@ -201,7 +201,7 @@ def register():
 @app.route('/verify_otp/<int:user_id>', methods=['GET', 'POST'])
 def verify_otp(user_id):
     conn = get_db()
-    user = conn.execute('SELECT * FROM users WHERE id =?', (user_id,)).fetchone()
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
     if not user:
         conn.close()
         flash('User not found!', 'error')
@@ -231,7 +231,7 @@ def login():
         password = request.form.get('password', '').strip()
 
         conn = get_db()
-        user_row = conn.execute('SELECT * FROM users WHERE username =?', (username,)).fetchone()
+        user_row = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         conn.close()
 
         if user_row:
@@ -456,7 +456,15 @@ def report_list():
                          search=search,
                          sort_by=sort_by,
                          order=order)
-
+@app.route('/notifications')
+@login_required
+def notifications():
+    notifs = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.created_at.desc()).all()
+    # Mark as read
+    for n in notifs:
+        n.is_read = True
+    db.session.commit()
+    return render_template('notifications.html', notifications=notifs)
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
