@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | LinkKiwi</title>
+    <title>Register | Prashan</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -16,7 +15,7 @@
             padding: 20px 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-    .register-card {
+   .register-card {
             background: #fff;
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
@@ -27,52 +26,52 @@
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-    .card-header {
+   .card-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
             border: none;
         }
-    .card-header h3 {
+   .card-header h3 {
             margin: 0;
             font-weight: 600;
             font-size: 1.8rem;
         }
-    .card-body {
+   .card-body {
             padding: 40px;
         }
-    .form-label {
+   .form-label {
             font-weight: 500;
             color: #495057;
             margin-bottom: 8px;
             font-size: 0.9rem;
         }
-    .form-control,.form-select {
+   .form-control,.form-select {
             border: 2px solid #e9ecef;
             border-radius: 8px;
             padding: 12px 15px;
             font-size: 0.95rem;
             transition: all 0.3s;
         }
-    .form-control:focus,.form-select:focus {
+   .form-control:focus,.form-select:focus {
             border-color: #667eea;
-            box-shadow: 0 0.2rem rgba(102, 126, 234, 0.15);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
         }
-    .input-group-text {
+   .input-group-text {
             background: #f8f9fa;
             border: 2px solid #e9ecef;
             border-right: none;
             border-radius: 8px 0 0 8px;
         }
-    .input-group.form-control {
+   .input-group.form-control {
             border-left: none;
             border-radius: 0 8px 8px 0;
         }
-    .password-wrapper {
+   .password-wrapper {
             position: relative;
         }
-    .toggle-password {
+   .toggle-password {
             position: absolute;
             right: 15px;
             top: 50%;
@@ -81,7 +80,7 @@
             color: #6c757d;
             z-index: 10;
         }
-    .btn-otp {
+   .btn-otp {
             background: #f8f9fa;
             border: 2px solid #e9ecef;
             border-left: none;
@@ -91,38 +90,38 @@
             padding: 0 20px;
             transition: all 0.3s;
         }
-    .btn-otp:hover {
+   .btn-otp:hover {
             background: #667eea;
             color: white;
         }
-    .btn-otp:disabled {
+   .btn-otp:disabled {
             background: #e9ecef;
             color: #6c757d;
             cursor: not-allowed;
         }
-    .otp-verified {
+   .otp-verified {
             color: #198754;
             font-size: 0.85rem;
             margin-top: 5px;
             display: none;
         }
-    .otp-verified i {
+   .otp-verified i {
             margin-right: 4px;
         }
-    .strength-bar {
+   .strength-bar {
             height: 4px;
             background: #e9ecef;
             border-radius: 2px;
             margin-top: 8px;
             overflow: hidden;
         }
-    .strength-fill {
+   .strength-fill {
             height: 100%;
             width: 0%;
             transition: all 0.3s ease;
             border-radius: 2px;
         }
-    .btn-register {
+   .btn-register {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             color: white;
@@ -134,37 +133,41 @@
             transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
-    .btn-register:hover {
+   .btn-register:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
-    .btn-register:disabled {
+   .btn-register:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-    .login-link {
+   .login-link {
             text-align: center;
             margin-top: 20px;
             color: #6c757d;
         }
-    .login-link a {
+   .login-link a {
             color: #667eea;
             font-weight: 600;
             text-decoration: none;
         }
-    .required {
+   .required {
             color: #dc3545;
         }
-    .alert {
+   .alert {
             border-radius: 8px;
             border: none;
         }
         @media (max-width: 768px) {
-      .card-body { padding: 25px; }
-      .card-header { padding: 25px; }
+     .card-body { padding: 25px; }
+     .card-header { padding: 25px; }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        emailjs.init("__vt3rSpl7DkoctBi");
+    </script>
 </head>
 <body>
     <div class="container">
@@ -173,7 +176,7 @@
                 <div class="register-card">
                     <div class="card-header">
                         <h3><i class="fas fa-user-plus me-2"></i>Create Account</h3>
-                        <p>OTP verification required for Mobile & Email</p>
+                        <p>Email OTP verification required</p>
                     </div>
 
                     <div class="card-body">
@@ -202,26 +205,24 @@
                                 <div class="invalid-feedback">Please enter your full name</div>
                             </div>
 
-                            <!-- Mobile with OTP -->
+                            <!-- Username -->
+                            <div class="mb-3">
+                                <label class="form-label">Username <span class="required">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                    <input type="text" class="form-control" name="username" placeholder="Choose a username" required>
+                                </div>
+                                <div class="invalid-feedback">Please enter username</div>
+                            </div>
+
+                            <!-- Mobile -->
                             <div class="mb-3">
                                 <label class="form-label">Mobile Number <span class="required">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     <input type="tel" class="form-control" name="mobile" id="mobile" placeholder="10 digit number" pattern="[6-9][0-9]{9}" maxlength="10" required>
-                                    <button type="button" class="btn btn-otp" id="sendMobileOtp">Send OTP</button>
                                 </div>
-                                <div class="otp-verified" id="mobileVerified"><i class="fas fa-check-circle"></i>Mobile Verified</div>
                                 <div class="invalid-feedback">Enter valid 10-digit mobile number</div>
-                            </div>
-
-                            <!-- Mobile OTP Input -->
-                            <div class="mb-3" id="mobileOtpBox" style="display:none;">
-                                <label class="form-label">Mobile OTP <span class="required">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                    <input type="text" class="form-control" name="mobile_otp" id="mobileOtp" placeholder="Enter 6 digit OTP" maxlength="6">
-                                    <button type="button" class="btn btn-otp" id="verifyMobileOtp">Verify</button>
-                                </div>
                             </div>
 
                             <!-- Email with OTP -->
@@ -259,7 +260,7 @@
                                 <div class="invalid-feedback">Password must be at least 6 characters</div>
                             </div>
 
-                            <!-- FIXED: State & District -->
+                            <!-- State & District -->
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label class="form-label">State <span class="required">*</span></label>
@@ -306,7 +307,6 @@
                                 </div>
                             </div>
 
-                            <input type="hidden" name="mobile_verified" id="mobileVerifiedFlag" value="0">
                             <input type="hidden" name="email_verified" id="emailVerifiedFlag" value="0">
 
                             <button type="submit" class="btn-register" id="registerBtn" disabled>
@@ -386,93 +386,64 @@
             fill.style.background = strength <= 40? '#dc3545' : strength <= 60? '#ffc107' : '#198754';
         });
 
-        // Mobile OTP Flow
-        document.getElementById('sendMobileOtp').addEventListener('click', function() {
-            const mobile = document.getElementById('mobile').value;
-            if (!/^[6-9][0-9]{9}$/.test(mobile)) {
-                alert('Enter valid 10-digit mobile number');
-                return;
-            }
-            fetch('/send-mobile-otp', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({mobile: mobile})
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    document.getElementById('mobileOtpBox').style.display = 'block';
-                    this.disabled = true;
-                    this.textContent = 'Sent';
-                } else {
-                    alert(data.message);
-                }
-            });
-        });
-
-        document.getElementById('verifyMobileOtp').addEventListener('click', function() {
-            const otp = document.getElementById('mobileOtp').value;
-            const mobile = document.getElementById('mobile').value;
-            fetch('/verify-mobile-otp', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({mobile: mobile, otp: otp})
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    document.getElementById('mobileVerified').style.display = 'block';
-                    document.getElementById('mobileOtpBox').style.display = 'none';
-                    document.getElementById('mobileVerifiedFlag').value = '1';
-                    checkAllVerified();
-                } else {
-                    alert('Invalid OTP');
-                }
-            });
-        });
-
-        // Email OTP Flow
+        // Email OTP Flow - EmailJS
         document.getElementById('sendEmailOtp').addEventListener('click', function() {
             const email = document.getElementById('email').value;
+            const btn = this;
+            
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 alert('Enter valid email address');
                 return;
             }
-            fetch('/send-email-otp', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email: email})
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    document.getElementById('emailOtpBox').style.display = 'block';
-                    this.disabled = true;
-                    this.textContent = 'Sent';
-                } else {
-                    alert(data.message);
-                }
+            
+            // 6 digit OTP generate
+            const otp = Math.floor(100000 + Math.random() * 900000);
+            sessionStorage.setItem('email_otp', otp);
+            sessionStorage.setItem('email_otp_email', email);
+            
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            
+            emailjs.send("service_a441io4", "template_avty214", {
+                to_email: email,
+                otp_code: otp,
+                from_name: "LinkKiwi"
+            }).then(function(response) {
+                console.log('SUCCESS!', response.status, response.text);
+                document.getElementById('emailOtpBox').style.display = 'block';
+                btn.textContent = 'Sent';
+                alert('OTP sent to ' + email + '. Check Inbox & Spam folder.');
+            }, function(error) {
+                console.log('FAILED...', error);
+                btn.disabled = false;
+                btn.textContent = 'Send OTP';
+                alert('Failed to send OTP: ' + error.text);
             });
         });
 
         document.getElementById('verifyEmailOtp').addEventListener('click', function() {
             const otp = document.getElementById('emailOtp').value;
             const email = document.getElementById('email').value;
-            fetch('/verify-email-otp', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email: email, otp: otp})
-            }).then(r => r.json()).then(data => {
-                if (data.success) {
-                    document.getElementById('emailVerified').style.display = 'block';
-                    document.getElementById('emailOtpBox').style.display = 'none';
-                    document.getElementById('emailVerifiedFlag').value = '1';
-                    checkAllVerified();
-                } else {
-                    alert('Invalid OTP');
-                }
-            });
+            const storedOtp = sessionStorage.getItem('email_otp');
+            const storedEmail = sessionStorage.getItem('email_otp_email');
+            
+            if (otp === storedOtp && email === storedEmail) {
+                document.getElementById('emailVerified').style.display = 'block';
+                document.getElementById('emailOtpBox').style.display = 'none';
+                document.getElementById('emailVerifiedFlag').value = '1';
+                sessionStorage.removeItem('email_otp');
+                sessionStorage.removeItem('email_otp_email');
+                checkAllVerified();
+                alert('Email Verified Successfully!');
+            } else {
+                alert('Invalid OTP. Try again.');
+            }
         });
 
-        // Enable Register button only after both OTP verified
+        // Enable Register button only after Email verified
         function checkAllVerified() {
-            const mobileOk = document.getElementById('mobileVerifiedFlag').value === '1';
             const emailOk = document.getElementById('emailVerifiedFlag').value === '1';
-            document.getElementById('registerBtn').disabled =!(mobileOk && emailOk);
+            document.getElementById('registerBtn').disabled =!emailOk;
         }
 
         // Mobile digits only
