@@ -106,56 +106,69 @@
 
         <!-- CHANGE #1: enctype add kela -->
         <form method="POST" action="{{ url_for('submit_report') }}" enctype="multipart/form-data">
-            <input type="hidden" name="csrf-token" value="{{ csrf_token()}}">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="exam_name"><i class="fas fa-book"></i> Exam Name *</label>
-                        <input type="text" id="exam_name" name="exam_name" class="form-control" required placeholder="Enter exam name">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
+
+                <!-- Row 1: Exam Details -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Exam Name *</label>
+                        <input type="text" name="exam_name" class="form-control" placeholder="e.g. JEE Mains 2026" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Subject Name *</label>
+                        <input type="text" name="subject_name" class="form-control" placeholder="e.g. Physics" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Report Date</label>
+                        <input type="date" name="report_date" class="form-control">
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="subject_name"><i class="fas fa-bookmark"></i> Subject Name *</label>
-                        <input type="text" id="subject_name" name="subject_name" class="form-control" required placeholder="Enter subject/course name">
+                <!-- Row 2: College -->
+                <div class="mb-3">
+                    <label class="form-label">College/Center Name *</label>
+                    <input type="text" name="college_name" class="form-control" placeholder="full name of college or school" required>
+                </div>
+
+                <!-- Row 3: Incident Location -->
+                <h5 class="mt-4">Incident Location</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">State</label>
+                        <input type="text" name="incident_state" class="form-control" placeholder="Maharashtra">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">District</label>
+                        <input type="text" name="incident_district" class="form-control" placeholder="Pune">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">City</label>
+                        <input type="text" name="incident_city" class="form-control" placeholder="Pune City">
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="college_name"><i class="fas fa-university"></i> College Name *</label>
-                <input type="text" id="college_name" name="college_name" class="form-control" required placeholder="Enter college/institute name">
-            </div>
-
-            
-                <div class="col-md-6"> 
-                    <div class="form-group">
-                        <label for="report_date"><i class="fas fa-calendar"></i> Report Date *</label>
-                        <!-- Typo fix kela: report_date -->
-                        <input type="date" id="report_date" name="report_date" class="form-control" value="{{ today }}" required>
-                    </div>
+                <!-- Row 4: Description -->
+                <div class="mb-3">
+                    <label class="form-label">Description of Incident</label>
+                    <textarea name="description" class="form-control" rows="4" placeholder="describe how/where you found leak.include time,location,source...."></textarea>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="description"><i class="fas fa-file-lines"></i> Leak Details *</label>
-                <textarea id="description" name="description" class="form-control" rows="5" required placeholder="Describe how/where you found the leak. Include time, location, source..."></textarea>
-            </div>
-
-            <!-- CHANGE #2: File Upload Section Add Kela -->
-            <div class="form-group">
-                <label for="files"><i class="fas fa-paperclip"></i> Attach Evidence (PDF / Photos)</label>
-                <input type="file" id="files" name="files" class="form-control" multiple accept=".pdf,.png,.jpg,.jpeg,.gif">
-                <div class="file-upload-note">
-                    <i class="fas fa-info-circle"></i> PDF, JPG, PNG allowed. Max 16MB per file. You can select multiple files.
+                <!-- Row 5: File Upload -->
+                <div class="mb-3">
+                    <label class="form-label">Upload Evidence</label>
+                    <input type="file" name="evidence" class="form-control" multiple accept="image/*,video/*,audio/*">
+                    <small class="text-muted">Photos, Videos, Audio - multiple files can select . Max 10MB per file</small>
                 </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-paper-plane"></i> Submit Report Anonymously
-            </button>
-        </form>
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-paper-plane"></i> Submit Report Anonymously
+                </button>
+            </form>
+
+        </div>
     </div>
 </div>
+
 {% endblock %}
+            

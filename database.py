@@ -32,7 +32,7 @@ def init_db():
             mobile_otp TEXT,
             otp_generated_at TEXT,
 
-            -- Identity Proof - Aadhar/PAN nako
+            -- Identity Proof 
             profile_photo TEXT,
             id_proof_type TEXT,
             id_proof_number TEXT,
@@ -82,7 +82,6 @@ def init_db():
         )
     ''')
 
-    # Entry Files Table - Optional, jar JSON nako asel tar
     c.execute('''
         CREATE TABLE IF NOT EXISTS entry_files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,15 +91,26 @@ def init_db():
             FOREIGN KEY (entry_id) REFERENCES entries (id)
         )
     ''')
+    
+    c.execute('''CREATE TABLE IF NOT EXISTS notifications (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    type TEXT,
+                    message TEXT,
+                    link TEXT,
+                    is_read INTEGER DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )''')
+    conn.commit()
+    conn.close()
 
-    # Default Admin User banav - Ekda ch
+
     admin_exists = c.execute("SELECT * FROM users WHERE username = 'admin'").fetchone()
     if not admin_exists:
         hashed_pw = generate_password_hash('admin123')
         c.execute('''INSERT INTO users
-                     (username, password, name, email, role, is_mobile_verified)
-                     VALUES (?,?,?,?,?,?)''',
-                  ('admin', hashed_pw, 'Admin', 'admin@linkkiwi.com', 'admin', 1))
+                     (username, password, name, email, role, is_mobile_verified, is_email_verified)  # <-- is_email_verified add kiya
+                     VALUES (?,?,?,?,?,?,?)''',  # <-- 1 ? add kiya
+                  ('admin', hashed_pw, 'Admin', 'admin@linkkiwi.com', 'admin', 1, 1)) # <-- last me 1 add kiya
 
     conn.commit()
     conn.close()
@@ -118,6 +128,5 @@ def drop_table():
     print("Old tables dropped!")
 
 if __name__ == '__main__':
-    # Pahile juni tables delete kar, mag navin banav
-    drop_table()
-    init_db()
+    drop_table()  # <-- Pehle purani table delete hogi
+    init_db()     # <-- Fir nayi table banegi

@@ -1,0 +1,52 @@
+{% extends "admin_base.html" %}
+{% block title %}Manage Reports{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">All Reports: {{ reports|length }}</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Student</th>
+                        <th>Exam</th>
+                        <th>College</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reports %}
+                    <tr>
+                        <td>ELD-{{ '%03d'|format(r.id) }}</td>
+                        <td>{{ r.name }}<br><small>{{ r.email }}</small></td>
+                        <td>{{ r.exam_name }}</td>
+                        <td>{{ r.college_name }}</td>
+                        <td>{{ r.report_date }}</td>
+                        <td>{{ r.description[:100] }}...</td>
+                        <td>
+                            <span class="badge 
+                                {{ 'badge-warning' if r.status=='Pending' else 'badge-info' if r.status=='In Progress' else 'badge-success' }}">
+                                {{ r.status or 'Pending' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('view_report', id=r.id) }}" class="btn btn-sm btn-primary">View</a>
+                            <a href="{{ url_for('delete_report', id=r.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8" class="text-center">No reports found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "admin_base.html" %}
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">All Students: {{ users|length }}</h6>
+        <input type="text" id="searchUser" class="form-control w-25" placeholder="Search by Name/Email/Mobile">
+    </div>
+    <div class="card-body">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'danger' if category=='error' else 'success' }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="userTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Verified</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>USR{{ '%03d'|format(u.id) }}</td>
+                        <td>{{ u.name }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>{{ u.mobile }}</td>
+                        <td>
+                            {% if u.is_email_verified %}<span class="badge badge-success">Email</span>{% endif %}
+                            {% if u.is_mobile_verified %}<span class="badge badge-info">Mobile</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_blocked %}<span class="badge badge-danger">Blocked</span>
+                            {% else %}<span class="badge badge-success">Active</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if u.id!= user.id %}
+                                <a href="{{ url_for('toggle_block', user_id=u.id) }}"
+                                   class="btn btn-sm {{ 'btn-success' if u.is_blocked else 'btn-warning' }}"
+                                   onclick="return confirm('Are you sure?')">
+                                   {{ 'Unblock' if u.is_blocked else 'Block' }}
+                                </a>
+                                <a href="{{ url_for('delete_user', user_id=u.id) }}"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Delete this user permanently?')">
+                                   Delete
+                                </a>
+                            {% else %}
+                                <span class="text-muted">This is you</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center">No students found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Live Search
+document.getElementById('searchUser').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll("#userTable tbody tr");
+    rows.forEach(row => {
+        let txt = row.innerText.toLowerCase();
+        row.style.display = txt.includes(filter)? "" : "none";
+    });
+});
+</script>
+{% endblock %}

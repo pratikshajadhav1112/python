@@ -1,0 +1,94 @@
+{% extends "admin_base.html" %}
+{% block title %}Analytics{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fa-solid fa-chart-pie me-2"></i>Analytics & Reports</h2>
+
+<div class="row">
+    <!-- Pie Chart -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <strong>Reports Status</strong>
+            </div>
+            <div class="card-body">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bar Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <strong>Reports per Month</strong>
+            </div>
+            <div class="card-body">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Line Chart -->
+    <div class="col-lg-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong>New Users Registered per Month</strong>
+            </div>
+            <div class="card-body">
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// 1. PIE CHART - Pending vs Resolved
+const pieCtx = document.getElementById('pieChart');
+new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+        labels: {{ status_labels | tojson }},
+        datasets: [{
+            data: {{ status_counts | tojson }},
+            backgroundColor: ['#ffc107', '#198754', '#0d6efd', '#dc3545']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' }
+});
+
+// 2. BAR CHART - Reports per Month
+const barCtx = document.getElementById('barChart');
+new Chart(barCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ report_months | tojson }},
+        datasets: [{
+            label: 'Total Reports',
+            data: {{ report_counts | tojson }},
+            backgroundColor: '#0d6efd'
+        }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true }
+});
+
+// 3. LINE CHART - Users per Month
+const lineCtx = document.getElementById('lineChart');
+new Chart(lineCtx, {
+    type: 'line',
+    data: {
+        labels: {{ user_months | tojson }},
+        datasets: [{
+            label: 'New Users',
+            data: {{ user_counts | tojson }},
+            borderColor: '#198754',
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true }
+});
+</script>
+{% endblock %}

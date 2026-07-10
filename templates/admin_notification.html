@@ -1,0 +1,27 @@
+{% extends "admin_base.html" %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<h2><i class="fa-solid fa-bell me-2"></i>Notifications</h2>
+
+<div class="card shadow-sm">
+    <div class="list-group list-group-flush">
+        {% for n in notes %}
+        <a href="{{ n['link'] }}" class="list-group-item list-group-item-action {% if n['is_read']==0 %}bg-light{% endif %}">
+            <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">
+                    {% if n['type']=='New Report' %}<i class="fa fa-file text-primary"></i>
+                    {% elif n['type']=='New User' %}<i class="fa fa-user-plus text-success"></i>
+                    {% else %}<i class="fa fa-triangle-exclamation text-danger"></i>{% endif %}
+                    {{ n['type'] }}
+                </h6>
+                <small>{{ n['created_at'][:16] }}</small>
+            </div>
+            <p class="mb-1">{{ n['message'] }}</p>
+        </a>
+        {% else %}
+        <p class="text-center p-4 text-muted">No notifications yet</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
