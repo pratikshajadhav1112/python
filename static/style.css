@@ -149,7 +149,12 @@ table {
     background: white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-
+td:nth-child(6) {  /* 6th column = Description */
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 th {
     background-color: #3498db;
     color: white;

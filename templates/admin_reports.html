@@ -2,13 +2,22 @@
 {% block title %}Manage Reports{% endblock %}
 
 {% block content %}
+<style>
+    .desc-col {
+        max-width: 350px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">All Reports: {{ reports|length }}</h6>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-hover">
                 <thead class="thead-dark">
                     <tr>
                         <th>Report ID</th>
@@ -16,8 +25,9 @@
                         <th>Exam</th>
                         <th>College</th>
                         <th>Date</th>
-                        <th>Status</th>
                         <th>Description</th>
+                        <th>Status</th>
+                        <th>AI Analysis</th>  <!-- AI + Action ekach column madhe -->
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -25,24 +35,42 @@
                     {% for r in reports %}
                     <tr>
                         <td>ELD-{{ '%03d'|format(r.id) }}</td>
-                        <td>{{ r.name }}<br><small>{{ r.email }}</small></td>
+                        <td>{{ r.name }}<br><small class="text-muted">{{ r.email }}</small></td>
                         <td>{{ r.exam_name }}</td>
                         <td>{{ r.college_name }}</td>
                         <td>{{ r.report_date }}</td>
-                        <td>{{ r.description[:100] }}...</td>
+                        <td class="desc-col" title="{{ r.description }}">{{ r.description[:120] }}{% if r.description|length > 120 %}...{% endif %}</td>
+                        
+                        <!-- 1. STATUS with Dropdown -->
                         <td>
-                            <span class="badge 
-                                {{ 'badge-warning' if r.status=='Pending' else 'badge-info' if r.status=='In Progress' else 'badge-success' }}">
-                                {{ r.status or 'Pending' }}
-                            </span>
+                            <form action="{{ url_for('update_status', id=r.id) }}" method="POST" class="d-flex gap-1">
+                                <select name="status" class="form-select form-select-sm">
+                                    <option value="Pending" {% if r.status=='Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="In Progress" {% if r.status=='In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Resolved" {% if r.status=='Resolved' %}selected{% endif %}>Resolved</option>
+                                    <option value="Rejected" {% if r.status=='Rejected' %}selected{% endif %}>Rejected</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-success">✓</button>
+                            </form>
                         </td>
+
+                        <!-- 2. AI ANALYSIS -->
                         <td>
-                            <a href="{{ url_for('view_report', id=r.id) }}" class="btn btn-sm btn-primary">View</a>
-                            <a href="{{ url_for('delete_report', id=r.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</a>
+                           <b>AI:</b> {{ r.ai_summary }} <br>
+                            <b>Urgency:</b> {{ r.urgency_score }}/100 <br>
+                            {% if r.urgency_score > 70 %}
+                                <span class="badge bg-danger">High Risk</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- 3. ACTION BUTTONS -->
+                        <td>
+                            <a href="{{ url_for('view_report', id=r.id) }}" class="btn btn-sm btn-primary mb-1">View</a>
+                            <a href="{{ url_for('delete_report', id=r.id) }}" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Delete this report?')">Delete</a>
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="8" class="text-center">No reports found</td></tr>
+                    <tr><td colspan="9" class="text-center">No reports found</td></tr>  <!-- 9 karla -->
                     {% endfor %}
                 </tbody>
             </table>

@@ -59,13 +59,23 @@
     </div>
 </div>
 
-<!-- 📄 Recent Reports -->
+<!-- 📄 Recent Reports with AI -->
 <div class="card p-4">
-    <h6 class="fw-bold mb-3">Recent Reports</h6>
+    <h6 class="fw-bold mb-3">Recent Reports - AI Analysis</h6>
     <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead class="table-light">
-                <tr><th>ID</th><th>Student</th><th>Exam</th><th>Status</th><th>Date</th></tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Exam</th>
+                    <th>Category</th>
+                    <th>AI Summary</th>
+                    <th>Urgency</th>
+                    <th>Sentiment</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
             </thead>
             <tbody>
                 {% for r in recent_reports %}
@@ -73,6 +83,18 @@
                     <td>#{{ r.id }}</td>
                     <td>{{ r.name }}</td>
                     <td>{{ r.exam_name }}</td>
+                    <td><span class="badge bg-info">{{ r.category }}</span></td>
+                    <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ r.ai_summary }}">{{ r.ai_summary }}</td>
+                    <td>
+                        {% if r.urgency_score >= 8 %}<span class="badge bg-danger">{{ r.urgency_score }}/10</span>
+                        {% elif r.urgency_score >= 5 %}<span class="badge bg-warning">{{ r.urgency_score }}/10</span>
+                        {% else %}<span class="badge bg-secondary">{{ r.urgency_score }}/10</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if r.sentiment == 'Negative' %}<span class="badge bg-danger">{{ r.sentiment }}</span>
+                        {% elif r.sentiment == 'Positive' %}<span class="badge bg-success">{{ r.sentiment }}</span>
+                        {% else %}<span class="badge bg-secondary">{{ r.sentiment }}</span>{% endif %}
+                    </td>
                     <td>
                         {% if r.status == 'Pending' %}<span class="badge bg-warning">Pending</span>
                         {% else %}<span class="badge bg-success">Resolved</span>{% endif %}
@@ -118,7 +140,7 @@ new Chart(document.getElementById('reportChart'), {
     options: { responsive: true, plugins: { legend: { display: false } } }
 });
 
-// Chart 2  
+// Chart 2
 new Chart(document.getElementById('userChart'), {
     type: 'line',
     data: {

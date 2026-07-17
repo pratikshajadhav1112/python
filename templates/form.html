@@ -1,96 +1,15 @@
 {% extends "base.html" %}
-
 {% block content %}
-<!-- Include Bootstrap and Font Awesome for layout and icon styling -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* Wrapper to center the form on the page */
-.form-wrapper {
-    max-width: 850px;   
-    margin: 0 auto;
-}
-/* Card style for the report form container */
-.form-card {
-    background: white;
-    border-radius: 16px;
-    padding: 45px 50px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-    border: 1px solid #e2e8f0;
-}
-.form-header {
-    text-align: center;
-    margin-bottom: 35px;
-}
-.form-header h2 {
-    font-size: 32px;
-    color: #0f172a;
-    font-weight: 800;
-    margin-bottom: 10px;
-}
-.subtitle {
-    color: #64748b;
-    font-size: 15px;
-}
-.form-group {
-    margin-bottom: 24px;
-}
-.form-group label {
-    font-weight: 600;
-    color: #334155;
-    margin-bottom: 8px;
-    font-size: 14px;
-    display: block;
-}
-.form-control, .form-select {
-    padding: 12px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 15px;
-    width: 100%;
-    transition: all 0.2s;
-}
-.form-control:focus, .form-select:focus {
-    border-color: #1e3a8a;
-    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
-    outline: none;
-}
-.btn-primary {
-    background: linear-gradient(135deg, #1e3a8a 0%, #0d6efd 100%);
-    color: white;
-    padding: 14px 30px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 16px;
-    width: 100%;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-    cursor: pointer;
-}
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
-}
-.security-note {
-    background: #ecfdf5;
-    color: #059669;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 30px;
-    text-align: center;
-}
-.file-upload-note {
-    font-size: 13px;
-    color: #64748b;
-    margin-top: 6px;
-}
-@media (max-width: 768px) {
-    .form-card { padding: 30px 25px; }
-}
+.form-wrapper { max-width: 850px; margin: 0 auto; }
+.form-card { background: white; border-radius: 16px; padding: 45px 50px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+.form-header { text-align: center; margin-bottom: 35px; }
+.form-header h2 { font-size: 32px; color: #0f172a; font-weight: 800; margin-bottom: 10px; }
+.subtitle { color: #64748b; font-size: 15px; }
+.security-note { background: #ecfdf5; color: #059669; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 30px; text-align: center; }
 </style>
 
 <div class="form-wrapper">
@@ -99,76 +18,118 @@
             <h2><i class="fas fa-shield-halved" style="color:#1e3a8a;"></i> Report an Exam Leak</h2>
             <p class="subtitle">Your identity will remain anonymous. Help us maintain exam integrity.</p>
         </div>
+        <div class="security-note"><i class="fas fa-lock"></i> All submissions are encrypted & 100% anonymous</div>
 
-        <div class="security-note">
-            <i class="fas fa-lock"></i> All submissions are encrypted & 100% anonymous
-        </div>
-
-        <!-- CHANGE #1: enctype add kela -->
         <form method="POST" action="{{ url_for('submit_report') }}" enctype="multipart/form-data">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <!-- Row 1: Exam Details -->
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Exam Name *</label>
-                        <input type="text" name="exam_name" class="form-control" placeholder="e.g. JEE Mains 2026" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Subject Name *</label>
-                        <input type="text" name="subject_name" class="form-control" placeholder="e.g. Physics" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Report Date</label>
-                        <input type="date" name="report_date" class="form-control">
-                    </div>
+                    <div class="col-md-4 mb-3"><label class="form-label">Exam Name *</label><input type="text" name="exam_name" class="form-control" required></div>
+                    <div class="col-md-4 mb-3"><label class="form-label">Subject Name *</label><input type="text" name="subject_name" class="form-control" required></div>
+                    <div class="col-md-4 mb-3"><label class="form-label">Report Date</label><input type="date" name="report_date" class="form-control" value="{{today}}"></div>
                 </div>
 
-                <!-- Row 2: College -->
+                <div class="mb-3"><label class="form-label">College/Center Name *</label><input type="text" name="college_name" class="form-control" required></div>
+
                 <div class="mb-3">
-                    <label class="form-label">College/Center Name *</label>
-                    <input type="text" name="college_name" class="form-control" placeholder="full name of college or school" required>
+                    <label class="form-label">Category</label>
+                    <select name="category" id="category" class="form-select">
+                        <option value="">AI will suggest or Select</option>
+                        <option value="Cheating">Cheating</option>
+                        <option value="Paper Leak">Paper Leak</option>
+                        <option value="Invigilator Issue">Invigilator Issue</option>
+                        <option value="Technical Issue">Technical Issue</option>
+                        <option value="Harassment">Harassment</option>
+                        <option value="Other">Other</option>
+                    </select>
                 </div>
 
-                <!-- Row 3: Incident Location -->
                 <h5 class="mt-4">Incident Location</h5>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">State</label>
-                        <input type="text" name="incident_state" class="form-control" placeholder="Maharashtra">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">District</label>
-                        <input type="text" name="incident_district" class="form-control" placeholder="Pune">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">City</label>
-                        <input type="text" name="incident_city" class="form-control" placeholder="Pune City">
-                    </div>
+                    <div class="col-md-4 mb-3"><label class="form-label">State</label><input type="text" name="incident_state" class="form-control"></div>
+                    <div class="col-md-4 mb-3"><label class="form-label">District</label><input type="text" name="incident_district" class="form-control"></div>
+                    <div class="col-md-4 mb-3"><label class="form-label">City</label><input type="text" name="incident_city" class="form-control"></div>
                 </div>
 
-                <!-- Row 4: Description -->
                 <div class="mb-3">
                     <label class="form-label">Description of Incident</label>
-                    <textarea name="description" class="form-control" rows="4" placeholder="describe how/where you found leak.include time,location,source...."></textarea>
+                    <textarea name="description" id="description" class="form-control" rows="4" placeholder="describe how/where you found leak...."></textarea>
+
+                    <div style="margin:10px 0; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="improveText()">✨ Improve with AI</button>
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="suggestCategory()">🎯 Suggest Category</button>
+                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="grammarCheck()">📝 Grammar Check</button>
+                    </div>
+                    <div id="ai_output" style="display:none; background:#f0f8ff; padding:10px; border-radius:8px; margin:10px 0;">
+                        <b>AI Suggestion:</b><p id="ai_text"></p>
+                        <button type="button" class="btn btn-sm btn-success" onclick="useAIText()">Use This Text</button>
+                    </div>
                 </div>
 
-                <!-- Row 5: File Upload -->
                 <div class="mb-3">
                     <label class="form-label">Upload Evidence</label>
-                    <input type="file" name="evidence" class="form-control" multiple accept="image/*,video/*,audio/*">
-                    <small class="text-muted">Photos, Videos, Audio - multiple files can select . Max 10MB per file</small>
+                    <input type="file" name="evidence" class="form-control" multiple accept="image/*,video/*,audio/*,.pdf">
+                    <small class="text-muted">Photos, Videos, Audio, PDF - Max 10MB per file</small>
                 </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-success btn-lg w-100">
-                    <i class="fas fa-paper-plane"></i> Submit Report Anonymously
-                </button>
+                <button type="submit" class="btn btn-success btn-lg w-100"><i class="fas fa-paper-plane"></i> Submit Report Anonymously</button>
             </form>
-
         </div>
     </div>
 </div>
 
+<!-- Floating Chatbot -->
+<div id="chatbot-box" style="position:fixed; bottom:20px; right:20px; width:320px; background:white; border:1px solid #ccc; border-radius:10px; display:none; z-index:9999; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+    <div style="background:#1e3a8a; color:white; padding:10px; border-radius:10px 10px 0 0;">AI Assistant <span onclick="toggleChat()" style="float:right; cursor:pointer;">X</span></div>
+    <div id="chat-messages" style="height:200px; overflow-y:auto; padding:10px; font-size:14px;"></div>
+    <div style="display:flex; padding:10px;">
+        <input id="chat-input" type="text" placeholder="Ask me..." style="width:75%; border:1px solid #ccc; border-radius:5px; padding:5px;">
+        <button onclick="sendChat()" class="btn btn-primary btn-sm" style="width:23%; margin-left:2%;">Send</button>
+    </div>
+</div>
+<button onclick="toggleChat()" style="position:fixed; bottom:20px; right:20px; z-index:9998;" class="btn btn-primary rounded-circle">💬</button>
+
+<script>
+const csrfToken = "{{ csrf_token() }}"; // 1 dach var
+
+async function improveText() {
+    let text = document.getElementById('description').value;
+    if(!text){ alert("Please write first"); return; }
+    let res = await fetch('/ai_improve', {
+        method:'POST',
+        headers:{'Content-Type':'application/json', 'X-CSRFToken': csrfToken},
+        body:JSON.stringify({text})
+    });
+    let data = await res.json();
+    document.getElementById('ai_text').innerText = data.result;
+    document.getElementById('ai_output').style.display = 'block';
+}
+
+async function suggestCategory() {
+    let text = document.getElementById('description').value;
+    if(!text){ alert("Please write first"); return; }
+    let res = await fetch('/ai_category', {
+        method:'POST',
+        headers:{'Content-Type':'application/json', 'X-CSRFToken': csrfToken}, // <- HE ADD AAHE KA CHECK KAR
+        body:JSON.stringify({text})
+    });
+    let data = await res.json();
+    document.getElementById('category').value = data.category;
+}
+
+async function grammarCheck() {
+    let text = document.getElementById('description').value;
+    if(!text){ alert("Please write first"); return; }
+    let res = await fetch('/ai_grammar', {
+        method:'POST',
+        headers:{'Content-Type':'application/json', 'X-CSRFToken': csrfToken}, // <- HE ADD AAHE KA CHECK KAR
+        body:JSON.stringify({text})
+    });
+    let data = await res.json();
+    document.getElementById('ai_text').innerText = data.result;
+    document.getElementById('ai_output').style.display = 'block';
+}
+
+function useAIText() { document.getElementById('description').value = document.getElementById('ai_text').innerText; }
+</script>
 {% endblock %}
-            

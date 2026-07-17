@@ -1,18 +1,33 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify,abort
+
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, abort,send_file
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from database import get_db, init_db
+from groq import Groq
 import os
+import requests
 import sqlite3
 import json
+import re
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from functools import wraps
-from datetime import datetime
+from io import BytesIO
+import zipfile
+import pytesseract
+from PIL import Image
+from fuzzywuzzy import fuzz
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'Linkkiwi2026'
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "Linkkiwi2026")
 csrf = CSRFProtect(app)
+
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+HIVE_API_KEY = os.getenv("HIVE_API_KEY")
 
 # Upload folders
 UPLOAD_FOLDER_PROFILE = 'static/uploads/profile_photos'
@@ -25,14 +40,138 @@ os.makedirs(UPLOAD_FOLDER_EVIDENCE, exist_ok=True)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.login_message = 'Please login to access this page'
 
 # DB initialize
 if not os.path.exists('myproject.db'):
     init_db()
 
-# User class for Flask-Login
-# User class for Flask-Login
+def allowed_file(filename):
+    
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3', 'wav', 'pdf'}
+
+# ========== AI FUNCTIONS ==========
+
+def analyze_complaint_with_groq(text): # 1. Complaint Analysis
+    """Returns dict: category, priority, summary"""
+    if not os.getenv("GROQ_API_KEY"): return {"category": "Other", "priority": "Medium", "summary": text[:100]}
+    prompt = f"""Analyze complaint: "{text}"
+    Return ONLY JSON: {{"category": "Cheating/Paper Leak/Invigilator Issue/Technical Issue/Harassment/Other",
+    "priority": "High/Medium/Low", "summary": "1 line summary"}}"""
+    try:
+        chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}], response_format={"type": "json_object"})
+        return json.loads(chat.choices[0].message.content)
+    except: return {"category": "Other", "priority": "Medium", "summary": text[:100]}
+
+def chatbot_reply(user_msg): # 2. AI Chatbot
+    prompt = f"You are exam help bot. Answer in 2 lines: {user_msg}"
+    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    return chat.choices[0].message.content
+
+def is_fake_report(text, user_id): # student_id -> user_id
+    db = get_db()
+    cur = db.execute("SELECT description FROM entries WHERE user_id=? ORDER BY created_at DESC LIMIT 3", (user_id,))
+    for row in cur.fetchall():
+        if row[0] and fuzz.ratio(text, row[0]) > 85: return True
+    if not os.getenv("GROQ_API_KEY"): return False
+    prompt = f"Is this spam or fake complaint: '{text}'. Reply only Yes or No"
+    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    return "yes" in chat.choices[0].message.content.lower()
+def get_sentiment(text): # 4. Sentiment Analysis
+    prompt = f"What is sentiment of: '{text}'. Reply only: Angry, Normal, Urgent"
+    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    return chat.choices[0].message.content
+
+def professional_report(points): # 5. AI Report Writing
+    prompt = f"Convert these points into formal complaint letter: {points}"
+    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    return chat.choices[0].message.content
+
+def dashboard_insights(): # 6. AI Dashboard
+    db = get_db()
+    data = db.execute("SELECT category, COUNT(*) FROM entries GROUP BY category").fetchall()
+    prompt = f"Analyze this complaint data: {data}. Give 3 bullet points: Most common issue, Trend, Recommendation"
+    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    return chat.choices[0].message.content
+
+
+def extract_text_ocr(filepath): # 7. AI OCR
+    try:
+        import pytesseract
+        from PIL import Image
+        img = Image.open(filepath)
+        text = pytesseract.image_to_string(img)
+        return text
+    except:
+        return "" # Tesseract nahi hai to khali chhod do
+def check_image_with_hive(filepath): # Hive Fake Image Check
+    if not HIVE_API_KEY: return {"is_fake": False}
+    # Hive API call logic here
+    return {"is_fake": False}
+
+# ========== ROUTES ==========
+
+@app.route('/submit_complaint', methods=['POST'])
+@login_required
+def submit_complaint():
+    text = request.form['complaint']
+    file = request.files.get('evidence')
+    filepath = None
+    hive_result = None
+
+    # 7. OCR + Hive Check
+    if file and file.filename != '' and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(UPLOAD_FOLDER_EVIDENCE, filename)
+        file.save(filepath)
+        if filename.lower().endswith(('png','jpg','jpeg')):
+            text += "\n[OCR Text]: " + extract_text_ocr(filepath)
+        hive_result = check_image_with_hive(filepath)
+        if hive_result and hive_result.get('is_fake'):
+            flash("Fake evidence detected by AI", "danger")
+            return redirect(url_for('student_dashboard'))
+
+    if is_fake_report(text, current_user.id):
+        flash("Duplicate or suspicious complaint detected", "warning")
+        return redirect(url_for('student_dashboard'))
+
+    ai_data = analyze_complaint_with_groq(text)
+    category = ai_data.get('category', 'Other')
+    priority = ai_data.get('priority', 'Medium') 
+    summary = ai_data.get('summary', text[:100])
+    sentiment = get_sentiment(text)
+
+    db = get_db()
+    cursor = db.execute("""INSERT INTO entries
+    (user_id, description, category, priority, ai_summary, sentiment, status, created_at)
+    VALUES (?,?,?,?,?,?,?,?)""",
+    (current_user.id, text, category, priority, summary, sentiment, 'Pending', datetime.now()))
+    
+    complaint_id = cursor.lastrowid  # <- NEW: ID ghetali
+    
+    # ===== YETHE 3 LINE ADD KAR =====
+    notification_msg = f"New {priority} priority complaint: {category}"
+    notification_link = f"/admin/report/{complaint_id}"  # je page var complaint detail aahe
+    db.execute("INSERT INTO notifications (type, message, link, is_read, created_at) VALUES (?,?,?,?,?)",
+               ('New Report', notification_msg, notification_link, 0, datetime.now()))
+    # =================================
+    
+    db.commit()
+    flash("Complaint submitted with AI Analysis", "success")
+    return redirect(url_for('student_dashboard'))
+@app.route('/chatbot', methods=['POST'])
+def chatbot():
+    msg = request.json['message']
+    reply = chatbot_reply(msg)
+    return jsonify({"reply": reply})
+
+@app.route('/ai_report_writer', methods=['POST'])
+@login_required
+def ai_report_writer():
+    points = request.form['points']
+    professional = professional_report(points)
+    return jsonify({"report": professional})
+
+
 class User(UserMixin):
     def __init__(self, id, username, name, role='student', is_mobile_verified=0, is_email_verified=0, is_blocked=0):
         self.id = id
@@ -59,9 +198,6 @@ def load_user(user_id):
             is_blocked=user.get('is_blocked', 0)
         )
     return None
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3', 'wav'}
 
 DUMMY_REPORTS = [
     {
@@ -216,7 +352,7 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 @app.route('/admin/dashboard')
-@admin_required # session check kadhun takla
+@admin_required
 def admin_dashboard():
     conn = get_db()
     c = conn.cursor()
@@ -227,10 +363,31 @@ def admin_dashboard():
         'total_reports': c.execute("SELECT COUNT(*) FROM entries").fetchone()[0],
         'pending': c.execute("SELECT COUNT(*) FROM entries WHERE status='Pending' OR status IS NULL").fetchone()[0],
         'resolved': c.execute("SELECT COUNT(*) FROM entries WHERE status='Resolved'").fetchone()[0],
+        'blocked': c.execute("SELECT COUNT(*) FROM users WHERE is_blocked=1").fetchone()[0],
+        'today_reports': c.execute("SELECT COUNT(*) FROM entries WHERE date(created_at)=date('now')").fetchone()[0]
     }
-    conn.close()
 
-    return render_template('admin_dashboard.html', user=current_user, stats=stats) # current_user pathavla
+    # FIX: JOIN lavla - users madhun name kadhayla
+    recent_reports = c.execute('''
+        SELECT e.id, u.name, e.exam_name, e.status, e.created_at, e.category, e.ai_summary, e.urgency_score, e.sentiment
+        FROM entries e
+        JOIN users u ON e.user_id = u.id
+        ORDER BY e.created_at DESC
+        LIMIT 10
+    ''').fetchall()
+
+    monthly_reports = c.execute("SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as cnt FROM entries GROUP BY month").fetchall()
+    monthly_users = c.execute("SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as cnt FROM users GROUP BY month").fetchall()
+
+    conn.close()
+    insights = dashboard_insights()
+    return render_template('admin_dashboard.html',
+                           user=current_user,
+                           stats=stats,
+                           insights=insights,
+                           recent_reports=recent_reports,
+                           monthly_reports=monthly_reports,
+                           monthly_users=monthly_users)
 
 @app.route('/admin/users')
 @admin_required # @login_required chya jagah @admin_required
@@ -280,28 +437,50 @@ def admin_reports():
     conn.close()
     return render_template('admin_reports.html', user=current_user, reports=[dict(r) for r in reports])
 
-
+@app.route('/admin/update_status/<int:complaint_id>', methods=['POST'])
+@login_required
+def update_status(complaint_id):
+    new_status = request.form['status']
+    db = get_db()
+    
+    # 1. Status update
+    db.execute('UPDATE entries SET status = ? WHERE id = ?', (new_status, complaint_id))
+    
+    # 2. Student la notification pathav
+    complaint = db.execute('SELECT user_id, category FROM entries WHERE id = ?', (complaint_id,)).fetchone()
+    msg = f"Your complaint for '{complaint['category']}' is now: {new_status}"
+    link = f"/student/complaint/{complaint_id}"
+    
+    db.execute("INSERT INTO notifications (type, message, link, is_read, created_at) VALUES (?,?,?,?,?)",
+               ('Status Update', msg, link, 0, datetime.now()))
+    
+    db.commit()
+    db.close()
+    flash(f"Status updated to {new_status}", "success")
+    return redirect(url_for('admin_report_detail', complaint_id=complaint_id))
 @app.route('/admin/evidence', methods=['GET', 'POST'])
 @admin_required
 def admin_evidence():
     conn = get_db()
-    query = '''SELECT e.id, e.exam, e.college, e.evidence_file, e.created_at, u.name, u.email 
-               FROM entries e JOIN users u ON e.user_id = u.id 
-               WHERE e.evidence_file IS NOT NULL'''
+    query = '''SELECT e.id, e.exam_name, e.college_name, e.created_at, u.name, u.email,
+                      ef.id as file_id, ef.filename, ef.file_type
+               FROM entries e 
+               JOIN users u ON e.user_id = u.id 
+               LEFT JOIN entry_files ef ON e.id = ef.entry_id
+               WHERE ef.filename IS NOT NULL AND ef.filename != '' '''
     params = []
 
-    # Filter logic
     exam = request.args.get('exam')
-    file_type = request.args.get('file_type')
+    file_type = request.args.get('file_type') # 'photo', 'video', 'audio'
     if exam:
-        query += ' AND e.exam LIKE ?'
+        query += ' AND e.exam_name LIKE ?'
         params.append(f'%{exam}%')
     if file_type == 'image':
-        query += ' AND e.evidence_file LIKE ?'
-        params.append('%.jpg%')
+        query += ' AND ef.file_type = ?'
+        params.append('photo')
     elif file_type == 'pdf':
-        query += ' AND e.evidence_file LIKE ?'
-        params.append('%.pdf%')
+        query += ' AND ef.file_type = ?'
+        params.append('pdf')
         
     query += ' ORDER BY e.created_at DESC'
     files = conn.execute(query, params).fetchall()
@@ -312,50 +491,51 @@ def admin_evidence():
 @admin_required
 def bulk_download():
     file_ids = request.form.getlist('file_ids')
+    if not file_ids:
+        return "No files selected", 400
+
     conn = get_db()
-    files = conn.execute(f"SELECT evidence_file FROM entries WHERE id IN ({','.join('?'*len(file_ids))})", file_ids).fetchall()
+    placeholders = ','.join('?' * len(file_ids))
+    files = conn.execute(f"SELECT filename FROM entry_files WHERE id IN ({placeholders})", file_ids).fetchall()
+    conn.close()
     
     memory_file = BytesIO()
-    with zipfile.ZipFile(memory_file, 'w') as zf:
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
         for f in files:
-            filepath = os.path.join('static/uploads', f['evidence_file'])
+            filepath = os.path.join('static/uploads', f['filename'])
             if os.path.exists(filepath):
-                zf.write(filepath, f['evidence_file'])
+                zf.write(filepath, f['filename']) # folder structure nako asel tar
     memory_file.seek(0)
     return send_file(memory_file, download_name='evidence_files.zip', as_attachment=True)
-    
-        #stdudent login dashboard
 @app.route('/admin/analytics')
 @admin_required
 def admin_analytics():
     conn = get_db()
-    
-    # 1. Pie chart sathi: Pending vs Resolved vs In Progress
-    status_data = conn.execute("SELECT status, COUNT(*) as count FROM entries GROUP BY status").fetchall()
-    status_labels = [s['status'] for s in status_data]
-    status_counts = [s['count'] for s in status_data]
-    
-    # 2. Bar chart: Reports per Month
-    monthly_reports = conn.execute("""
-        SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count 
-        FROM entries GROUP BY month ORDER BY month LIMIT 6
-    """).fetchall()
-    report_months = [m['month'] for m in monthly_reports]
-    report_counts = [m['count'] for m in monthly_reports]
-    
-    # 3. Line chart: Users per Month
-    monthly_users = conn.execute("""
-        SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as count 
-        FROM users WHERE role='user' GROUP BY month ORDER BY month LIMIT 6
-    """).fetchall()
-    user_months = [m['month'] for m in monthly_users]
-    user_counts = [m['count'] for m in monthly_users]
-    
+
+    total_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    total_entries = conn.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
+
+    # evidence_file ki jagah entry_files table se count karo
+    total_files = conn.execute("SELECT COUNT(*) FROM entry_files").fetchone()[0]
+
+    total_reports = total_entries # entries ch vapra
+
+    # Last 7 days ka chart data
+    labels = []
+    data = []
+    for i in range(6, -1, -1):
+        day = (datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d')
+        count = conn.execute("SELECT COUNT(*) FROM entries WHERE DATE(created_at) =?", (day,)).fetchone()[0]
+        labels.append(day[5:]) # MM-DD
+        data.append(count)
+
     conn.close()
-    return render_template('admin_analytics.html', 
-                           status_labels=status_labels, status_counts=status_counts,
-                           report_months=report_months, report_counts=report_counts,
-                           user_months=user_months, user_counts=user_counts)
+    return render_template('admin_analytics.html',
+                           total_users=total_users,
+                           total_entries=total_entries,
+                           total_files=total_files,
+                           total_reports=total_reports,
+                           labels=labels, data=data)
 @app.route('/admin/notifications')
 @admin_required
 def admin_notifications():
@@ -382,16 +562,19 @@ from werkzeug.security import generate_password_hash, check_password_hash
 @admin_required
 def admin_settings():
     conn = get_db()
-    admin = conn.execute("SELECT * FROM users WHERE id = ?", (session['user_id'],)).fetchone()
+    user_id = session.get('user_id') # .get() ne KeyError yenar nahi
+    if not user_id:
+        return redirect(url_for('login')) # jar login nasel tar login la pathav
+
+    admin = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
 
     if request.method == 'POST':
-        # 1. Password Change
         old_pass = request.form['old_password']
         new_pass = request.form['new_password']
         
         if check_password_hash(admin['password'], old_pass):
             hashed = generate_password_hash(new_pass)
-            conn.execute("UPDATE users SET password = ? WHERE id = ?", (hashed, session['user_id']))
+            conn.execute("UPDATE users SET password = ? WHERE id = ?", (hashed, user_id))
             conn.commit()
             flash('Password updated successfully', 'success')
         else:
@@ -399,6 +582,7 @@ def admin_settings():
     
     conn.close()
     return render_template('admin_settings.html', admin=admin)
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -423,7 +607,32 @@ def about():
 def form():
     today = datetime.now().strftime('%Y-%m-%d')
     return render_template('form.html', today=today)
+@app.route('/ai_improve', methods=['POST'])
+@login_required
+def ai_improve():
+    text = request.json['text']
+    # Option 1 + 4 combine: Professional report
+    result = professional_report(text)
+    return jsonify({"result": result})
 
+@app.route('/ai_category', methods=['POST'])
+@login_required
+def ai_category():
+    text = request.json['text']
+    # Option 2: Sirf category kadha
+    ai_data = analyze_complaint_with_groq(text)
+    return jsonify({"category": ai_data.get('category', 'Other')})
+
+@app.route('/ai_grammar', methods=['POST'])
+@login_required
+def ai_grammar():
+    text = request.json['text']
+    prompt = f"Convert this text to professional formal English: '{text}'"
+    chat = groq_client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return jsonify({"result": chat.choices[0].message.content})
 @app.route('/submit', methods=['POST'])
 @login_required
 def submit_report():
@@ -433,51 +642,69 @@ def submit_report():
         college_name = request.form.get('college_name', '').strip()
         report_date = request.form.get('report_date', '').strip()
         description = request.form.get('description', '').strip()
+        incident_state = request.form.get('incident_state', '').strip()
+        incident_district = request.form.get('incident_district', '').strip()
+        incident_city = request.form.get('incident_city', '').strip() # <- ye lo
 
         if not exam_name or not subject_name or not college_name:
             flash('Exam Name, Subject Name and College Name are required!', 'error')
             return redirect(url_for('form'))
+        category = request.form.get('category', '').strip() # ADD THIS
+        if not category: category = ai_data['category'] # AI se lo agar blank hai
+        # AI
+        ai_data = analyze_complaint_with_groq(description)
+        ai_summary = ai_data['summary']
+        category = ai_data['category']
+        urgency_map = {'High': 9, 'Medium': 5, 'Low': 2}
+        urgency_score = urgency_map.get(ai_data['priority'], 5)
+        sentiment = get_sentiment(description)
 
-        incident_state = request.form.get('incident_state', '').strip()
-        incident_district = request.form.get('incident_district', '').strip()
-        incident_city = request.form.get('incident_city', '').strip()
-
-        # Evidence files handle kar
+        # FILE UPLOAD
         evidence_files = request.files.getlist('evidence')
-        photos, videos, audios = [], [], []
+        photos, videos, audios = [], [] , []
+        os.makedirs(UPLOAD_FOLDER_EVIDENCE, exist_ok=True)
 
         for file in evidence_files:
             if file and file.filename!= '' and allowed_file(file.filename):
                 filename = secure_filename(f"{datetime.now().timestamp()}_{file.filename}")
                 filepath = os.path.join(UPLOAD_FOLDER_EVIDENCE, filename)
                 file.save(filepath)
-
                 ext = filename.rsplit('.', 1)[1].lower()
-                if ext in {'png', 'jpg', 'jpeg', 'gif'}:
-                    photos.append(filename)
-                elif ext == 'mp4':
-                    videos.append(filename)
-                elif ext in {'mp3', 'wav'}:
-                    audios.append(filename)
+                if ext in {'png', 'jpg', 'jpeg', 'gif'}: photos.append(filename)
+                elif ext == 'mp4': videos.append(filename)
+                elif ext in {'mp3', 'wav'}: audios.append(filename)
+                elif ext == 'pdf': photos.append(filename)
 
+        # DB SAVE - 18 column, 18 values
         conn = get_db()
-        conn.execute(
-            '''INSERT INTO entries
-               (user_id, exam_name, subject_name, college_name, report_date, description,
-                incident_state, incident_district, incident_city,
-                photos, videos, audios)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''',
-            (current_user.id, exam_name, subject_name, college_name, report_date, description,
-             incident_state, incident_district, incident_city,
-             json.dumps(photos), json.dumps(videos), json.dumps(audios))
-        )
+        c = conn.cursor()
+        c.execute('''INSERT INTO entries
+           (user_id, exam_name, subject_name, college_name, report_date, description,
+            incident_state, incident_district, incident_city,
+            photos, videos, audios, category, ai_summary, urgency_score, sentiment, status, created_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+        (current_user.id, exam_name, subject_name, college_name, report_date, description,
+         incident_state, incident_district, incident_city,
+         json.dumps(photos), json.dumps(videos), json.dumps(audios),
+         category, ai_summary, urgency_score, sentiment, 'Pending', datetime.now()))
+
+        entry_id = c.lastrowid
+        for f in photos + videos + audios:
+            ext = f.rsplit('.',1)[1].lower()
+            if ext == 'pdf': file_type = 'pdf'
+            elif ext in {'png', 'jpg', 'jpeg', 'gif'}: file_type = 'photo'
+            elif ext == 'mp4': file_type = 'video'
+            else: file_type = 'audio'
+            c.execute("INSERT INTO entry_files (entry_id, filename, file_type) VALUES (?,?,?)", (entry_id, f, file_type))
+
         conn.commit()
         conn.close()
 
-        flash('Report Submitted Successfully!', 'success')
+        flash('Report Submitted Successfully with AI Analysis!', 'success')
         return redirect(url_for('report_list'))
+
     except Exception as e:
-        print("ERROR:", e)
+        print("SUBMIT ERROR:", e)
         flash(f'Error: {e}', 'error')
         return redirect(url_for('form'))
 @app.route('/search')

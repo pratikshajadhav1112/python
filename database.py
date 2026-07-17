@@ -73,6 +73,9 @@ def init_db():
             audios TEXT,
 
             -- Admin
+            urgency_score INTEGER DEFAULT 0,
+            ai_summary TEXT,
+            fake_status TEXT,
             admin_remark TEXT,
             is_dummy INTEGER DEFAULT 0,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -102,6 +105,15 @@ def init_db():
                 )''')
     conn.commit()
     conn.close()
+    c.execute('''CREATE TABLE entries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        exam TEXT,
+        college TEXT,
+        evidence_file TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )''')
 
 
     admin_exists = c.execute("SELECT * FROM users WHERE username = 'admin'").fetchone()
@@ -111,22 +123,13 @@ def init_db():
                      (username, password, name, email, role, is_mobile_verified, is_email_verified)  # <-- is_email_verified add kiya
                      VALUES (?,?,?,?,?,?,?)''',  # <-- 1 ? add kiya
                   ('admin', hashed_pw, 'Admin', 'admin@linkkiwi.com', 'admin', 1, 1)) # <-- last me 1 add kiya
+   
+
 
     conn.commit()
     conn.close()
     print("✅ Database ready with new schema!")
 
-def drop_table():
-    """All tables delete karnyasathi - Navin schema sathi"""
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('DROP TABLE IF EXISTS entry_files')
-    cursor.execute('DROP TABLE IF EXISTS entries')
-    cursor.execute('DROP TABLE IF EXISTS users')
-    conn.commit()
-    conn.close()
-    print("Old tables dropped!")
 
-if __name__ == '__main__':
-    drop_table()  # <-- Pehle purani table delete hogi
-    init_db()     # <-- Fir nayi table banegi
+
+     
