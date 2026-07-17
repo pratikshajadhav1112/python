@@ -194,7 +194,7 @@
 
                         <form method="POST" action="{{ url_for('register') }}" id="regForm" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
+                            
                             <!-- Full Name -->
                             <div class="mb-3">
                                 <label class="form-label">Full Name <span class="required">*</span></label>
@@ -306,7 +306,7 @@
                                     <div class="invalid-feedback">Please select district</div>
                                 </div>
                             </div>
-
+                           
                             <input type="hidden" name="email_verified" id="emailVerifiedFlag" value="0">
 
                             <button type="submit" class="btn-register" id="registerBtn" disabled>
