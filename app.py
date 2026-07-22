@@ -16,9 +16,7 @@ from dotenv import load_dotenv
 from functools import wraps
 from io import BytesIO
 import zipfile
-import pytesseract
-from PIL import Image
-from fuzzywuzzy import fuzz
+
 
 load_dotenv()
 
@@ -67,12 +65,12 @@ def chatbot_reply(user_msg): # 2. AI Chatbot
     chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
     return chat.choices[0].message.content
 
-def is_fake_report(text, user_id): # student_id -> user_id
+def is_fake_report(text, user_id):
     db = get_db()
     cur = db.execute("SELECT description FROM entries WHERE user_id=? ORDER BY created_at DESC LIMIT 3", (user_id,))
     for row in cur.fetchall():
-        if row[0] and fuzz.ratio(text, row[0]) > 85: return True
-    if not os.getenv("GROQ_API_KEY"): return False
+        if row[0] and text[:50] == row[0][:50]: return True # 50 characters match zale tar duplicate
+    if not GROQ_API_KEY: return False
     prompt = f"Is this spam or fake complaint: '{text}'. Reply only Yes or No"
     chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
     return "yes" in chat.choices[0].message.content.lower()
@@ -90,9 +88,7 @@ def dashboard_insights(): # 6. AI Dashboard
     db = get_db()
     data = db.execute("SELECT category, COUNT(*) FROM entries GROUP BY category").fetchall()
     prompt = f"Analyze this complaint data: {data}. Give 3 bullet points: Most common issue, Trend, Recommendation"
-    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
-    return chat.choices[0].message.content
-
+    
 
 def extract_text_ocr(filepath): # 7. AI OCR
     try:
@@ -437,12 +433,12 @@ def admin_reports():
     conn.close()
     return render_template('admin_reports.html', user=current_user, reports=[dict(r) for r in reports])
 
-@app.route('/admin/update_status/<int:complaint_id>', methods=['POST'])
-@login_required
-def update_status(complaint_id):
+@app.route('/admin/update_status/<int:id>', methods=['POST']) # complaint_id chya jagah id
+def update_status(id): # ithe pan id
     new_status = request.form['status']
     db = get_db()
-    
+    db.execute('UPDATE entries SET status = ? WHERE id = ?', (new_status, id)) # ithe pan
+    ...    
     # 1. Status update
     db.execute('UPDATE entries SET status = ? WHERE id = ?', (new_status, complaint_id))
     
@@ -558,30 +554,73 @@ def inject_notifications():
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+def get_settings():
+    conn = get_db()
+    s = conn.execute("SELECT * FROM settings WHERE id=1").fetchone()
+    conn.close()
+    return s
+
+@app.before_request # Maintenance check for free hosting
+def check_maintenance():
+    settings = get_settings()
+    if settings and settings['maintenance_mode'] == 1:
+        if request.endpoint and 'static' not in request.endpoint:
+            if not current_user.is_authenticated or current_user.role != 'admin':
+                return render_template('maintenance.html'), 503
+
 @app.route('/admin/settings', methods=['GET', 'POST'])
+@login_required
 @admin_required
 def admin_settings():
     conn = get_db()
-    user_id = session.get('user_id') # .get() ne KeyError yenar nahi
-    if not user_id:
-        return redirect(url_for('login')) # jar login nasel tar login la pathav
-
-    admin = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    settings = conn.execute("SELECT * FROM settings WHERE id=1").fetchone()
+    admin = conn.execute("SELECT * FROM users WHERE id = ?", (current_user.id,)).fetchone()
 
     if request.method == 'POST':
-        old_pass = request.form['old_password']
-        new_pass = request.form['new_password']
+        # Password change form
+        if 'change_password' in request.form:
+            old_pass = request.form['old_password']
+            new_pass = request.form['new_password']
+            if check_password_hash(admin['password'], old_pass):
+                hashed = generate_password_hash(new_pass)
+                conn.execute("UPDATE users SET password = ? WHERE id = ?", (hashed, current_user.id))
+                conn.commit()
+                flash('Password updated successfully', 'success')
+            else:
+                flash('Old password is wrong', 'danger')
         
-        if check_password_hash(admin['password'], old_pass):
-            hashed = generate_password_hash(new_pass)
-            conn.execute("UPDATE users SET password = ? WHERE id = ?", (hashed, user_id))
+        # Settings form
+        elif 'save_settings' in request.form:
+            ai_model = request.form['ai_model']
+            maintenance_mode = 1 if request.form.get('maintenance_mode') else 0
+            registration_open = 1 if request.form.get('registration_open') else 0
+            max_daily = int(request.form['max_daily_complaints'])
+            
+            conn.execute("""UPDATE settings SET 
+                            ai_model=?, maintenance_mode=?, registration_open=?, max_daily_complaints=?
+                            WHERE id=1""", 
+                         (ai_model, maintenance_mode, registration_open, max_daily))
             conn.commit()
-            flash('Password updated successfully', 'success')
-        else:
-            flash('Old password is wrong', 'danger')
-    
+            flash('Settings updated successfully!', 'success')
+
     conn.close()
-    return render_template('admin_settings.html', admin=admin)
+    return render_template('admin_settings.html', admin=admin, settings=settings)
+@app.route('/admin/export_csv')
+@login_required
+@admin_required
+def export_csv():
+    conn = get_db()
+    data = conn.execute("SELECT e.*, u.name, u.username FROM entries e JOIN users u ON e.user_id = u.id").fetchall()
+    conn.close()
+
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['ID', 'Student Name', 'Username', 'Exam', 'College', 'Status', 'Category', 'Urgency', 'Date'])
+    for row in data:
+        cw.writerow([row['id'], row['name'], row['username'], row['exam_name'], row['college_name'], row['status'], row['category'], row['urgency_score'], row['created_at']])
+    
+    output = si.getvalue()
+    return Response(output, mimetype="text/csv", headers={"Content-disposition": "attachment; filename=complaints.csv"})
 
 @app.route('/dashboard')
 @login_required
@@ -662,6 +701,7 @@ def submit_report():
         # FILE UPLOAD
         evidence_files = request.files.getlist('evidence')
         photos, videos, audios = [], [] , []
+        os.makedirs(UPLOAD_FOLDER_PROFILE, exist_ok=True)
         os.makedirs(UPLOAD_FOLDER_EVIDENCE, exist_ok=True)
 
         for file in evidence_files:

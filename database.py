@@ -29,7 +29,7 @@ def init_db():
             -- Verification
             is_mobile_verified INTEGER DEFAULT 0,
             is_email_verified INTEGER DEFAULT 0,
-            mobile_otp TEXT,
+            email_otp TEXT,
             otp_generated_at TEXT,
 
             -- Identity Proof 
@@ -48,7 +48,7 @@ def init_db():
         )
     ''')
 
-    # Entries Table - Complaint sathi navin fields
+    # Entries Table - Fakt ekdach
     c.execute('''
         CREATE TABLE IF NOT EXISTS entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,9 +72,11 @@ def init_db():
             videos TEXT,
             audios TEXT,
 
-            -- Admin
+            -- AI fields
+            category TEXT,
             urgency_score INTEGER DEFAULT 0,
             ai_summary TEXT,
+            sentiment TEXT,
             fake_status TEXT,
             admin_remark TEXT,
             is_dummy INTEGER DEFAULT 0,
@@ -85,6 +87,7 @@ def init_db():
         )
     ''')
 
+    # Entry Files Table
     c.execute('''
         CREATE TABLE IF NOT EXISTS entry_files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,6 +98,7 @@ def init_db():
         )
     ''')
     
+    # Notifications Table
     c.execute('''CREATE TABLE IF NOT EXISTS notifications (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     type TEXT,
@@ -103,33 +107,16 @@ def init_db():
                     is_read INTEGER DEFAULT 0,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )''')
-    conn.commit()
-    conn.close()
-    c.execute('''CREATE TABLE entries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        exam TEXT,
-        college TEXT,
-        evidence_file TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )''')
-
-
+    
+    # Admin user banav
     admin_exists = c.execute("SELECT * FROM users WHERE username = 'admin'").fetchone()
     if not admin_exists:
         hashed_pw = generate_password_hash('admin123')
         c.execute('''INSERT INTO users
-                     (username, password, name, email, role, is_mobile_verified, is_email_verified)  # <-- is_email_verified add kiya
-                     VALUES (?,?,?,?,?,?,?)''',  # <-- 1 ? add kiya
-                  ('admin', hashed_pw, 'Admin', 'admin@linkkiwi.com', 'admin', 1, 1)) # <-- last me 1 add kiya
+                     (username, password, name, email, role, is_mobile_verified, is_email_verified)
+                     VALUES (?,?,?,?,?,?,?)''',
+                  ('admin', hashed_pw, 'Admin', 'admin@linkkiwi.com', 'admin', 1, 1))
    
-
-
-    conn.commit()
-    conn.close()
+    conn.commit()  # <- Sagla commit ithach
+    conn.close()   # <- Mag close
     print("✅ Database ready with new schema!")
-
-
-
-     

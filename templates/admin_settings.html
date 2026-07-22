@@ -1,63 +1,72 @@
-{% extends "admin_base.html" %}
-{% block title %}Settings{% endblock %}
-
+{% extends "base.html" %}
 {% block content %}
-<h2><i class="fa-solid fa-gear me-2"></i>Settings</h2>
+<div class="container mt-4">
+    <h2>Admin Settings</h2>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-<div class="row">
-    <!-- Left: Profile Info -->
-    <div class="col-md-6">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-                <i class="fa fa-user"></i> Admin Profile
-            </div>
-            <div class="card-body">
-                <p><b>Name:</b> {{ admin['name'] }}</p>
-                <p><b>Email:</b> {{ admin['email'] }}</p>
-                <p><b>Role:</b> <span class="badge bg-danger">Admin</span></p>
-            </div>
-        </div>
-    </div>
+    <div class="row">
+        <!-- Column 1: Site Settings -->
+        <div class="col-md-6">
+            
+            <div class="card">
+                <div class="card-header">Site Control - Free Plan</div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> <!-- HE ADD KEL -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="maintenance_mode" id="maintenance" {% if settings.maintenance_mode %}checked{% endif %}>
+                            <label class="form-check-label" for="maintenance">Maintenance Mode ON</label>
+                        </div>
 
-    <!-- Right: Change Password -->
-    <div class="col-md-6">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-dark text-white">
-                <i class="fa fa-key"></i> Change Password
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    <div class="mb-3">
-                        <label>Old Password</label>
-                        <input type="password" name="old_password" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>New Password</label>
-                        <input type="password" name="new_password" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Update Password</button>
-                </form>
-            </div>
-        </div>
-    </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="registration_open" id="registration" {% if settings.registration_open %}checked{% endif %}>
+                            <label class="form-check-label" for="registration">New Registration Open</label>
+                        </div>
 
-    <!-- Full Width: Site Settings -->
-    <div class="col-12">
-        <div class="card shadow-sm">
-            <div class="card-header bg-info text-white">
-                <i class="fa fa-sliders"></i> Site Settings
-            </div>
-            <div class="card-body">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="themeSwitch" checked>
-                    <label class="form-check-label" for="themeSwitch">Blue + White Theme - Government Style</label>
+                        <div class="mb-3">
+                            <label class="form-label">AI Model - Free</label>
+                            <select name="ai_model" class="form-control">
+                                <option value="llama-3.1-8b-instant" {% if settings.ai_model == 'llama-3.1-8b-instant' %}selected{% endif %}>Llama 3.1 8B - Fast & Free</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Max Complaints Per Student/Day</label>
+                            <input type="number" name="max_daily_complaints" class="form-control" value="{{ settings.max_daily_complaints }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </form>
                 </div>
-                <hr>
-                <div class="mb-3">
-                    <label>Site Name</label>
-                    <input type="text" class="form-control" value="Leak Reporting Portal" readonly>
+            </div>
+             <a href="{{ url_for('export_csv') }}" class="btn btn-success mt-3">Download All Data CSV</a>
+        </div>
+
+        <!-- Column 2: Change Password -->
+        <div class="col-md-6">
+             <div class="card">
+                <div class="card-header">Change Admin Password</div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="mb-3">
+                            <label>Old Password</label>
+                            <input type="password" name="old_password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>New Password</label>
+                            <input type="password" name="new_password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Update Password</button>
+                    </form>
                 </div>
-                <button class="btn btn-success" disabled>Save Settings - Coming Soon</button>
             </div>
         </div>
     </div>
