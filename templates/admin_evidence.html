@@ -1,5 +1,5 @@
 {% extends "admin_base.html" %}
-{% block title %}Evidence Files - Advance{% endblock %}
+{% block title %}Evidence Files{% endblock %}
 
 {% block content %}
 <h2><i class="fa-solid fa-folder-open me-2"></i>Evidence Files</h2>
@@ -7,46 +7,55 @@
 <!-- Filter Bar -->
 <form method="get" class="card shadow-sm p-3 mb-4">
     <div class="row g-2">
-        <div class="col-md-4"><input type="text" name="exam" class="form-control" placeholder="Search by Exam"></div>
+        <div class="col-md-4"><input type="text" name="exam" class="form-control" placeholder="Search by Exam" value="{{ request.args.get('exam','') }}"></div>
         <div class="col-md-3">
             <select name="file_type" class="form-select">
                 <option value="">All File Types</option>
-                <option value="image">Images Only</option>
-                <option value="pdf">PDF Only</option>
+                <option value="image" {% if request.args.get('file_type')=='image' %}selected{% endif %}>Images Only</option>
+                <option value="pdf" {% if request.args.get('file_type')=='pdf' %}selected{% endif %}>PDF Only</option>
             </select>
         </div>
         <div class="col-md-2"><button class="btn btn-primary w-100"><i class="fa fa-search"></i> Filter</button></div>
     </div>
 </form>
 
-<form method="post" action="{{ url_for('bulk_download') }}">
 <div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between">
+    <div class="card-header">
         <span>Total Files: {{ files|length }}</span>
-        <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-download"></i> Bulk Download Selected</button>
     </div>
     <div class="card-body">
+        {% if files|length == 0 %}
+            <p class="text-center">No evidence files found.</p>
+        {% endif %}
         <div class="row">
             {% for f in files %}
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
-                    <input type="checkbox" name="file_ids" value="{{ f['id'] }}" class="form-check-input m-2">
-                    
-                    {% if f['evidence_file'].endswith('.jpg') or f['evidence_file'].endswith('.png') %}
-                        <img src="{{ url_for('uploaded_file', filename=f['evidence_file']) }}" 
-                             class="card-img-top" style="height:150px; object-fit:cover; cursor:pointer;"
-                             data-bs-toggle="modal" data-bs-target="#previewModal" 
-                             onclick="showPreview('{{ url_for('uploaded_file', filename=f['evidence_file']) }}')">
-                    {% else %}
+
+                    {% if f['file_type'] == 'image' %}
+                        <img src="{{ url_for('uploaded_file', filename=f['filename']) }}"
+                             class="card-img-top" style="height:180px; object-fit:cover; cursor:pointer;"
+                             data-bs-toggle="modal" data-bs-target="#previewModal"
+                             onclick="showPreview('{{ url_for('uploaded_file', filename=f['filename']) }}')">
+                    {% elif f['file_type'] == 'pdf' %}
                         <div class="text-center p-4 bg-light">
                             <i class="fa-solid fa-file-pdf fa-4x text-danger"></i>
                         </div>
+                    {% else %}
+                        <div class="text-center p-4 bg-light">
+                            <i class="fa-solid fa-file-video fa-4x text-primary"></i>
+                        </div>
                     {% endif %}
-                    
+
                     <div class="card-body">
                         <h6 class="card-title">{{ f['name'] }}</h6>
-                        <p class="card-text small">{{ f['exam'] }}<br>{{ f['created_at'][:10] }}</p>
-                        <a href="{{ url_for('uploaded_file', filename=f['evidence_file']) }}" class="btn btn-sm btn-primary" download>Download</a>
+                        <p class="card-text small">
+                            Exam: {{ f['exam_name'] }}<br>
+                            Date: {{ f['created_at'][:10] }}
+                        </p>
+                        <a href="{{ url_for('uploaded_file', filename=f['filename']) }}" class="btn btn-sm btn-primary w-100" download>
+                            <i class="fa fa-download"></i> Download
+                        </a>
                     </div>
                 </div>
             </div>
@@ -54,11 +63,10 @@
         </div>
     </div>
 </div>
-</form>
 
 <!-- Preview Modal -->
 <div class="modal fade" id="previewModal">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-body text-center">
         <img id="previewImg" src="" class="img-fluid">

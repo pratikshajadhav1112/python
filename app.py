@@ -90,46 +90,25 @@ def dashboard_insights(): # 6. AI Dashboard
     prompt = f"Analyze this complaint data: {data}. Give 3 bullet points: Most common issue, Trend, Recommendation"
     
 
-def extract_text_ocr(filepath): # 7. AI OCR
-    try:
-        import pytesseract
-        from PIL import Image
-        img = Image.open(filepath)
-        text = pytesseract.image_to_string(img)
-        return text
-    except:
-        return "" # Tesseract nahi hai to khali chhod do
-def check_image_with_hive(filepath): # Hive Fake Image Check
-    if not HIVE_API_KEY: return {"is_fake": False}
-    # Hive API call logic here
-    return {"is_fake": False}
+
+
 
 # ========== ROUTES ==========
-
 @app.route('/submit_complaint', methods=['POST'])
 @login_required
 def submit_complaint():
     text = request.form['complaint']
     file = request.files.get('evidence')
     filepath = None
-    hive_result = None
 
-    # 7. OCR + Hive Check
+    # 1. File upload - fakt save kar, check nako
     if file and file.filename != '' and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        filename = secure_filename(f"{datetime.now().timestamp()}_{file.filename}")
         filepath = os.path.join(UPLOAD_FOLDER_EVIDENCE, filename)
         file.save(filepath)
-        if filename.lower().endswith(('png','jpg','jpeg')):
-            text += "\n[OCR Text]: " + extract_text_ocr(filepath)
-        hive_result = check_image_with_hive(filepath)
-        if hive_result and hive_result.get('is_fake'):
-            flash("Fake evidence detected by AI", "danger")
-            return redirect(url_for('student_dashboard'))
+        text += f"\n[Evidence Uploaded]: {filename}" # DB madhe nav save hoil
 
-    if is_fake_report(text, current_user.id):
-        flash("Duplicate or suspicious complaint detected", "warning")
-        return redirect(url_for('student_dashboard'))
-
+    # 2. AI Analysis - fakt Groq
     ai_data = analyze_complaint_with_groq(text)
     category = ai_data.get('category', 'Other')
     priority = ai_data.get('priority', 'Medium') 
@@ -137,23 +116,16 @@ def submit_complaint():
     sentiment = get_sentiment(text)
 
     db = get_db()
-    cursor = db.execute("""INSERT INTO entries
+    db.execute("""INSERT INTO entries
     (user_id, description, category, priority, ai_summary, sentiment, status, created_at)
     VALUES (?,?,?,?,?,?,?,?)""",
     (current_user.id, text, category, priority, summary, sentiment, 'Pending', datetime.now()))
     
-    complaint_id = cursor.lastrowid  # <- NEW: ID ghetali
-    
-    # ===== YETHE 3 LINE ADD KAR =====
-    notification_msg = f"New {priority} priority complaint: {category}"
-    notification_link = f"/admin/report/{complaint_id}"  # je page var complaint detail aahe
-    db.execute("INSERT INTO notifications (type, message, link, is_read, created_at) VALUES (?,?,?,?,?)",
-               ('New Report', notification_msg, notification_link, 0, datetime.now()))
-    # =================================
-    
     db.commit()
+    db.close()
+    
     flash("Complaint submitted with AI Analysis", "success")
-    return redirect(url_for('student_dashboard'))
+    return redirect(url_for('dashboard')) # student_dashboard navhata mhanun
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
     msg = request.json['message']
@@ -267,7 +239,7 @@ def register():
                      (name, username, email, mobile, hashed_pw,
                       request.remote_addr, request.headers.get('User-Agent'),
                       'student', 1, 0)) # Email verified=1, Mobile=0 skip
-
+                        
         conn.commit()
         conn.close()
 
@@ -454,55 +426,49 @@ def update_status(id): # ithe pan id
     db.close()
     flash(f"Status updated to {new_status}", "success")
     return redirect(url_for('admin_report_detail', complaint_id=complaint_id))
-@app.route('/admin/evidence', methods=['GET', 'POST'])
+@app.route('/admin/evidence')
 @admin_required
 def admin_evidence():
     conn = get_db()
-    query = '''SELECT e.id, e.exam_name, e.college_name, e.created_at, u.name, u.email,
-                      ef.id as file_id, ef.filename, ef.file_type
-               FROM entries e 
-               JOIN users u ON e.user_id = u.id 
-               LEFT JOIN entry_files ef ON e.id = ef.entry_id
-               WHERE ef.filename IS NOT NULL AND ef.filename != '' '''
+    conn.row_factory = sqlite3.Row
+
+    query = '''SELECT e.id, e.exam_name, e.created_at, u.name,
+                      e.photos
+               FROM entries e
+               JOIN users u ON e.user_id = u.id
+               WHERE e.photos IS NOT NULL AND e.photos!= '[]' '''
+
     params = []
-
     exam = request.args.get('exam')
-    file_type = request.args.get('file_type') # 'photo', 'video', 'audio'
+    file_type = request.args.get('file_type')
+
     if exam:
-        query += ' AND e.exam_name LIKE ?'
+        query += ' AND e.exam_name LIKE?'
         params.append(f'%{exam}%')
-    if file_type == 'image':
-        query += ' AND ef.file_type = ?'
-        params.append('photo')
-    elif file_type == 'pdf':
-        query += ' AND ef.file_type = ?'
-        params.append('pdf')
-        
+
     query += ' ORDER BY e.created_at DESC'
-    files = conn.execute(query, params).fetchall()
+    entries = conn.execute(query, params).fetchall()
     conn.close()
+
+    files = []
+    for entry in entries:
+        photos = json.loads(entry['photos']) if entry['photos'] else []
+        for photo in photos:
+            ext = photo.rsplit('.', 1)[1].lower()
+            ftype = 'image' if ext in ['jpg','jpeg','png','gif'] else 'pdf' if ext == 'pdf' else 'video'
+
+            if file_type and file_type!= ftype: continue # filter
+
+            files.append({
+                'id': entry['id'],
+                'name': entry['name'],
+                'exam_name': entry['exam_name'],
+                'created_at': entry['created_at'],
+                'filename': photo,
+                'file_type': ftype
+            })
+
     return render_template('admin_evidence.html', files=files)
-
-@app.route('/admin/evidence/bulk_download', methods=['POST'])
-@admin_required
-def bulk_download():
-    file_ids = request.form.getlist('file_ids')
-    if not file_ids:
-        return "No files selected", 400
-
-    conn = get_db()
-    placeholders = ','.join('?' * len(file_ids))
-    files = conn.execute(f"SELECT filename FROM entry_files WHERE id IN ({placeholders})", file_ids).fetchall()
-    conn.close()
-    
-    memory_file = BytesIO()
-    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for f in files:
-            filepath = os.path.join('static/uploads', f['filename'])
-            if os.path.exists(filepath):
-                zf.write(filepath, f['filename']) # folder structure nako asel tar
-    memory_file.seek(0)
-    return send_file(memory_file, download_name='evidence_files.zip', as_attachment=True)
 @app.route('/admin/analytics')
 @admin_required
 def admin_analytics():
