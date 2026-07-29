@@ -1,5 +1,6 @@
 
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, abort,send_file
+# Import standard and third-party modules used in the Flask application
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, abort, send_file
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,78 +18,107 @@ from functools import wraps
 from io import BytesIO
 import zipfile
 
-
+# Load environment variables from .env file
 load_dotenv()
 
+# Create Flask app and configure secret key and CSRF protection
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "Linkkiwi2026")
 csrf = CSRFProtect(app)
 
+# Initialize AI clients and API keys
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 HIVE_API_KEY = os.getenv("HIVE_API_KEY")
 
-# Upload folders
+# Upload folder paths and maximum allowed upload size
 UPLOAD_FOLDER_PROFILE = 'static/uploads/profile_photos'
 UPLOAD_FOLDER_EVIDENCE = 'static/uploads/evidence'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 os.makedirs(UPLOAD_FOLDER_PROFILE, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER_EVIDENCE, exist_ok=True)
 
-# Flask-Login setup
+# Flask-Login setup for user session management
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# DB initialize
+# Initialize local database file if it does not already exist
 if not os.path.exists('myproject.db'):
     init_db()
 
+# Utility to validate uploaded file extensions
 def allowed_file(filename):
-    
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3', 'wav', 'pdf'}
 
 # ========== AI FUNCTIONS ==========
 
-def analyze_complaint_with_groq(text): # 1. Complaint Analysis
+# Analyze the complaint text and return category, priority, and summary
+def analyze_complaint_with_groq(text):
     """Returns dict: category, priority, summary"""
-    if not os.getenv("GROQ_API_KEY"): return {"category": "Other", "priority": "Medium", "summary": text[:100]}
+    if not os.getenv("GROQ_API_KEY"):
+        return {"category": "Other", "priority": "Medium", "summary": text[:100]}
+
     prompt = f"""Analyze complaint: "{text}"
     Return ONLY JSON: {{"category": "Cheating/Paper Leak/Invigilator Issue/Technical Issue/Harassment/Other",
     "priority": "High/Medium/Low", "summary": "1 line summary"}}"""
     try:
-        chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}], response_format={"type": "json_object"})
+        chat = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"}
+        )
         return json.loads(chat.choices[0].message.content)
-    except: return {"category": "Other", "priority": "Medium", "summary": text[:100]}
+    except:
+        return {"category": "Other", "priority": "Medium", "summary": text[:100]}
 
-def chatbot_reply(user_msg): # 2. AI Chatbot
+# Generate chatbot response for a given user message
+def chatbot_reply(user_msg):
     prompt = f"You are exam help bot. Answer in 2 lines: {user_msg}"
-    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    chat = groq_client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}]
+    )
     return chat.choices[0].message.content
 
+# Check if the report is likely a duplicate or spam based on recent user submissions
 def is_fake_report(text, user_id):
     db = get_db()
     cur = db.execute("SELECT description FROM entries WHERE user_id=? ORDER BY created_at DESC LIMIT 3", (user_id,))
     for row in cur.fetchall():
-        if row[0] and text[:50] == row[0][:50]: return True # 50 characters match zale tar duplicate
-    if not GROQ_API_KEY: return False
+        if row[0] and text[:50] == row[0][:50]:
+            return True  # duplicate if first 50 chars match
+    if not GROQ_API_KEY:
+        return False
     prompt = f"Is this spam or fake complaint: '{text}'. Reply only Yes or No"
-    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    chat = groq_client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}]
+    )
     return "yes" in chat.choices[0].message.content.lower()
-def get_sentiment(text): # 4. Sentiment Analysis
+
+# Determine sentiment from complaint text
+def get_sentiment(text):
     prompt = f"What is sentiment of: '{text}'. Reply only: Angry, Normal, Urgent"
-    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    chat = groq_client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}]
+    )
     return chat.choices[0].message.content
 
-def professional_report(points): # 5. AI Report Writing
+# Convert user points into a formal complaint report
+def professional_report(points):
     prompt = f"Convert these points into formal complaint letter: {points}"
-    chat = groq_client.chat.completions.create(model="llama-3.1-8b-instant", messages=[{"role": "user", "content": prompt}])
+    chat = groq_client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}]
+    )
     return chat.choices[0].message.content
 
-def dashboard_insights(): # 6. AI Dashboard
+# Generate dashboard insights based on complaint categories
+def dashboard_insights():
     db = get_db()
     data = db.execute("SELECT category, COUNT(*) FROM entries GROUP BY category").fetchall()
     prompt = f"Analyze this complaint data: {data}. Give 3 bullet points: Most common issue, Trend, Recommendation"
-    
 
 
 
