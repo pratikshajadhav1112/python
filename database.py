@@ -2,7 +2,6 @@ import os
 import sqlite3
 from werkzeug.security import generate_password_hash
 
-# Absolute path - Always with app.py folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'myproject.db')
 
@@ -15,7 +14,7 @@ def init_db():
     conn = get_db()
     c = conn.cursor()
 
-    # Users Table - Navin fields sobat
+    # Users Table
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,21 +24,11 @@ def init_db():
             mobile TEXT UNIQUE,
             name TEXT,
             role TEXT DEFAULT 'student',
-
-            -- Verification
             is_mobile_verified INTEGER DEFAULT 0,
             is_email_verified INTEGER DEFAULT 0,
             email_otp TEXT,
             otp_generated_at TEXT,
-
-            -- Identity Proof 
             profile_photo TEXT,
-            id_proof_type TEXT,
-            id_proof_number TEXT,
-            id_proof_photo TEXT,
-            is_id_verified INTEGER DEFAULT 0,
-
-            -- Tracking & Moderation
             signup_ip TEXT,
             signup_user_agent TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -48,7 +37,7 @@ def init_db():
         )
     ''')
 
-    # Entries Table - Fakt ekdach
+    # Entries Table
     c.execute('''
         CREATE TABLE IF NOT EXISTS entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,45 +48,29 @@ def init_db():
             status TEXT DEFAULT 'Pending',
             report_date TEXT,
             description TEXT,
-
-            -- Incident Location
             incident_state TEXT,
             incident_district TEXT,
             incident_city TEXT,
-            incident_college TEXT,
-            incident_address TEXT,
-
-            -- Multiple Files - JSON madhe store karu
             photos TEXT,
-            videos TEXT,
-            audios TEXT,
-
-            -- AI fields
-            category TEXT,
             urgency_score INTEGER DEFAULT 0,
             ai_summary TEXT,
+            category TEXT,
             sentiment TEXT,
-            fake_status TEXT,
-            admin_remark TEXT,
-            is_dummy INTEGER DEFAULT 0,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT,
-
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
 
-    # Entry Files Table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS entry_files (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            entry_id INTEGER,
-            filename TEXT,
-            file_type TEXT, -- 'photo', 'video', 'audio'
-            FOREIGN KEY (entry_id) REFERENCES entries (id)
-        )
-    ''')
-    
+    # Settings Table - Navin for Admin Panel
+    c.execute('''CREATE TABLE IF NOT EXISTS settings (
+                    id INTEGER PRIMARY KEY,
+                    ai_model TEXT DEFAULT 'llama-3.1-8b-instant',
+                    maintenance_mode INTEGER DEFAULT 0,
+                    registration_open INTEGER DEFAULT 1,
+                    max_daily_complaints INTEGER DEFAULT 5
+                )''')
+    c.execute("INSERT OR IGNORE INTO settings (id) VALUES (1)")
+
     # Notifications Table
     c.execute('''CREATE TABLE IF NOT EXISTS notifications (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,15 +81,15 @@ def init_db():
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )''')
     
-    # Admin user banav
+    # Admin user
     admin_exists = c.execute("SELECT * FROM users WHERE username = 'admin'").fetchone()
     if not admin_exists:
         hashed_pw = generate_password_hash('admin123')
         c.execute('''INSERT INTO users
-                     (username, password, name, email, role, is_mobile_verified, is_email_verified)
-                     VALUES (?,?,?,?,?,?,?)''',
-                  ('admin', hashed_pw, 'Admin', 'admin@linkkiwi.com', 'admin', 1, 1))
+                     (username, password, name, email, role, is_email_verified)
+                     VALUES (?,?,?,?,?,?)''',
+                  ('admin', hashed_pw, 'Admin', 'admin@linkkiwi.com', 'admin', 1))
    
-    conn.commit()  # <- Sagla commit ithach
-    conn.close()   # <- Mag close
-    print("✅ Database ready with new schema!")
+    conn.commit()
+    conn.close()
+    print("✅ Database ready!")

@@ -110,44 +110,35 @@
 
 {% block scripts %}
 <script>
-// Server data la JS variable madhe tak
-const reportLabels = [{% for m in monthly_reports %}"{{ m.month }}"{% if not loop.last %},{% endif %}{% endfor %}];
-const reportData = [{% for m in monthly_reports %}{{ m.cnt }}{% if not loop.last %},{% endif %}{% endfor %}];
+    // Server kadun JSON direct milala - kuthehi error nahi yenar
+    const labelsReports = JSON.parse('{{ report_labels_json | safe }}');
+    const dataReports = JSON.parse('{{ report_data_json | safe }}');
+    const labelsUsers = JSON.parse('{{ user_labels_json | safe }}');
+    const dataUsers = JSON.parse('{{ user_data_json | safe }}');
 
-const userLabels = [{% for m in monthly_users %}"{{ m.month }}"{% if not loop.last %},{% endif %}{% endfor %}];
-const userData = [{% for m in monthly_users %}{{ m.cnt }}{% if not loop.last %},{% endif %}{% endfor %}];
+    // Jar data rikama asel tar
+    if(labelsReports.length === 0){ labelsReports.push('No Data'); dataReports.push(0); }
+    if(labelsUsers.length === 0){ labelsUsers.push('No Data'); dataUsers.push(0); }
 
-// Animated Counter
-document.querySelectorAll('.counter').forEach(counter => {
-    const target = +counter.innerText;
-    let count = 0;
-    const inc = target / 100;
-    const update = () => {
-        count += inc;
-        if(count < target) { counter.innerText = Math.ceil(count); setTimeout(update, 20); }
-        else { counter.innerText = target; }
-    }
-    update();
-});
+    // Counter
+    document.querySelectorAll('.counter').forEach(counter => { 
+        const target = +counter.innerText; let count = 0; const inc = target / 100; 
+        const update = () => { count += inc; if(count < target) { counter.innerText = Math.ceil(count); setTimeout(update, 20); } else { counter.innerText = target; } }
+        update();
+    });
 
-// Chart 1
-new Chart(document.getElementById('reportChart'), {
-    type: 'bar',
-    data: {
-        labels: reportLabels,
-        datasets: [{ label: 'Reports', data: reportData, backgroundColor: '#0d47a1', borderRadius: 8 }]
-    },
-    options: { responsive: true, plugins: { legend: { display: false } } }
-});
+    // Chart 1
+    new Chart(document.getElementById('reportChart'), { 
+        type: 'bar', 
+        data: { labels: labelsReports, datasets: [{ label: 'Reports', data: dataReports, backgroundColor: '#0d47a1', borderRadius: 8 }] }, 
+        options: { responsive: true, plugins: { legend: { display: false } }
+    });
 
-// Chart 2
-new Chart(document.getElementById('userChart'), {
-    type: 'line',
-    data: {
-        labels: userLabels,
-        datasets: [{ label: 'Users', data: userData, borderColor: '#28a745', tension: 0.4, fill: true }]
-    },
-    options: { responsive: true, plugins: { legend: { display: false } }
-});
+    // Chart 2
+    new Chart(document.getElementById('userChart'), { 
+        type: 'line', 
+        data: { labels: labelsUsers, datasets: [{ label: 'Users', data: dataUsers, borderColor: '#28a745', tension: 0.4, fill: true }] }, 
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
 </script>
 {% endblock %}

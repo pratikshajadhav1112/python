@@ -324,6 +324,7 @@ def admin_required(f):
 def admin_dashboard():
     conn = get_db()
     c = conn.cursor()
+    c.row_factory = sqlite3.Row # Important: taaki dict jaisa access mile
 
     # Stats kadhayche
     stats = {
@@ -344,8 +345,21 @@ def admin_dashboard():
         LIMIT 10
     ''').fetchall()
 
-    monthly_reports = c.execute("SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as cnt FROM entries GROUP BY month").fetchall()
-    monthly_users = c.execute("SELECT strftime('%Y-%m', created_at) as month, COUNT(*) as cnt FROM users GROUP BY month").fetchall()
+    # Charts ke liye data - Month name ke liye
+    monthly_reports = c.execute("""
+        SELECT strftime('%b %Y', created_at) as month, COUNT(*) as cnt
+        FROM entries
+        GROUP BY strftime('%Y-%m', created_at)
+        ORDER BY strftime('%Y-%m', created_at)
+    """).fetchall()
+
+    monthly_users = c.execute("""
+        SELECT strftime('%b %Y', created_at) as month, COUNT(*) as cnt
+        FROM users
+        WHERE role='student'
+        GROUP BY strftime('%Y-%m', created_at)
+        ORDER BY strftime('%Y-%m', created_at)
+    """).fetchall()
 
     conn.close()
     insights = dashboard_insights()
@@ -356,7 +370,6 @@ def admin_dashboard():
                            recent_reports=recent_reports,
                            monthly_reports=monthly_reports,
                            monthly_users=monthly_users)
-
 @app.route('/admin/users')
 @admin_required # @login_required chya jagah @admin_required
 def admin_users():
@@ -399,12 +412,36 @@ def delete_user(user_id):
 @app.route('/admin/reports')
 @admin_required
 def admin_reports():
+    # 1. URL se page number lena. agar /admin/reports?page=2 hai to page=2
+    page = request.args.get('page', 1, type=int)
+    per_page = 10 # Ek page me kitne report dikhane hai
+
+    offset = (page - 1) * per_page # 1st page: 0, 2nd page: 10, 3rd page: 20
+
     conn = get_db()
     conn.row_factory = sqlite3.Row
-    reports = conn.execute("SELECT e.*, u.name FROM entries e JOIN users u ON e.user_id=u.id ORDER BY e.id DESC").fetchall()
-    conn.close()
-    return render_template('admin_reports.html', user=current_user, reports=[dict(r) for r in reports])
 
+    # 2. Total kitne report hai ye ginti karna buttons ke liye
+    total_reports = conn.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
+
+    # 3. Sirf 10 report nikalna. LIMIT = kitne, OFFSET = kaha se start
+    reports = conn.execute("""
+        SELECT e.*, u.name
+        FROM entries e
+        JOIN users u ON e.user_id=u.id
+        ORDER BY e.id DESC
+        LIMIT? OFFSET?
+    """, (per_page, offset)).fetchall() # <-- Yaha LIMIT OFFSET add kiya
+
+    conn.close()
+
+    # 4. Template ko page, total bhi bhejna padega
+    return render_template('admin_reports.html',
+                           user=current_user,
+                           reports=[dict(r) for r in reports],
+                           page=page,
+                           total=total_reports,
+                           per_page=per_page)
 @app.route('/admin/update_status/<int:id>', methods=['POST']) # complaint_id chya jagah id
 def update_status(id): # ithe pan id
     new_status = request.form['status']
@@ -597,7 +634,7 @@ def dashboard():
     
     # Student asel tar home.html
     return render_template('home.html') # user_dashboard.html nahi
-    
+   
 @app.route('/')
 @login_required
 def home():

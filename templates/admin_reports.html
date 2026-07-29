@@ -12,8 +12,8 @@
 </style>
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">All Reports: {{ reports|length }}</h6>
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">All Reports: {{ total }}</h6> <!-- total dikhao -->
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -27,7 +27,7 @@
                         <th>Date</th>
                         <th>Description</th>
                         <th>Status</th>
-                        <th>AI Analysis</th>  <!-- AI + Action ekach column madhe -->
+                        <th>AI Analysis</th>  
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -70,11 +70,40 @@
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="9" class="text-center">No reports found</td></tr>  <!-- 9 karla -->
+                    <tr><td colspan="9" class="text-center">No reports found</td></tr> 
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- PAGINATION YAHAN AAYEGA - LOOP KE BAHAR -->
+        <nav aria-label="Page navigation" class="mt-4">
+          <ul class="pagination justify-content-center">
+
+            <!-- Previous Button -->
+            {% if page > 1 %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('admin_reports', page=page-1) }}">Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+
+            <!-- Page Number -->
+            <li class="page-item disabled"><span class="page-link">Page {{ page }}</span></li>
+
+            <!-- Next Button -->
+            {% if page * per_page < total %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('admin_reports', page=page+1) }}">Next</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
+
+          </ul>
+        </nav>
+
     </div>
 </div>
 {% endblock %}

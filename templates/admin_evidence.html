@@ -32,11 +32,12 @@
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
 
+                    {% set file_url = url_for('uploaded_file', filename=f['filename']) %}
                     {% if f['file_type'] == 'image' %}
-                        <img src="{{ url_for('uploaded_file', filename=f['filename']) }}"
+                        <img src="{{ file_url }}"
                              class="card-img-top" style="height:180px; object-fit:cover; cursor:pointer;"
                              data-bs-toggle="modal" data-bs-target="#previewModal"
-                             onclick="showPreview('{{ url_for('uploaded_file', filename=f['filename']) }}')">
+                             onclick="showPreview('{{ file_url }}')">
                     {% elif f['file_type'] == 'pdf' %}
                         <div class="text-center p-4 bg-light">
                             <i class="fa-solid fa-file-pdf fa-4x text-danger"></i>
@@ -51,12 +52,13 @@
                         <h6 class="card-title">{{ f['name'] }}</h6>
                         <p class="card-text small">
                             Exam: {{ f['exam_name'] }}<br>
-                            Date: {{ f['created_at'][:10] }}
+                            Date: {{ f['created_at'][:10] if f['created_at'] else '-' }}
                         </p>
-                        <a href="{{ url_for('uploaded_file', filename=f['filename']) }}" class="btn btn-sm btn-primary w-100" download>
+                        <a href="{{ file_url }}" class="btn btn-sm btn-primary w-100" download>
                             <i class="fa fa-download"></i> Download
                         </a>
                     </div>
+
                 </div>
             </div>
             {% endfor %}
@@ -68,6 +70,10 @@
 <div class="modal fade" id="previewModal">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
       <div class="modal-body text-center">
         <img id="previewImg" src="" class="img-fluid">
       </div>
