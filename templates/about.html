@@ -1,29 +1,48 @@
-{% extends "base.html" %} {# base template extend karta hai #}
+{% extends "base.html" %}
 
-{% block content %}  
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> {# import Font Awesome icons #}
+{% block content %}
+<!-- About page – modern, premium, enterprise-grade design -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* wrapper for full about page content */
-.about-wrapper {        
-    max-width: 1200px;      /* limit page width */
-    margin: 0 auto;         /* center wrapper horizontally */
-}
+  /* ===== WRAPPER ===== */
+  .about-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 0 20px;
+  }
 
-/* Hero Section */
-.about-hero {
+  /* ===== HERO SECTION ===== */
+  .about-hero {
     text-align: center;
-    padding: 20px 0 60px 0;
-}
-.about-hero h1 {
-    font-size: 48px;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 15px;
+    padding: 30px 20px 60px;
+    position: relative;
+  }
+
+  .about-hero .hero-badge {
+    display: inline-block;
+    background: #eaf3fc;
+    color: #1a4b7a;
+    padding: 6px 22px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    border: 1px solid #c6d9ed;
+  }
+
+  .about-hero h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #0b1e2f;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
     position: relative;
     display: inline-block;
-}
-.about-hero h1::after {
+  }
+
+  .about-hero h1::after {
     content: '';
     position: absolute;
     bottom: -12px;
@@ -31,276 +50,439 @@
     transform: translateX(-50%);
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #0d6efd, #3b82f6);
-    border-radius: 2px;
-}
-.about-hero p {
-    font-size: 18px;
-    color: #64748b;
-    max-width: 700px;
-    margin: 30px auto 0;
-    line-height: 1.8;
-}
+    background: linear-gradient(90deg, #1a4b7a, #7bb3ff);
+    border-radius: 10px;
+  }
 
-/* Mission Card */
-.mission-card {
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  .about-hero p {
+    font-size: 1.15rem;
+    color: #506a84;
+    max-width: 720px;
+    margin: 32px auto 0;
+    line-height: 1.8;
+    font-weight: 400;
+  }
+
+  /* ===== MISSION CARD – premium gradient ===== */
+  .mission-card {
+    background: linear-gradient(145deg, #0b2a4a 0%, #1a4b7a 100%);
     color: white;
-    padding: 50px;
-    border-radius: 20px;
-    margin: 50px 0;
-    box-shadow: 0 20px 60px rgba(13, 110, 253, 0.3);
+    padding: 52px 56px;
+    border-radius: 40px;
+    margin: 40px 0 56px;
+    box-shadow: 0 20px 60px -12px rgba(26, 75, 122, 0.25);
     position: relative;
     overflow: hidden;
-}
-.mission-card::before {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .mission-card::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-}
-.mission-card h3 {
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 20px;
-    position: relative;
-}
-.mission-card p {
-    font-size: 17px;
-    line-height: 1.8;
-    opacity: 0.95;
-    position: relative;
-}
+    top: -40%;
+    right: -20%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
 
-/* Features Grid */
-.features-grid {
+  .mission-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(123, 179, 255, 0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .mission-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .mission-card h3 i {
+    color: #7bb3ff;
+    font-size: 1.8rem;
+  }
+
+  .mission-card p {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    opacity: 0.92;
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+  }
+
+  /* ===== FEATURES GRID ===== */
+  .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 30px;
-    margin: 60px 0;
-}
-/* animation */
-.feature-card {
-    background: white;
-    padding: 40px 30px;
-    border-radius: 16px;
+    gap: 28px;
+    margin: 56px 0 60px;
+  }
+
+  .feature-card {
+    background: #ffffff;
+    padding: 38px 28px 34px;
+    border-radius: 32px;
     text-align: center;
-    border: 1px solid #e2e8f0;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #eef4fa;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-}
-.feature-card::before {
+    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+  }
+
+  .feature-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #0d6efd, #3b82f6);
+    background: linear-gradient(90deg, #1a4b7a, #7bb3ff);
     transform: scaleX(0);
-    transition: transform 0.4s;
-}
-.feature-card:hover {
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .feature-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    border-color: #0d6efd;
-}
-.feature-card:hover::before {
+    box-shadow: 0 20px 48px -12px rgba(18, 52, 86, 0.08);
+    border-color: #c6d9ed;
+  }
+
+  .feature-card:hover::before {
     transform: scaleX(1);
-}
-.feature-icon {
+  }
+
+  .feature-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    border-radius: 20px;
+    background: linear-gradient(135deg, #ecf3fc, #dbe8f5);
+    border-radius: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 25px;
-    font-size: 36px;
-    color: #0d6efd;
-    transition: all 0.3s;
-}
-.feature-card:hover .feature-icon {
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    margin: 0 auto 22px;
+    font-size: 2.2rem;
+    color: #1a4b7a;
+    transition: all 0.35s ease;
+  }
+
+  .feature-card:hover .feature-icon {
+    background: linear-gradient(135deg, #1a4b7a, #0b2a4a);
     color: white;
-    transform: rotateY(360deg);
-}
-.feature-card h4 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 12px;
-}
-.feature-card p {
-    color: #64748b;
-    font-size: 15px;
+    transform: rotateY(360deg) scale(1.02);
+  }
+
+  .feature-card h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #0b1e2f;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card p {
+    color: #56718e;
+    font-size: 0.95rem;
     line-height: 1.7;
     margin: 0;
-}
+  }
 
-/* Stats Section */
-.stats-section {
-    background: #f8fafc;
-    padding: 60px 40px;
-    border-radius: 20px;
-    margin: 60px 0;
-    border: 1px solid #e2e8f0;
-}
-.stats-grid {
+  /* ===== STATS SECTION ===== */
+  .stats-section {
+    background: linear-gradient(135deg, #f4f8fe, #ecf3fa);
+    padding: 56px 40px;
+    border-radius: 40px;
+    margin: 56px 0;
+    border: 1px solid #dde7f0;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.01);
+  }
+
+  .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 40px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 32px;
     text-align: center;
-}
-.stat-item h2 {
-    font-size: 48px;
-    font-weight: 800;
-    color: #0d6efd;
-    margin: 0 0 10px 0;
-}
-.stat-item p {
-    color: #64748b;
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-}
+  }
 
-/* CTA Section  */
-.cta-section {
+  .stat-item {
+    padding: 8px 0;
+  }
+
+  .stat-item h2 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #1a4b7a;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .stat-item p {
+    color: #56718e;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .stat-item .stat-icon {
+    display: block;
+    font-size: 1.8rem;
+    color: #7bb3ff;
+    margin-bottom: 6px;
+  }
+
+  /* ===== CTA SECTION ===== */
+  .cta-section {
     text-align: center;
-    padding: 60px 40px;
-    background: white;
-    border-radius: 20px;
-    border: 2px solid #e2e8f0;
-    margin: 60px 0;
-}
-.cta-section h3 {
-    font-size: 32px;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 15px;
-}
-.cta-section p {
-    color: #64748b;
-    font-size: 17px;
-    margin-bottom: 30px;
-}
-/* submit your first report button*/
-.cta-btn {
-    background: #0d6efd;
+    padding: 56px 40px 52px;
+    background: #ffffff;
+    border-radius: 40px;
+    border: 1px solid #eef4fa;
+    margin: 56px 0 20px;
+    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    transition: all 0.3s ease;
+  }
+
+  .cta-section:hover {
+    border-color: #c6d9ed;
+    box-shadow: 0 12px 40px -12px rgba(18, 52, 86, 0.06);
+  }
+
+  .cta-section h3 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #0b1e2f;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+
+  .cta-section p {
+    color: #56718e;
+    font-size: 1.05rem;
+    margin-bottom: 28px;
+  }
+
+  .cta-btn {
+    background: linear-gradient(135deg, #0b2a4a, #1a4b7a);
     color: white;
-    padding: 16px 40px;
-    border-radius: 12px;
+    padding: 16px 44px;
+    border-radius: 60px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 1rem;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-}
+    gap: 12px;
+    transition: all 0.25s ease;
+    box-shadow: 0 8px 28px -8px rgba(26, 75, 122, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
 
-.cta-btn:hover {
-    background: #0a58ca;
+  .cta-btn:hover {
+    background: linear-gradient(135deg, #0f2d4a, #1a4b7a);
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
-}
-/* mobile media ouery*/
-@media (max-width: 768px) {
-    .about-hero h1 { font-size: 36px; }
-    .mission-card { padding: 35px 25px; }
-    .features-grid { grid-template-columns: 1fr; }
-}
+    box-shadow: 0 16px 40px -12px rgba(26, 75, 122, 0.35);
+    color: white;
+  }
+
+  .cta-btn i {
+    font-size: 1.1rem;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .about-hero h1 {
+      font-size: 2.4rem;
+    }
+    .about-hero p {
+      font-size: 1rem;
+    }
+    .mission-card {
+      padding: 34px 24px;
+      border-radius: 28px;
+    }
+    .mission-card h3 {
+      font-size: 1.6rem;
+    }
+    .mission-card p {
+      font-size: 0.95rem;
+    }
+    .features-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .feature-card {
+      padding: 28px 18px 24px;
+    }
+    .stats-section {
+      padding: 40px 20px;
+      border-radius: 28px;
+    }
+    .stat-item h2 {
+      font-size: 2.6rem;
+    }
+    .cta-section {
+      padding: 40px 24px 36px;
+      border-radius: 28px;
+    }
+    .cta-section h3 {
+      font-size: 1.8rem;
+    }
+    .cta-btn {
+      padding: 14px 32px;
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .about-hero h1 {
+      font-size: 1.8rem;
+    }
+    .about-hero .hero-badge {
+      font-size: 0.7rem;
+      padding: 4px 16px;
+    }
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .stat-item h2 {
+      font-size: 2rem;
+    }
+    .mission-card {
+      padding: 26px 18px;
+    }
+    .cta-section h3 {
+      font-size: 1.5rem;
+    }
+    .cta-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 14px 20px;
+    }
+  }
+
+  /* ===== ANIMATIONS ===== */
+  .feature-card {
+    animation: fadeUp 0.6s ease forwards;
+    opacity: 0;
+  }
+  .feature-card:nth-child(2) { animation-delay: 0.08s; }
+  .feature-card:nth-child(3) { animation-delay: 0.16s; }
+  .feature-card:nth-child(4) { animation-delay: 0.24s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-item {
+    animation: fadeUp 0.6s ease forwards;
+    opacity: 0;
+  }
+  .stat-item:nth-child(2) { animation-delay: 0.1s; }
+  .stat-item:nth-child(3) { animation-delay: 0.2s; }
+  .stat-item:nth-child(4) { animation-delay: 0.3s; }
 </style>
 
 <div class="about-wrapper">
-    <!-- Hero -->
-    <div class="about-hero">
-        <h1>About Us</h1>
-        <p>
-            Exam Leak Detection & Transparency Platform is designed to improve fairness and transparency in examinations 
-            using advanced AI technology and community participation.
-        </p>
-    </div>
+  <!-- ===== HERO ===== -->
+  <div class="about-hero">
+    
+    <h1>About Us</h1>
+    <p>
+      Exam Leak Detection &amp; Transparency Platform is designed to improve fairness and transparency in examinations
+      using advanced AI technology and community participation.
+    </p>
+  </div>
 
-    <!-- Mission -->
-    <div class="mission-card">
-        <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
-        <p>
-            We are committed to creating a corruption-free examination ecosystem where every student gets equal opportunity. 
-            Our platform empowers citizens to report exam irregularities anonymously while leveraging AI to detect patterns, 
-            prevent future leaks, and ensure complete transparency in the education system.
-        </p>
-    </div>
+  <!-- ===== MISSION CARD ===== -->
+  <div class="mission-card">
+    <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
+    <p>
+      We are committed to creating a corruption‑free examination ecosystem where every student gets equal opportunity.
+      Our platform empowers citizens to report exam irregularities anonymously while leveraging AI to detect patterns,
+      prevent future leaks, and ensure complete transparency in the education system.
+    </p>
+  </div>
 
-    <!-- Features -->
-    <div class="features-grid">
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-file-shield"></i>
-            </div>
-            <h4>Report Exam Issues</h4>
-            <p>Submit detailed reports about exam leaks or irregularities with complete anonymity and security.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <h4>Track Report Status</h4>
-            <p>Monitor your submitted reports in real-time from Pending to Resolved with full transparency.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-magnifying-glass-chart"></i>
-            </div>
-            <h4>Maintain Transparency</h4>
-            <p>AI-powered analytics detect patterns and help authorities take preventive measures against leaks.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-lock"></i>
-            </div>
-            <h4>Secure Record Management</h4>
-            <p>All data is encrypted and stored securely. Your identity remains completely confidential.</p>
-        </div>
+  <!-- ===== FEATURES GRID ===== -->
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-file-shield"></i></div>
+      <h4>Report Exam Issues</h4>
+      <p>Submit detailed reports about exam leaks or irregularities with complete anonymity and security.</p>
     </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+      <h4>Track Report Status</h4>
+      <p>Monitor your submitted reports in real‑time from Pending to Resolved with full transparency.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
+      <h4>Maintain Transparency</h4>
+      <p>AI‑powered analytics detect patterns and help authorities take preventive measures against leaks.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-lock"></i></div>
+      <h4>Secure Record Management</h4>
+      <p>All data is encrypted and stored securely. Your identity remains completely confidential.</p>
+    </div>
+  </div>
 
-    <!-- Stats -->
-    <div class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <h2>500+</h2>
-                <p>Reports Submitted</p>
-            </div>
-            <div class="stat-item">
-                <h2>95%</h2>
-                <p>Resolution Rate</p>
-            </div>
-            <div class="stat-item">
-                <h2>24/7</h2>
-                <p>Monitoring System</p>
-            </div>
-            <div class="stat-item">
-                <h2>100%</h2>
-                <p>Anonymous & Secure</p>
-            </div>
-        </div>
+  <!-- ===== STATS SECTION ===== -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-icon"><i class="fas fa-file-alt"></i></span>
+        <h2>500+</h2>
+        <p>Reports Submitted</p>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
+        <h2>95%</h2>
+        <p>Resolution Rate</p>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon"><i class="fas fa-clock"></i></span>
+        <h2>24/7</h2>
+        <p>Monitoring System</p>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon"><i class="fas fa-user-secret"></i></span>
+        <h2>100%</h2>
+        <p>Anonymous &amp; Secure</p>
+      </div>
     </div>
+  </div>
 
-    <!-- CTA -->
-    <div class="cta-section">
-        <h3>Ready to Make a Difference?</h3>
-        <p>Join thousands of students fighting for fair examinations</p>
-        <a href="{{ url_for('form') }}" class="cta-btn">
-            <i class="fas fa-rocket"></i> Submit Your First Report
-        </a>
-    </div>
+  <!-- ===== CTA SECTION ===== -->
+  <div class="cta-section">
+    <h3>Ready to Make a Difference?</h3>
+    <p>Join thousands of students fighting for fair examinations</p>
+    <a href="{{ url_for('form') }}" class="cta-btn">
+      <i class="fas fa-rocket"></i> Submit Your First Report
+    </a>
+  </div>
 </div>
-
 {% endblock %}

@@ -1,115 +1,238 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Home page content for reporting exam leaks -->
+<!-- Home page – redesigned hero & features -->
 <style>
-/* Hero section styles */
-.hero-section {
-    /* section background gradient and layout */
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-    color: white; /* text color for contrast */
-    padding: 100px 20px;
+  /* ===== HERO – glassmorphism with depth ===== */
+  .hero-section {
+    background: linear-gradient(145deg, #0b2a4a 0%, #1a4b7a 100%);
+    color: white;
+    padding: 80px 30px 70px;
     text-align: center;
-    border-radius: 12px;
-    margin-bottom: 60px;
-}
-.hero-section h1 {
-    /* main hero heading styling */
-    font-size: 48px;
-    font-weight: 800;
-    margin-bottom: 20px;
-}
-.hero-section p {
-    /* hero description text styling */
-    font-size: 18px;
-    opacity: 0.9;
-    margin-bottom: 30px;
-}
-.hero-btn {
-    /* button style in hero section */
+    border-radius: 48px;
+    margin-bottom: 64px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px -12px rgba(10, 40, 70, 0.25);
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(100, 180, 255, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-section h1 {
+    font-size: 3.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 2;
+    line-height: 1.2;
+  }
+  .hero-section h1 i {
+    color: #7bb3ff;
+    margin-right: 12px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  }
+  .hero-section p {
+    font-size: 1.2rem;
+    opacity: 0.85;
+    margin-bottom: 36px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 2;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+  }
+  .hero-btn {
     background: white;
-    color: #0d6efd;
-    padding: 14px 32px;
-    border-radius: 10px;
+    color: #0b2a4a;
+    padding: 14px 36px;
+    border-radius: 60px;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 600;
     display: inline-block;
-    transition: all 0.3s;
-}
-.hero-btn:hover {
-    /* hover effect for hero button */
-    background: #f8f9fa;
-    color: #0a58ca;
+    transition: all 0.25s ease;
+    margin: 8px 10px;
+    border: 1px solid transparent;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    position: relative;
+    z-index: 2;
+    font-size: 0.95rem;
+  }
+  .hero-btn i { margin-right: 10px; }
+  .hero-btn:hover {
+    background: #f0f6ff;
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
+    box-shadow: 0 14px 32px -8px rgba(0, 20, 40, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #0a2a4a;
+  }
+  .hero-btn-outline {
+    background: transparent;
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+  }
+  .hero-btn-outline:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: white;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
 
-/* Features section styles */
-.features {
-    /* spacing around feature cards */
-    padding: 20px 0 60px 0;
-}
-.feature-box {
-    /* individual feature card container */
+  /* ===== FEATURES – premium cards ===== */
+  .features { padding: 20px 0 40px 0; }
+  .feature-box {
     text-align: center;
-    padding: 30px 20px;
-}
-.feature-icon {
-    /* icon style for features */
-    font-size: 56px; 
-    color: #0d6efd; 
-    margin-bottom: 20px;
-}
-.feature-box h4 {
-    /* feature title styling */
-    font-size: 22px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 12px;
-}
-.feature-box p {
-    /* feature description text styling */
-    color: #64748b;
-    font-size: 15px;
+    padding: 36px 24px 32px;
+    background: #ffffff;
+    border-radius: 36px;
+    border: 1px solid #eef4fa;
+    transition: all 0.25s ease;
+    height: 100%;
+    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1a4b7a, #7bb3ff);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .feature-box:hover {
+    border-color: #c6d9ed;
+    transform: translateY(-6px);
+    box-shadow: 0 20px 44px -16px rgba(18, 52, 86, 0.10);
+  }
+  .feature-box:hover::after { opacity: 1; }
+  .feature-icon {
+    font-size: 3.2rem;
+    color: #1a4b7a;
+    margin-bottom: 18px;
+    display: inline-block;
+    background: #ecf3fc;
+    padding: 16px;
+    border-radius: 28px;
+    transition: all 0.2s;
+    line-height: 1;
+  }
+  .feature-box:hover .feature-icon {
+    background: #d7e6fc;
+    transform: scale(1.02);
+  }
+  .feature-box h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #0b1e2f;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+  .feature-box p {
+    color: #506a84;
+    font-size: 0.95rem;
     line-height: 1.6;
-}
+    margin-bottom: 0;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .hero-section { padding: 56px 20px 50px; border-radius: 32px; margin-bottom: 40px; }
+    .hero-section h1 { font-size: 2.2rem; }
+    .hero-section p { font-size: 1rem; }
+    .hero-btn { padding: 12px 24px; font-size: 0.9rem; margin: 6px 6px; }
+    .feature-box { padding: 28px 16px 24px; }
+    .feature-icon { font-size: 2.6rem; padding: 12px; }
+  }
+  @media (max-width: 480px) {
+    .hero-section h1 { font-size: 1.8rem; }
+    .hero-btn { display: block; width: 100%; margin: 8px 0; }
+    .feature-box { padding: 22px 12px 20px; }
+  }
+
+  /* animation */
+  .feature-box { animation: fadeUp 0.6s ease forwards; }
+  .feature-box:nth-child(2) { animation-delay: 0.08s; }
+  .feature-box:nth-child(3) { animation-delay: 0.16s; }
+  @keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(18px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
 </style>
 
+<!-- ===== HERO ===== -->
 <div class="hero-section">
-    <h1><i class="fas fa-shield-halved"></i> Secure Exam Integrity And Transperancy</h1>
-    <p>Report exam leaks anonymously. Help maintain fairness in education.</p>
+  <h1><i class="fas fa-shield-halved"></i> Secure Exam Integrity &amp; Transparency</h1>
+  <p>Report exam leaks anonymously. Help maintain fairness in education with zero compromise.</p>
+  <div>
     <a href="{{ url_for('form') }}" class="hero-btn">
-        <i class="fas fa-file-alt"></i> Submit Report Now
+      <i class="fas fa-file-alt"></i> Submit Report
     </a>
-    <a href="{{ url_for('about') }}" class="hero-btn">
-        <i class="fas fa-file-alt"></i>About
+    <a href="{{ url_for('about') }}" class="hero-btn hero-btn-outline">
+      <i class="fas fa-info-circle"></i> About
     </a>
+  </div>
 </div>
 
+<!-- ===== FEATURES ===== -->
 <div class="features">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="feature-box">
-                <i class="fas fa-lock feature-icon"></i>
-                <h4>100% Anonymous</h4>
-                <p>Your identity is never stored. Complete privacy guaranteed.</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="feature-box">
-                <i class="fas fa-bolt feature-icon"></i>
-                <h4>Instant Action</h4>
-                <p>Reports are verified and forwarded to authorities immediately.</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="feature-box">
-                <i class="fas fa-robot feature-icon"></i>
-                <h4>AI Powered</h4>
-                <p>Advanced AI detects patterns and prevents future leaks.</p>
-            </div>
-        </div>
+  <div class="row justify-content-center g-4">
+    <div class="col-md-4">
+      <div class="feature-box">
+        <div class="feature-icon"><i class="fas fa-lock"></i></div>
+        <h4>100% Anonymous</h4>
+        <p>Your identity is never stored. Complete privacy guaranteed with end‑to‑end encryption.</p>
+      </div>
     </div>
+    <div class="col-md-4">
+      <div class="feature-box">
+        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+        <h4>Instant Action</h4>
+        <p>Reports are verified and forwarded to authorities immediately. Real‑time tracking.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="feature-box">
+        <div class="feature-icon"><i class="fas fa-robot"></i></div>
+        <h4>AI Powered</h4>
+        <p>Advanced AI detects leak patterns and helps prevent future violations intelligently.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Trust badge (cosmetic) -->
+<div class="text-center mt-3 mb-2">
+  <span class="badge rounded-pill px-4 py-2" style="background: #eaf2fb; color: #1a4b7a; font-weight: 500; border: 1px solid #c9dcef;">
+    <i class="fas fa-check-circle" style="color: #1f8b4c;"></i> Trusted by 200+ institutions
+  </span>
 </div>
 
 {% endblock %}
