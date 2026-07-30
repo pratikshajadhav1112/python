@@ -586,7 +586,21 @@ def inject_notifications():
     return dict(unread_count=0)
 
 from werkzeug.security import generate_password_hash, check_password_hash
+@app.route('/admin/notifications/mark_all_read')
+def mark_all_read():
+    # Mark all notifications as read
+    Notification.query.update({'is_read': 1})
+    db.session.commit()
+    flash('All notifications marked as read', 'success')
+    return redirect(url_for('admin_notifications'))
 
+@app.route('/admin/notifications/mark_read/<int:id>')
+def mark_notification_read(id):
+    # Mark single notification as read (AJAX endpoint)
+    note = Notification.query.get_or_404(id)
+    note.is_read = 1
+    db.session.commit()
+    return jsonify({'success': True})
 def get_settings():
     conn = get_db()
     s = conn.execute("SELECT * FROM settings WHERE id=1").fetchone()

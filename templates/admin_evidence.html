@@ -1,89 +1,617 @@
 {% extends "admin_base.html" %}
 {% block title %}Evidence Files{% endblock %}
+{% block page_title %}Evidence Files{% endblock %}
+{% block breadcrumb %}Evidence{% endblock %}
 
 {% block content %}
-<h2><i class="fa-solid fa-folder-open me-2"></i>Evidence Files</h2>
+<!-- ===== STYLES ===== -->
+<style>
+  /* ===== STATS ROW ===== */
+  .stats-mini {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stats-mini .stat-item {
+    background: white;
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 1px solid #eef4fa;
+    text-align: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 20, 40, 0.02);
+  }
+  .stats-mini .stat-item:hover {
+    border-color: #c6d9ed;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -8px rgba(18, 52, 86, 0.06);
+  }
+  .stats-mini .stat-item .number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0b1e2f;
+    line-height: 1.2;
+  }
+  .stats-mini .stat-item .label {
+    font-size: 0.75rem;
+    color: #56718e;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .stats-mini .stat-item .icon {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .stats-mini .stat-item.images .icon { color: #1a4b7a; }
+  .stats-mini .stat-item.pdfs .icon { color: #dc3545; }
+  .stats-mini .stat-item.videos .icon { color: #0f8b4e; }
+  .stats-mini .stat-item.total .icon { color: #e67e22; }
 
-<!-- Filter Bar -->
-<form method="get" class="card shadow-sm p-3 mb-4">
-    <div class="row g-2">
-        <div class="col-md-4"><input type="text" name="exam" class="form-control" placeholder="Search by Exam" value="{{ request.args.get('exam','') }}"></div>
-        <div class="col-md-3">
-            <select name="file_type" class="form-select">
-                <option value="">All File Types</option>
-                <option value="image" {% if request.args.get('file_type')=='image' %}selected{% endif %}>Images Only</option>
-                <option value="pdf" {% if request.args.get('file_type')=='pdf' %}selected{% endif %}>PDF Only</option>
-            </select>
-        </div>
-        <div class="col-md-2"><button class="btn btn-primary w-100"><i class="fa fa-search"></i> Filter</button></div>
-    </div>
-</form>
+  /* ===== FILTER CARD ===== */
+  .filter-card {
+    background: #ffffff;
+    border: 1px solid #eef4fa;
+    border-radius: 28px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    transition: all 0.2s ease;
+  }
+  .filter-card:hover {
+    border-color: #d5e3f2;
+  }
+  .filter-card .form-label {
+    font-weight: 600;
+    color: #1a334a;
+    font-size: 0.8rem;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .filter-card .form-control,
+  .filter-card .form-select {
+    border-radius: 16px;
+    padding: 12px 18px;
+    border: 1.5px solid #e3ebf5;
+    font-size: 0.95rem;
+    background: #fafcff;
+    transition: all 0.2s ease;
+  }
+  .filter-card .form-control:focus,
+  .filter-card .form-select:focus {
+    border-color: #1a4b7a;
+    box-shadow: 0 0 0 4px rgba(26, 75, 122, 0.06);
+    background: #ffffff;
+  }
+  .filter-card .form-control::placeholder {
+    color: #9bb1c7;
+  }
+  .btn-filter {
+    border-radius: 16px;
+    padding: 12px 24px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #1a4b7a, #0b2a4a);
+    color: white;
+    border: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(26, 75, 122, 0.12);
+    width: 100%;
+  }
+  .btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(26, 75, 122, 0.2);
+    color: white;
+  }
+  .btn-filter i {
+    margin-right: 8px;
+  }
+  .btn-clear-filter {
+    border-radius: 16px;
+    padding: 12px 24px;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1.5px solid #e3ebf5;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+  .btn-clear-filter:hover {
+    background: #e2ebf5;
+    border-color: #b6cfe0;
+    transform: translateY(-2px);
+  }
 
-<div class="card shadow-sm">
-    <div class="card-header">
-        <span>Total Files: {{ files|length }}</span>
-    </div>
-    <div class="card-body">
-        {% if files|length == 0 %}
-            <p class="text-center">No evidence files found.</p>
-        {% endif %}
-        <div class="row">
-            {% for f in files %}
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
+  /* ===== CARD ===== */
+  .files-card {
+    background: #ffffff;
+    border: 1px solid #eef4fa;
+    border-radius: 28px;
+    padding: 24px 28px 28px;
+    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    transition: all 0.2s ease;
+  }
+  .files-card:hover {
+    border-color: #d5e3f2;
+  }
 
-                    {% set file_url = url_for('uploaded_file', filename=f['filename']) %}
-                    {% if f['file_type'] == 'image' %}
-                        <img src="{{ file_url }}"
-                             class="card-img-top" style="height:180px; object-fit:cover; cursor:pointer;"
-                             data-bs-toggle="modal" data-bs-target="#previewModal"
-                             onclick="showPreview('{{ file_url }}')">
-                    {% elif f['file_type'] == 'pdf' %}
-                        <div class="text-center p-4 bg-light">
-                            <i class="fa-solid fa-file-pdf fa-4x text-danger"></i>
-                        </div>
-                    {% else %}
-                        <div class="text-center p-4 bg-light">
-                            <i class="fa-solid fa-file-video fa-4x text-primary"></i>
-                        </div>
-                    {% endif %}
+  .files-card .card-header-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 
-                    <div class="card-body">
-                        <h6 class="card-title">{{ f['name'] }}</h6>
-                        <p class="card-text small">
-                            Exam: {{ f['exam_name'] }}<br>
-                            Date: {{ f['created_at'][:10] if f['created_at'] else '-' }}
-                        </p>
-                        <a href="{{ file_url }}" class="btn btn-sm btn-primary w-100" download>
-                            <i class="fa fa-download"></i> Download
-                        </a>
-                    </div>
+  .files-card .card-header-custom h6 {
+    font-weight: 600;
+    color: #0b1e2f;
+    font-size: 1.05rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+  .files-card .card-header-custom h6 i {
+    color: #1a4b7a;
+  }
+
+  .files-card .card-header-custom .badge-total {
+    background: #eaf3fc;
+    color: #1a4b7a;
+    padding: 4px 16px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* ===== FILE GRID ===== */
+  .file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 24px;
+  }
+
+  .file-card {
+    background: #ffffff;
+    border: 1px solid #eef4fa;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 20, 40, 0.02);
+  }
+
+  .file-card:hover {
+    transform: translateY(-6px);
+    border-color: #c6d9ed;
+    box-shadow: 0 16px 40px -12px rgba(18, 52, 86, 0.08);
+  }
+
+  .file-card .file-preview {
+    height: 160px;
+    background: #f8faff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .file-card .file-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .file-card .file-preview img:hover {
+    transform: scale(1.02);
+  }
+
+  .file-card .file-preview .file-icon {
+    font-size: 4rem;
+    opacity: 0.6;
+  }
+
+  .file-card .file-preview .file-icon.pdf { color: #dc3545; }
+  .file-card .file-preview .file-icon.video { color: #0f8b4e; }
+  .file-card .file-preview .file-icon.audio { color: #1a4b7a; }
+  .file-card .file-preview .file-icon.other { color: #e67e22; }
+
+  .file-card .file-preview .file-type-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 2px 12px;
+    border-radius: 40px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .file-card .file-body {
+    padding: 16px 18px 18px;
+  }
+
+  .file-card .file-body .file-name {
+    font-weight: 600;
+    color: #0b1e2f;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .file-card .file-body .file-meta {
+    font-size: 0.75rem;
+    color: #56718e;
+    line-height: 1.6;
+  }
+
+  .file-card .file-body .file-meta i {
+    width: 16px;
+    color: #1a4b7a;
+  }
+
+  .file-card .file-body .btn-download {
+    border-radius: 40px;
+    padding: 6px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #eaf3fc;
+    color: #1a4b7a;
+    border: none;
+    transition: all 0.2s ease;
+    width: 100%;
+    margin-top: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .file-card .file-body .btn-download:hover {
+    background: #d7e6fc;
+    transform: translateY(-2px);
+    color: #0b2a4a;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+  }
+
+  .empty-state i {
+    font-size: 3.6rem;
+    color: #c6d9ed;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .empty-state h5 {
+    color: #1a334a;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+  }
+
+  .empty-state p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+  }
+
+  /* ===== PREVIEW MODAL ===== */
+  .modal-content {
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 32px 72px rgba(0, 0, 0, 0.15);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 18px 24px;
+  }
+
+  .modal-header .modal-title {
+    font-weight: 600;
+    color: #0b1e2f;
+  }
+
+  .modal-body {
+    padding: 24px;
+    background: #f8faff;
+    border-radius: 0 0 24px 24px;
+  }
+
+  .modal-body img {
+    max-height: 70vh;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .filter-card {
+      padding: 18px 16px;
+      border-radius: 20px;
+    }
+    .files-card {
+      padding: 18px 16px 20px;
+      border-radius: 20px;
+    }
+    .file-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+    .file-card .file-preview {
+      height: 120px;
+    }
+    .stats-mini {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .btn-filter, .btn-clear-filter {
+      padding: 10px 16px;
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .file-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .file-card .file-preview {
+      height: 100px;
+    }
+    .file-card .file-body {
+      padding: 12px 14px 14px;
+    }
+    .file-card .file-body .file-name {
+      font-size: 0.8rem;
+    }
+    .stats-mini {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stats-mini .stat-item {
+      padding: 12px 10px;
+    }
+    .stats-mini .stat-item .number {
+      font-size: 1.4rem;
+    }
+    .files-card .card-header-custom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  /* ===== ANIMATIONS ===== */
+  .file-card {
+    animation: fadeUp 0.5s ease forwards;
+    opacity: 0;
+  }
+  .file-card:nth-child(1) { animation-delay: 0.04s; }
+  .file-card:nth-child(2) { animation-delay: 0.08s; }
+  .file-card:nth-child(3) { animation-delay: 0.12s; }
+  .file-card:nth-child(4) { animation-delay: 0.16s; }
+  .file-card:nth-child(5) { animation-delay: 0.20s; }
+  .file-card:nth-child(6) { animation-delay: 0.24s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stats-mini .stat-item {
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .stats-mini .stat-item:nth-child(2) { animation-delay: 0.05s; }
+  .stats-mini .stat-item:nth-child(3) { animation-delay: 0.10s; }
+  .stats-mini .stat-item:nth-child(4) { animation-delay: 0.15s; }
+</style>
+
+<!-- ===== MINI STATS ===== -->
+<div class="stats-mini">
+  <div class="stat-item total">
+    <span class="icon"><i class="bi bi-folder"></i></span>
+    <div class="number">{{ files|length }}</div>
+    <div class="label">Total Files</div>
+  </div>
+  <div class="stat-item images">
+    <span class="icon"><i class="bi bi-image"></i></span>
+    <div class="number">{{ files|selectattr('file_type', 'equalto', 'image')|list|length }}</div>
+    <div class="label">Images</div>
+  </div>
+  <div class="stat-item pdfs">
+    <span class="icon"><i class="bi bi-file-pdf"></i></span>
+    <div class="number">{{ files|selectattr('file_type', 'equalto', 'pdf')|list|length }}</div>
+    <div class="label">PDFs</div>
+  </div>
+  <div class="stat-item videos">
+    <span class="icon"><i class="bi bi-film"></i></span>
+    <div class="number">{{ files|selectattr('file_type', 'in', ['video', 'audio'])|list|length }}</div>
+    <div class="label">Media</div>
+  </div>
 </div>
 
-<!-- Preview Modal -->
-<div class="modal fade" id="previewModal">
+<!-- ===== FILTER BAR ===== -->
+<div class="filter-card">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label"><i class="bi bi-search me-1"></i> Search</label>
+      <input type="text" name="exam" class="form-control" placeholder="Search by exam name..." value="{{ request.args.get('exam','') }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label"><i class="bi bi-filter me-1"></i> File Type</label>
+      <select name="file_type" class="form-select">
+        <option value="">All File Types</option>
+        <option value="image" {% if request.args.get('file_type')=='image' %}selected{% endif %}>
+          <i class="bi bi-image"></i> Images Only
+        </option>
+        <option value="pdf" {% if request.args.get('file_type')=='pdf' %}selected{% endif %}>
+          <i class="bi bi-file-pdf"></i> PDF Only
+        </option>
+        <option value="video" {% if request.args.get('file_type')=='video' %}selected{% endif %}>
+          <i class="bi bi-film"></i> Videos
+        </option>
+        <option value="audio" {% if request.args.get('file_type')=='audio' %}selected{% endif %}>
+          <i class="bi bi-music-note"></i> Audio
+        </option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn-filter">
+        <i class="bi bi-funnel"></i> Filter
+      </button>
+    </div>
+    <div class="col-md-2">
+      <a href="{{ url_for('admin_evidence') }}" class="btn-clear-filter d-block text-center">
+        <i class="bi bi-arrow-counterclockwise"></i> Clear
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- ===== FILES GRID ===== -->
+<div class="files-card">
+  <div class="card-header-custom">
+    <h6>
+      <i class="bi bi-folder2-open"></i> Evidence Files
+      <span class="badge-total">{{ files|length }} files</span>
+    </h6>
+    <div>
+      <span style="font-size:0.8rem; color:#56718e;">
+        <i class="bi bi-database me-1"></i> 
+        {% set total_size = files|sum(attribute='file_size')|default(0) %}
+        {{ (total_size / 1024 / 1024)|round(1) if total_size > 0 else 0 }} MB total
+      </span>
+    </div>
+  </div>
+
+  {% if files|length == 0 %}
+    <div class="empty-state">
+      <i class="bi bi-folder-x"></i>
+      <h5>No Evidence Files Found</h5>
+      <p>Try adjusting your search filters or upload new files.</p>
+    </div>
+  {% else %}
+    <div class="file-grid">
+      {% for f in files %}
+      <div class="file-card">
+        <!-- ===== PREVIEW ===== -->
+        <div class="file-preview" 
+             {% if f.file_type == 'image' %}
+               onclick="showPreview('{{ url_for('uploaded_file', filename=f.filename) }}')"
+               data-bs-toggle="modal" data-bs-target="#previewModal"
+             {% endif %}>
+          
+          {% set file_url = url_for('uploaded_file', filename=f.filename) %}
+          
+          {% if f.file_type == 'image' %}
+          
+            <img src="{{ file_url }}" alt="{{ f.name }}" loading="lazy">
+            <span class="file-type-badge"><i class="bi bi-image"></i> Image</span>
+          {% elif f.file_type == 'pdf' %}
+            <div class="file-icon pdf"><i class="bi bi-file-pdf-fill"></i></div>
+            <span class="file-type-badge"><i class="bi bi-file-pdf"></i> PDF</span>
+          {% elif f.file_type == 'video' %}
+            <div class="file-icon video"><i class="bi bi-film"></i></div>
+            <span class="file-type-badge"><i class="bi bi-play-circle"></i> Video</span>
+          {% elif f.file_type == 'audio' %}
+            <div class="file-icon audio"><i class="bi bi-music-note-beamed"></i></div>
+            <span class="file-type-badge"><i class="bi bi-volume-up"></i> Audio</span>
+          {% else %}
+            <div class="file-icon other"><i class="bi bi-file-earmark"></i></div>
+            <span class="file-type-badge"><i class="bi bi-file"></i> Other</span>
+          {% endif %}
+        </div>
+
+        <!-- ===== BODY ===== -->
+        <div class="file-body">
+          <div class="file-name" title="{{ f.name }}">{{ f.name }}</div>
+          <div class="file-meta">
+            <div><i class="bi bi-mortarboard"></i> {{ f.exam_name|default('N/A') }}</div>
+            <div><i class="bi bi-calendar3"></i> {{ f.created_at[:10] if f.created_at else '-' }}</div>
+            <div><i class="bi bi-hdd"></i> {{ (f.file_size|default(0) / 1024)|round(1) if f.file_size else 0 }} KB</div>
+          </div>
+          <a href="{{ file_url }}" class="btn-download" download>
+            <i class="bi bi-download"></i> Download
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+<!-- ===== PREVIEW MODAL ===== -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Preview</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title"><i class="bi bi-eye me-2"></i>Image Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
-        <img id="previewImg" src="" class="img-fluid">
+        <img id="previewImg" src="" class="img-fluid" alt="Preview" style="max-height:70vh;">
       </div>
     </div>
   </div>
 </div>
 
+<!-- ===== SCRIPTS ===== -->
 <script>
-function showPreview(src) {
+  function showPreview(src) {
     document.getElementById('previewImg').src = src;
-}
+  }
+
+  // ===== KEYBOARD SHORTCUT: ESC to close modal =====
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('previewModal');
+      const bsModal = bootstrap.Modal.getInstance(modal);
+      if (bsModal) bsModal.hide();
+    }
+  });
+
+  // ===== AUTO-CLOSE FLASH MESSAGES =====
+  document.querySelectorAll('.alert').forEach(function(el) {
+    setTimeout(function() {
+      const closeBtn = el.querySelector('.btn-close');
+      if (closeBtn) closeBtn.click();
+    }, 5000);
+  });
+
+  // ===== FILE TYPE FILTER PRESERVATION =====
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileType = urlParams.get('file_type');
+    if (fileType) {
+      const select = document.querySelector('select[name="file_type"]');
+      if (select) {
+        for (let option of select.options) {
+          if (option.value === fileType) {
+            option.selected = true;
+            break;
+          }
+        }
+      }
+    }
+  });
 </script>
 {% endblock %}

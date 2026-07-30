@@ -1,74 +1,110 @@
 {% extends "base.html" %}
+{% block title %}Admin Settings · ExamShield{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>Admin Settings</h2>
-    
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="fw-bold mb-1"><i class="bi bi-gear-fill text-primary me-2"></i>Admin Settings</h1>
+        <p class="text-muted">Manage platform controls, security, and limits.</p>
+    </div>
+    <a href="{{ url_for('export_csv') }}" class="btn btn-success btn-lg">
+        <i class="bi bi-download me-2"></i>Export All Data
+    </a>
+</div>
 
-    <div class="row">
-        <!-- Column 1: Site Settings -->
-        <div class="col-md-6">
+<div class="row g-4">
+    <!-- Column 1: Site Settings -->
+    <div class="col-lg-6">
+        <div class="card-premium h-100">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-sliders fs-4 text-primary me-2"></i>
+                <h4 class="mb-0 fw-semibold">Platform Controls</h4>
+                <span class="badge bg-success-subtle text-success ms-auto">Free Plan</span>
+            </div>
             
-            <div class="card">
-                <div class="card-header">Site Control - Free Plan</div>
-                <div class="card-body">
-                    <form method="POST">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> <!-- HE ADD KEL -->
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="maintenance_mode" id="maintenance" {% if settings.maintenance_mode %}checked{% endif %}>
-                            <label class="form-check-label" for="maintenance">Maintenance Mode ON</label>
-                        </div>
+            <form method="POST"> <!-- SAME FORM -->
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="registration_open" id="registration" {% if settings.registration_open %}checked{% endif %}>
-                            <label class="form-check-label" for="registration">New Registration Open</label>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">AI Model - Free</label>
-                            <select name="ai_model" class="form-control">
-                                <option value="llama-3.1-8b-instant" {% if settings.ai_model == 'llama-3.1-8b-instant' %}selected{% endif %}>Llama 3.1 8B - Fast & Free</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Max Complaints Per Student/Day</label>
-                            <input type="number" name="max_daily_complaints" class="form-control" value="{{ settings.max_daily_complaints }}">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Settings</button>
-                    </form>
+                <div class="d-flex justify-content-between align-items-center p-3 mb-3 rounded-3 bg-soft-blue">
+                    <div>
+                        <label class="form-check-label fw-semibold" for="maintenance">Maintenance Mode</label>
+                        <p class="text-muted small mb-0">Disable public access during updates</p>
+                    </div>
+                    <div class="form-check form-switch fs-4">
+                        <input class="form-check-input" type="checkbox" name="maintenance_mode" id="maintenance" {% if settings.maintenance_mode %}checked{% endif %}>
+                    </div>
                 </div>
-            </div>
-             <a href="{{ url_for('export_csv') }}" class="btn btn-success mt-3">Download All Data CSV</a>
+
+                <div class="d-flex justify-content-between align-items-center p-3 mb-3 rounded-3 bg-soft-blue">
+                    <div>
+                        <label class="form-check-label fw-semibold" for="registration">New Registrations</label>
+                        <p class="text-muted small mb-0">Allow new students to sign up</p>
+                    </div>
+                    <div class="form-check form-switch fs-4">
+                        <input class="form-check-input" type="checkbox" name="registration_open" id="registration" {% if settings.registration_open %}checked{% endif %}>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">AI Model</label>
+                    <select name="ai_model" class="form-select"> <!-- NAME SAME -->
+                        <option value="llama-3.1-8b-instant" {% if settings.ai_model == 'llama-3.1-8b-instant' %}selected{% endif %}>Llama 3.1 8B - Fast & Free</option>
+                    </select>
+                    <small class="text-muted">Currently locked to free tier model</small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Max Complaints Per Student / Day</label>
+                    <input type="number" name="max_daily_complaints" class="form-control" value="{{ settings.max_daily_complaints }}" min="1"> <!-- NAME SAME -->
+                    <small class="text-muted">Prevents spam and abuse</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-check-circle me-2"></i>Save Settings
+                </button>
+            </form>
         </div>
+    </div>
 
-        <!-- Column 2: Change Password -->
-        <div class="col-md-6">
-             <div class="card">
-                <div class="card-header">Change Admin Password</div>
-                <div class="card-body">
-                    <form method="POST">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <div class="mb-3">
-                            <label>Old Password</label>
-                            <input type="password" name="old_password" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label>New Password</label>
-                            <input type="password" name="new_password" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-warning">Update Password</button>
-                    </form>
-                </div>
+    <!-- Column 2: Change Password -->
+    <div class="col-lg-6">
+        <div class="card-premium h-100">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-shield-lock fs-4 text-warning me-2"></i>
+                <h4 class="mb-0 fw-semibold">Security</h4>
             </div>
+            
+            <form method="POST"> <!-- SAME FORM -->
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label> <!-- label improved -->
+                    <input type="password" name="old_password" class="form-control" placeholder="Enter current password" required> <!-- NAME SAME -->
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">New Password</label>
+                    <input type="password" name="new_password" class="form-control" placeholder="Enter new password" required> <!-- NAME SAME -->
+                </div>
+                
+                <div class="alert alert-warning-subtle d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <small>Choose a strong password with 8+ characters</small>
+                </div>
+
+                <button type="submit" class="btn btn-warning w-100 text-white fw-semibold">
+                    <i class="bi bi-key-fill me-2"></i>Update Password
+                </button>
+            </form>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bg-soft-blue { background: #F0F6FE; }
+.alert-warning-subtle { background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; }
+.badge.bg-success-subtle { background: #D1FAE5; color: #065F46; }
+.form-check-input:checked { background-color: var(--accent); border-color: var(--accent); }
+</style>
 {% endblock %}
