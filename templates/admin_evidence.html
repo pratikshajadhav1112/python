@@ -490,68 +490,34 @@
 <!-- ===== FILES GRID ===== -->
 <div class="files-card">
   <div class="card-header-custom">
-    <h6>
-      <i class="bi bi-folder2-open"></i> Evidence Files
-      <span class="badge-total">{{ files|length }} files</span>
-    </h6>
-    <div>
-      <span style="font-size:0.8rem; color:#56718e;">
-        <i class="bi bi-database me-1"></i> 
-        {% set total_size = files|sum(attribute='file_size')|default(0) %}
-        {{ (total_size / 1024 / 1024)|round(1) if total_size > 0 else 0 }} MB total
-      </span>
-    </div>
+    <h6><i class="bi bi-folder2-open"></i> Evidence Files <span class="badge-total">{{ files|length }} files</span></h6>
   </div>
 
   {% if files|length == 0 %}
-    <div class="empty-state">
-      <i class="bi bi-folder-x"></i>
-      <h5>No Evidence Files Found</h5>
-      <p>Try adjusting your search filters or upload new files.</p>
-    </div>
+    <div class="empty-state"><i class="bi bi-folder-x"></i><h5>No Evidence Files Found</h5></div>
   {% else %}
     <div class="file-grid">
       {% for f in files %}
+      {% set file_url = url_for('uploaded_file', filename=f.filename) %} <!-- URL ko variable me store -->
       <div class="file-card">
-        <!-- ===== PREVIEW ===== -->
         <div class="file-preview" 
              {% if f.file_type == 'image' %}
-               onclick="showPreview('{{ url_for('uploaded_file', filename=f.filename) }}')"
+               data-src="{{ file_url }}" <!-- onclick hata ke data attribute -->
                data-bs-toggle="modal" data-bs-target="#previewModal"
              {% endif %}>
           
-          {% set file_url = url_for('uploaded_file', filename=f.filename) %}
-          
           {% if f.file_type == 'image' %}
-          
             <img src="{{ file_url }}" alt="{{ f.name }}" loading="lazy">
             <span class="file-type-badge"><i class="bi bi-image"></i> Image</span>
           {% elif f.file_type == 'pdf' %}
             <div class="file-icon pdf"><i class="bi bi-file-pdf-fill"></i></div>
             <span class="file-type-badge"><i class="bi bi-file-pdf"></i> PDF</span>
-          {% elif f.file_type == 'video' %}
-            <div class="file-icon video"><i class="bi bi-film"></i></div>
-            <span class="file-type-badge"><i class="bi bi-play-circle"></i> Video</span>
-          {% elif f.file_type == 'audio' %}
-            <div class="file-icon audio"><i class="bi bi-music-note-beamed"></i></div>
-            <span class="file-type-badge"><i class="bi bi-volume-up"></i> Audio</span>
-          {% else %}
-            <div class="file-icon other"><i class="bi bi-file-earmark"></i></div>
-            <span class="file-type-badge"><i class="bi bi-file"></i> Other</span>
           {% endif %}
         </div>
 
-        <!-- ===== BODY ===== -->
         <div class="file-body">
           <div class="file-name" title="{{ f.name }}">{{ f.name }}</div>
-          <div class="file-meta">
-            <div><i class="bi bi-mortarboard"></i> {{ f.exam_name|default('N/A') }}</div>
-            <div><i class="bi bi-calendar3"></i> {{ f.created_at[:10] if f.created_at else '-' }}</div>
-            <div><i class="bi bi-hdd"></i> {{ (f.file_size|default(0) / 1024)|round(1) if f.file_size else 0 }} KB</div>
-          </div>
-          <a href="{{ file_url }}" class="btn-download" download>
-            <i class="bi bi-download"></i> Download
-          </a>
+          <a href="{{ file_url }}" class="btn-download" download><i class="bi bi-download"></i> Download</a>
         </div>
       </div>
       {% endfor %}
@@ -560,58 +526,31 @@
 </div>
 
 <!-- ===== PREVIEW MODAL ===== -->
-<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="previewModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-eye me-2"></i>Image Preview</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <img id="previewImg" src="" class="img-fluid" alt="Preview" style="max-height:70vh;">
-      </div>
+      <div class="modal-header"><h5 class="modal-title"><i class="bi bi-eye me-2"></i>Image Preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body text-center"><img id="previewImg" src="" class="img-fluid"></div>
     </div>
   </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script>
-  function showPreview(src) {
-    document.getElementById('previewImg').src = src;
-  }
+  document.addEventListener("DOMContentLoaded", function() {
+    // Image click pe preview
+    document.querySelectorAll('.file-preview[data-src]').forEach(function(preview) {
+      preview.addEventListener('click', function() {
+        document.getElementById('previewImg').src = this.getAttribute('data-src');
+      });
+    });
 
-  // ===== KEYBOARD SHORTCUT: ESC to close modal =====
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      const modal = document.getElementById('previewModal');
-      const bsModal = bootstrap.Modal.getInstance(modal);
-      if (bsModal) bsModal.hide();
-    }
-  });
-
-  // ===== AUTO-CLOSE FLASH MESSAGES =====
-  document.querySelectorAll('.alert').forEach(function(el) {
-    setTimeout(function() {
-      const closeBtn = el.querySelector('.btn-close');
-      if (closeBtn) closeBtn.click();
-    }, 5000);
-  });
-
-  // ===== FILE TYPE FILTER PRESERVATION =====
-  document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const fileType = urlParams.get('file_type');
-    if (fileType) {
-      const select = document.querySelector('select[name="file_type"]');
-      if (select) {
-        for (let option of select.options) {
-          if (option.value === fileType) {
-            option.selected = true;
-            break;
-          }
-        }
+    // ESC to close
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('previewModal'));
+        if (modal) modal.hide();
       }
-    }
+    });
   });
 </script>
 {% endblock %}
