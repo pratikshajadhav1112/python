@@ -6,17 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ExamShield · Leak Detection & Transparency{% endblock %}</title>
     
-    <!-- Bootstrap 5.3.0 -->
+    <!-- Bootstrap 5.3.0 (lightweight, kept for backend compatibility) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome 6.4.0 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
+    <!-- Google Font (Inter) for modern look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     
     <style>
-        /* ===== RESET & BASE ===== */
+        /* ===== RESET & BASE (modern, premium) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -33,7 +33,7 @@
             flex-direction: column;
         }
 
-        /* ===== NAVBAR FIX - YETHE CHANGE KELAY ===== */
+        /* ===== NAVBAR (glassmorphism / premium) ===== */
         .navbar {
             background: rgba(22, 48, 84, 0.92) !important;
             backdrop-filter: blur(10px);
@@ -41,9 +41,9 @@
             box-shadow: 0 8px 32px rgba(0, 20, 40, 0.12);
             padding: 14px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            position: sticky; /* ADD KEL */
-            top: 0; /* ADD KEL */
-            z-index: 1050 !important; /* ADD KEL - ha saglyat imp aahe */
+            position: sticky;
+            top: 0;
+            z-index: 1050 !important;
         }
 
         .navbar-brand {
@@ -131,15 +131,14 @@
             transform: scale(1.02);
         }
 
-        /* ===== DROPDOWN FIX - YETHE PAN CHANGE KELAY ===== */
         .dropdown-menu {
             border-radius: 20px;
             border: 1px solid #eaf0f6;
             box-shadow: 0 12px 40px rgba(0, 20, 40, 0.08);
             padding: 8px 0;
             margin-top: 10px;
-            z-index: 1060 !important; /* ADD KEL - navbar peksha var */
-            position: absolute; /* ADD KEL */
+            z-index: 1060 important;
+            position: absolute;
         }
 
         .dropdown-item {
@@ -181,8 +180,8 @@
             padding: 0 30px;
             flex: 1;
             width: 100%;
-            position: relative; /* ADD KEL */
-            z-index: 1; /* ADD KEL - card la kami priority */
+            position: relative;
+            z-index: index 1;
         }
 
         /* ===== BACK BUTTON ===== */
@@ -238,6 +237,78 @@
             }
         }
 
+        @media (max-width: 480px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            .btn-light.btn-sm, .btn-success.btn-sm {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ===== UTILITY ===== */
+        .shadow-premium {
+            box-shadow: 0 8px 30px -8px rgba(18, 52, 86, 0.06);
+        }
+
+        .rounded-4 {
+            border-radius: 24px;
+        }
+
+        .bg-soft-blue {
+            background: #f0f6fe;
+        }
+
+        .text-premium {
+            color: #0b2a44;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .fade-in-up {
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .navbar, .alert, .main-content {
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        /* override bootstrap btn primary */
+        .btn-primary {
+            background: #1a3d60;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 28px;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(26, 61, 96, 0.12);
+        }
+
+        .btn-primary:hover {
+            background: #0f2d4a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px -6px rgba(18, 52, 86, 0.2);
+        }
+
+        .btn-outline-primary {
+            border-radius: 40px;
+            border: 1.5px solid #b7cee5;
+            color: #1a3d60;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-outline-primary:hover {
+            background: #eaf1fa;
+            border-color: #6e9ac7;
+            transform: translateY(-2px);
+        }
+
         /* cards */
         .card-premium {
             background: #ffffff;
@@ -246,8 +317,8 @@
             padding: 24px 28px;
             box-shadow: 0 6px 20px rgba(0, 20, 40, 0.02);
             transition: all 0.2s ease;
-            position: relative; /* ADD KEL */
-            z-index: 1; /* ADD KEL */
+            position: relative;
+            z-index: 1;
         }
 
         .card-premium:hover {
@@ -255,7 +326,19 @@
             box-shadow: 0 12px 36px -12px rgba(18, 52, 86, 0.06);
         }
 
-        /* FOOTER CSS same aahe... */
+        /* small polish */
+        .badge-soft {
+            background: #e7f0fa;
+            color: #1a4870;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        /* ============================================================ */
+        /* ================ PREMIUM FOOTER STYLES ====================== */
+        /* ============================================================ */
         .premium-footer {
             background: linear-gradient(180deg, #0b1e2f 0%, #0a1a28 100%);
             color: rgba(255, 255, 255, 0.85);
@@ -265,7 +348,323 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             animation: fadeUp 0.6s ease forwards;
         }
-        /* ...baki footer css tasach thev... */
+
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 40px 30px;
+        }
+
+        /* ===== TOP SECTION ===== */
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.2fr;
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-brand .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand .footer-logo i {
+            font-size: 2rem;
+            color: #7bb3ff;
+            filter: drop-shadow(0 4px 12px rgba(123, 179, 255, 0.15));
+        }
+
+        .footer-brand .footer-logo span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        .footer-tagline {
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.65);
+            max-width: 380px;
+            margin-bottom: 18px;
+        }
+
+        .footer-trust-badge {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-trust-badge span {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-trust-badge span i {
+            color: #7bb3ff;
+            font-size: 0.7rem;
+        }
+
+        /* ===== LINK SECTIONS ===== */
+        .footer-links h6 {
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 16px;
+            opacity: 0.8;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links ul li a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links ul li a i {
+            font-size: 0.5rem;
+            color: #7bb3ff;
+            transition: all 0.2s ease;
+        }
+
+        .footer-links ul li a:hover {
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .footer-links ul li a:hover i {
+            color: white;
+            transform: translateX(2px);
+        }
+
+        /* ===== CONTACT ===== */
+        .footer-contact li {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            list-style: none;
+        }
+
+        .footer-contact li i {
+            width: 20px;
+            color: #7bb3ff;
+            font-size: 0.85rem;
+        }
+
+        /* ===== MIDDLE: TRUST INDICATORS ===== */
+        .footer-middle {
+            padding: 28px 0 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .trust-indicators {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px 24px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .trust-item i {
+            font-size: 1.2rem;
+            color: #7bb3ff;
+            opacity: 0.6;
+        }
+
+        /* ===== BOTTOM ===== */
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-copyright p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+        }
+
+        .footer-copyright p strong {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+        }
+
+        .footer-version {
+            font-size: 0.7rem !important;
+            color: rgba(255, 255, 255, 0.3) !important;
+            margin-top: 2px !important;
+        }
+
+        .dot-separator {
+            margin: 0 6px;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 14px;
+        }
+
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-social a:hover {
+            background: rgba(123, 179, 255, 0.1);
+            border-color: #7bb3ff;
+            color: #7bb3ff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px -8px rgba(123, 179, 255, 0.15);
+        }
+
+        /* ===== FOOTER RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .footer-top {
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+            }
+            .footer-brand {
+                grid-column: 1 / -1;
+            }
+            .footer-tagline {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                padding: 0 20px 20px;
+            }
+            .footer-top {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding-bottom: 28px;
+            }
+            .footer-brand {
+                grid-column: 1;
+            }
+            .trust-indicators {
+                justify-content: center;
+                gap: 12px 20px;
+            }
+            .trust-item {
+                font-size: 0.7rem;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 18px;
+            }
+            .footer-social {
+                justify-content: center;
+            }
+            .footer-trust-badge {
+                justify-content: center;
+            }
+            .footer-brand .footer-logo {
+                justify-content: center;
+            }
+            .footer-tagline {
+                text-align: center;
+            }
+            .footer-links {
+                text-align: center;
+            }
+            .footer-links ul li a {
+                justify-content: center;
+            }
+            .footer-contact li {
+                justify-content: center;
+            }
+            .footer-middle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .premium-footer {
+                padding-top: 30px;
+                margin-top: 40px;
+            }
+            .footer-container {
+                padding: 0 14px 16px;
+            }
+            .footer-brand .footer-logo span {
+                font-size: 1.2rem;
+            }
+            .footer-tagline {
+                font-size: 0.82rem;
+            }
+            .trust-item {
+                font-size: 0.65rem;
+                gap: 6px;
+            }
+            .trust-item i {
+                font-size: 0.9rem;
+            }
+            .footer-social a {
+                width: 34px;
+                height: 34px;
+                font-size: 0.8rem;
+            }
+            .footer-copyright p {
+                font-size: 0.7rem;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -278,7 +677,7 @@
             <i class="fas fa-shield-alt"></i> ExamShield
         </a>
         
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         
@@ -314,8 +713,9 @@
                     <input class="form-control form-control-sm search-input me-2" 
                            type="search" 
                            name="search" 
-                           placeholder="Quick Search...">
-                    <button class="btn btn-light btn-sm" type="submit">
+                           placeholder="Quick Search..." 
+                           style="min-width: 180px;">
+                    <button class="btn btn-light btn-sm" type="submit" title="Search">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
@@ -353,7 +753,7 @@
                 <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show shadow-sm" role="alert">
                     <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }} me-2"></i>
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -363,6 +763,7 @@
 <!-- ===== MAIN CONTENT ===== -->
 <main class="container-fluid main-content">
     {% block content %}
+    <!-- Default content (will be overridden by child templates) -->
     <div class="text-center py-5">
         <h2 class="fw-light text-secondary">Welcome to ExamShield</h2>
         <p class="text-muted">Secure, transparent, and modern complaint reporting platform.</p>
@@ -370,29 +771,167 @@
     {% endblock %}
 </main>
 
-<!-- ===== BACK BUTTON ===== -->
+<!-- ===== BACK BUTTON (always visible) ===== -->
 <div>
     <a href="{{ url_for('home') }}" class="back-btn">
         <i class="fas fa-arrow-left"></i> Back to Home
     </a>
 </div>
 
-<!-- ===== FOOTER ===== -->
+<!-- ============================================================ -->
+<!-- ==================== PREMIUM FOOTER ======================== -->
+<!-- ============================================================ -->
 <footer class="premium-footer">
-    <!-- Tuzha full footer code ithech aahe -->
+    <div class="footer-container">
+        <!-- ===== TOP SECTION: Logo + Description ===== -->
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>ExamShield</span>
+                </div>
+                <p class="footer-tagline">
+                    Securing examination integrity through transparency, 
+                    AI-powered detection, and community participation.
+                </p>
+                <div class="footer-trust-badge">
+                    <span><i class="fas fa-lock"></i> 100% Secure</span>
+                    <span><i class="fas fa-user-secret"></i> Anonymous</span>
+                    <span><i class="fas fa-certificate"></i> Govt. Certified</span>
+                </div>
+            </div>
+
+            <!-- ===== QUICK LINKS ===== -->
+            <div class="footer-links">
+                <h6>Quick Links</h6>
+                <ul>
+                    <li><a href="{{ url_for('home') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                    <li><a href="{{ url_for('form') }}"><i class="fas fa-chevron-right"></i> Submit Report</a></li>
+                    <li><a href="{{ url_for('report_list') }}"><i class="fas fa-chevron-right"></i> All Reports</a></li>
+                </ul>
+            </div>
+
+            <!-- ===== SUPPORT ===== -->
+            <div class="footer-links">
+                <h6>Support</h6>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Help Center</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Terms of Service</a></li>
+                </ul>
+            </div>
+
+            <!-- ===== CONTACT ===== -->
+            <div class="footer-links">
+                <h6>Contact</h6>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-envelope"></i> support@examshield.gov.in</li>
+                    <li><i class="fas fa-phone-alt"></i> +91 1800-123-4567</li>
+                    <li><i class="fas fa-clock"></i> 24/7 Support Available</li>
+                    <li><i class="fas fa-map-marker-alt"></i> New Delhi, India</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== MIDDLE: Trust Indicators ===== -->
+        <div class="footer-middle">
+            <div class="trust-indicators">
+                <div class="trust-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>ISO 27001 Certified</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-database"></i>
+                    <span>Encrypted Storage</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-robot"></i>
+                    <span>AI-Powered Detection</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-users"></i>
+                    <span>100K+ Users Protected</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-award"></i>
+                    <span>Govt. Recognized</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM: Copyright + Social ===== -->
+        <div class="footer-bottom">
+            <div class="footer-copyright">
+                <p>
+                    &copy; 2026 <strong>ExamShield</strong> — Exam Leak Detection &amp; Transparency Platform. 
+                    All rights reserved.
+                </p>
+                <p class="footer-version">
+                    <i class="fas fa-code-branch"></i> v2.0.1 
+                    <span class="dot-separator">•</span> 
+                    <i class="fas fa-heart" style="color: #e74c3c;"></i> Made with integrity
+                </p>
+            </div>
+            <div class="footer-social">
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </div>
 </footer>
 
 <!-- ===== BOOTSTRAP JS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- ===== FRONTEND UI ENHANCEMENTS (no backend logic) ===== -->
 <script>
-    // Flash auto close
-    document.querySelectorAll('.alert').forEach(el => {
-        setTimeout(() => {
-            const closeBtn = el.querySelector('.btn-close');
-            if (closeBtn) closeBtn.click();
-        }, 5000);
-    });
+    (function() {
+        // Add subtle animation to flash messages auto-dismiss after 5s
+        document.querySelectorAll('.alert').forEach(el => {
+            setTimeout(() => {
+                const closeBtn = el.querySelector('.btn-close');
+                if (closeBtn) closeBtn.click();
+            }, 5000);
+        });
+
+        // Active nav link highlight (already handled by backend, but we add a small glow)
+        document.querySelectorAll('.nav-link.active').forEach(el => {
+            el.style.boxShadow = 'inset 0 0 0 2px rgba(255,255,255,0.15)';
+        });
+
+        // Search input: add micro-interaction
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.01)';
+            });
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        }
+
+        // Dropdown hover effect (bootstrap already handles, but we add smoothness)
+        document.querySelectorAll('.dropdown-toggle').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.2s';
+            });
+        });
+
+        // Footer: Add smooth scroll for anchor links
+        document.querySelectorAll('.footer-links a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    })();
 </script>
 
 {% block extra_js %}{% endblock %}

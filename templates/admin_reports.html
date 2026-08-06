@@ -3,7 +3,7 @@
 
 {% block content %}
 <style>
-    .desc-col {
+   .desc-col {
         max-width: 350px;
         white-space: nowrap;
         overflow: hidden;
@@ -13,7 +13,7 @@
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">All Reports: {{ total }}</h6> <!-- total dikhao -->
+        <h6 class="m-0 font-weight-bold text-primary">All Reports: {{ total }}</h6>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -27,7 +27,7 @@
                         <th>Date</th>
                         <th>Description</th>
                         <th>Status</th>
-                        <th>AI Analysis</th>  
+                        <th>AI Analysis</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -40,10 +40,11 @@
                         <td>{{ r.college_name }}</td>
                         <td>{{ r.report_date }}</td>
                         <td class="desc-col" title="{{ r.description }}">{{ r.description[:120] }}{% if r.description|length > 120 %}...{% endif %}</td>
-                        
+
                         <!-- 1. STATUS with Dropdown -->
                         <td>
                             <form action="{{ url_for('update_status', id=r.id) }}" method="POST" class="d-flex gap-1">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- FIX: CSRF Token -->
                                 <select name="status" class="form-select form-select-sm">
                                     <option value="Pending" {% if r.status=='Pending' %}selected{% endif %}>Pending</option>
                                     <option value="In Progress" {% if r.status=='In Progress' %}selected{% endif %}>In Progress</option>
@@ -66,21 +67,23 @@
                         <!-- 3. ACTION BUTTONS -->
                         <td>
                             <a href="{{ url_for('view_report', id=r.id) }}" class="btn btn-sm btn-primary mb-1">View</a>
-                            <a href="{{ url_for('delete_report', id=r.id) }}" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Delete this report?')">Delete</a>
+                            <!-- DELETE la pan POST + CSRF kela -->
+                            <form method="POST" action="{{ url_for('delete_report', id=r.id) }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Delete this report?')">Delete</button>
+                            </form>
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="9" class="text-center">No reports found</td></tr> 
+                    <tr><td colspan="9" class="text-center">No reports found</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- PAGINATION YAHAN  -->
+        <!-- PAGINATION -->
         <nav aria-label="Page navigation" class="mt-4">
           <ul class="pagination justify-content-center">
-
-            <!-- Previous Button -->
             {% if page > 1 %}
             <li class="page-item">
               <a class="page-link" href="{{ url_for('admin_reports', page=page-1) }}">Previous</a>
@@ -89,10 +92,8 @@
             <li class="page-item disabled"><span class="page-link">Previous</span></li>
             {% endif %}
 
-            <!-- Page Number -->
             <li class="page-item disabled"><span class="page-link">Page {{ page }}</span></li>
 
-            <!-- Next Button -->
             {% if page * per_page < total %}
             <li class="page-item">
               <a class="page-link" href="{{ url_for('admin_reports', page=page+1) }}">Next</a>
@@ -100,7 +101,6 @@
             {% else %}
             <li class="page-item disabled"><span class="page-link">Next</span></li>
             {% endif %}
-
           </ul>
         </nav>
 
