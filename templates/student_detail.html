@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}My Report {{ report.display_id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 900px;">
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-file-alt"></i> My Report: {{ report.display_id }}</h5>
+        <span class="badge bg-{{ 'success' if report.status=='Resolved' else 'warning' }} fs-6">
+            {{ report.status }}
+        </span>
+    </div>
+
+    <div class="card-body">
+        <!-- Basic Info -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><b>Exam:</b> {{ report.exam_name }}</p>
+                <p><b>Subject:</b> {{ report.subject_name }}</p>
+                <p><b>College:</b> {{ report.college_name }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><b>Date:</b> {{ report.report_date }}</p>
+                <p><b>Category:</b> {{ report.category }}</p>
+                <p><b>Location:</b> {{ report.incident_city }}</p>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <h6>Description</h6>
+            <div class="p-3 bg-light rounded">{{ report.description }}</div>
+        </div>
+
+        <!-- Evidence -->
+        {% if report.photos %}
+        <div class="mb-3">
+            <h6>Attached Evidence</h6>
+            {% for photo in report.photos %}
+                <img src="{{ url_for('static', filename='uploads/evidence/' + photo) }}" class="img-fluid rounded mb-2" style="max-height:200px;">
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('report_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to My Reports
+            </a>
+
+            <!-- Student fakt Delete karu shakto -->
+            {% if current_user.id == report.user_id %}
+            <form method="POST" action="{{ url_for('delete_report', id=report.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this report? This cannot be undone.')">
+                    <i class="fas fa-trash"></i> Delete Report
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

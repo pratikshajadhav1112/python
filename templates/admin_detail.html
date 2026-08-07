@@ -1,0 +1,87 @@
+{% extends "admin_base.html" %}
+{% block title %}Report {{ report.display_id }} - Admin{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-file-alt"></i> Report ID: {{ report.display_id }}
+        </h6>
+        <span class="badge bg-{{ 'success' if report.status=='Resolved' else 'warning' if report.status=='Pending' else 'info' }} fs-6">
+            {{ report.status }}
+        </span>
+    </div>
+
+    <div class="card-body">
+        <!-- Basic Info -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <p><b><i class="fas fa-graduation-cap"></i> Exam:</b> {{ report.exam_name }}</p>
+                <p><b><i class="fas fa-book"></i> Subject:</b> {{ report.subject_name }}</p>
+                <p><b><i class="fas fa-university"></i> College:</b> {{ report.college_name }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><b><i class="fas fa-calendar"></i> Date:</b> {{ report.report_date }}</p>
+                <p><b><i class="fas fa-map-marker-alt"></i> Location:</b> {{ report.incident_city }}, {{ report.incident_district }}</p>
+                <p><b><i class="fas fa-user"></i> Submitted By:</b> {{ report.name }} ({{ report.email }})</p>
+            </div>
+        </div>
+
+        <!-- AI Analysis - Fakt Admin -->
+        <div class="alert alert-info">
+            <h6><i class="fas fa-robot"></i> AI Analysis</h6>
+            <p><b>Summary:</b> {{ report.ai_summary }}</p>
+            <p><b>Sentiment:</b> {{ report.sentiment }}</p>
+            <p><b>Urgency Score:</b> {{ report.urgency_score }}/100
+                {% if report.urgency_score > 70 %}<span class="badge bg-danger">High Risk</span>{% endif %}
+            </p>
+            <p><b>Category:</b> {{ report.category }}</p>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+            <h6><i class="fas fa-align-left"></i> Description</h6>
+            <div class="p-3 bg-light rounded">{{ report.description }}</div>
+        </div>
+
+        <!-- Evidence Files -->
+        {% if report.photos %}
+        <div class="mb-4">
+            <h6><i class="fas fa-paperclip"></i> Evidence</h6>
+            <div class="row">
+                {% for photo in report.photos %}
+                <div class="col-md-3 mb-2">
+                    <img src="{{ url_for('static', filename='uploads/evidence/' + photo) }}" class="img-fluid rounded" style="max-height:150px;">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+
+            <!-- Status Update -->
+            <form method="POST" action="{{ url_for('update_status', id=report.id) }}" class="d-flex gap-2">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+                    <option value="Pending" {% if report.status=='Pending' %}selected{% endif %}>Pending</option>
+                    <option value="In Review" {% if report.status=='In Review' %}selected{% endif %}>In Review</option>
+                    <option value="Resolved" {% if report.status=='Resolved' %}selected{% endif %}>Resolved</option>
+                </select>
+            </form>
+
+            <!-- Delete -->
+            <form method="POST" action="{{ url_for('delete_report', id=report.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure to delete this report?')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -455,7 +455,7 @@ def admin_reports():
         FROM entries e
         JOIN users u ON e.user_id=u.id
         ORDER BY e.id DESC
-        LIMIT? OFFSET?
+        LIMIT ? OFFSET ? -- ITHA SPACE TAKLA
     """, (per_page, offset)).fetchall()
 
     conn.close()
@@ -475,7 +475,7 @@ def update_status(id):
     db = get_db()
 
     # 1. Status update
-    db.execute('UPDATE entries SET status =? WHERE id =?', (new_status, id))
+    db.execute('UPDATE entries SET status =? WHERE id = ?', (new_status, id))
 
     # 2. Student ko notification pathao
     complaint = db.execute('SELECT user_id, category FROM entries WHERE id =?', (id,)).fetchone()
@@ -808,7 +808,7 @@ def search_page():
 def view_report(id):
     conn = get_db()
     conn.row_factory = sqlite3.Row
-    report = conn.execute('SELECT * FROM entries WHERE id =?', (id,)).fetchone()
+    report = conn.execute('SELECT e.*, u.name, u.email FROM entries e JOIN users u ON e.user_id=u.id WHERE e.id =?', (id,)).fetchone()
 
     if report is None:
         conn.close()
@@ -821,13 +821,14 @@ def view_report(id):
         return redirect(url_for('report_list'))
 
     report_dict = dict(report)
-    report_dict['photos'] = json.loads(report_dict['photos']) if report_dict['photos'] else []
-    report_dict['videos'] = json.loads(report_dict['videos']) if report_dict['videos'] else []
-    report_dict['audios'] = json.loads(report_dict['audios']) if report_dict['audios'] else []
+    for key in ['photos', 'videos', 'audios']:
+        try:
+            report_dict[key] = json.loads(report_dict[key]) if report_dict[key] else []
+        except:
+            report_dict[key] = []
     conn.close()
 
     report_dict['display_id'] = f"ELD-{report_dict['id']:03d}"
-    report_dict['is_dummy'] = False
 
     if report_dict['report_date']:
         try:
@@ -836,7 +837,11 @@ def view_report(id):
         except:
             pass
 
-    return render_template('detail.html', report=report_dict)
+    # Role nusar template
+    if current_user.role == 'admin':
+        return render_template('admin_detail.html', report=report_dict)
+    else:
+        return render_template('student_detail.html', report=report_dict)
 
 @app.route('/delete/<int:id>', methods=['POST'])
 @login_required
