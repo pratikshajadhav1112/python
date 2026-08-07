@@ -264,11 +264,12 @@ def register():
 
         hashed_pw = generate_password_hash(password)
 
+        # FIX: 10 columns = 10 ?
         conn.execute('''INSERT INTO users
-                     (name, username, email, mobile, password,
+                     (name, username, email, mobile, password, state, district,
                       signup_ip, signup_user_agent, role, is_email_verified, is_mobile_verified)
-                     VALUES (?,?,?,?,?,?)''',
-                     (name, username, email, mobile, hashed_pw,
+                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', # 12 ?
+                     (name, username, email, mobile, hashed_pw, state, district,
                       request.remote_addr, request.headers.get('User-Agent'),
                       'student', 1, 0))
 
@@ -279,7 +280,6 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
