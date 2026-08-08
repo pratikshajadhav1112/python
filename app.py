@@ -467,29 +467,47 @@ def admin_reports():
                            total=total_reports,
                            per_page=per_page)
 
-# FIX 2: YE PURA FUNCTION REPLACE KARO
 @app.route('/admin/update_status/<int:id>', methods=['POST'])
 @admin_required
 def update_status(id):
-    new_status = request.form['status']
-    db = get_db()
+    db = None
+    try:
+        new_status = request.form['status']
+        db = get_db()
+        db.execute('BEGIN IMMEDIATE')
 
-    # 1. Status update
-    db.execute('UPDATE entries SET status =? WHERE id = ?', (new_status, id))
+        # 1. Status update
+        db.execute('UPDATE entries SET status =? WHERE id =?', (new_status, id))
 
-    # 2. Student ko notification pathao
-    complaint = db.execute('SELECT user_id, category FROM entries WHERE id =?', (id,)).fetchone()
-    if complaint:
-        msg = f"Your complaint for '{complaint['category']}' is now: {new_status}"
-        link = f"/report/{id}" # FIX: view_report ka url
+        # 2. Student ko notification pathao
+        complaint = db.execute('SELECT user_id, category FROM entries WHERE id =?', (id,)).fetchone()
+        if complaint and complaint['user_id']:
+            title = f"Complaint Status Updated" # YE NEW ADD KIYA
+            msg = f"Your complaint for '{complaint['category']}' is now: {new_status}"
+            link = f"/report/{id}"
 
-        db.execute("INSERT INTO notifications (type, message, link, is_read, created_at) VALUES (?,?,?,?,?)",
-                   ('Status Update', msg, link, 0, datetime.now()))
+            db.execute(
+                "INSERT INTO notifications (user_id, title, type, message, link, is_read, created_at) VALUES (?,?,?,?,?,?,?)",
+                (complaint['user_id'], title, 'Status Update', msg, link, 0, datetime.now()) # title add
+            )
+        else:
+            flash("Error: Complaint me user_id nahi mila", "danger")
+            db.rollback()
+            return redirect(url_for('admin_reports'))
 
-    db.commit()
-    db.close()
-    flash(f"Status updated to {new_status}", "success")
-    return redirect(url_for('admin_reports')) # reports list pe wapas bhejo
+        db.commit()
+        flash(f"Status updated to {new_status}", "success")
+
+    except sqlite3.OperationalError as e:
+        if db: db.rollback()
+        flash("Database busy. Please try again.", "danger")
+    except sqlite3.IntegrityError as e:
+        if db: db.rollback()
+        flash(f"DB Error: {e}", "danger")
+    finally:
+        if db: db.close()
+
+    return redirect(url_for('admin_reports'))
 
 @app.route('/admin/evidence')
 @admin_required
@@ -584,7 +602,7 @@ def inject_notifications():
 # FIX 3: YE DONO FUNCTION REPLACE KARO
 @app.route('/admin/notifications/mark_all_read')
 @admin_required
-def mark_all_read():
+def admin_mark_all_read():
     conn = get_db()
     conn.execute("UPDATE notifications SET is_read = 1")
     conn.commit()
@@ -925,8 +943,84 @@ def report_list():
                 report_dict['report_date_display'] = date_obj.strftime('%d-%m-%Y')
             except: pass
         all_reports.append(report_dict)
+         # HE 2 LINES ADD KAR - HACH RETURN AAHE
+    dummy_reports = DUMMY_REPORTS if current_user.role == 'admin' else []
+    return render_template('reports.html', reports=all_reports + dummy_reports, 
+                           search=search, sort_by=sort_by, order=order,
+                           exam_filter=exam_filter, college_filter=college_filter)
 
-    return render_template("reports.html", reports=all_reports, search=search, sort_by=sort_by, order=order, exam_filter=exam_filter, college_filter=college_filter)
+
+def get_db():
+    db = sqlite3.connect('myproject.db', timeout=20.0) # timeout add
+    db.row_factory = sqlite3.Row
+    db.execute("PRAGMA foreign_keys = ON")
+    db.execute("PRAGMA journal_mode=WAL") # WAL mode add
+    db.execute("PRAGMA busy_timeout = 20000")
+    return db
+@app.context_processor
+def inject_notifications():
+    # Sirf student ke liye count
+    if current_user.is_authenticated and current_user.role == 'student':
+        db = get_db()
+        count = db.execute("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0", (current_user.id,)).fetchone()[0]
+        db.close()
+        return dict(unread_count=count)
+    return dict(unread_count=0)
+
+@app.route('/student/notifications')
+@login_required
+def student_notifications():
+    if current_user.role!= 'student':
+        flash('Access Denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    user_id = current_user.id
+    filter_type = request.args.get('filter', 'all')
+    db = get_db()
+    query = "SELECT * FROM notifications WHERE user_id =?"
+    if filter_type == 'unread':
+        query += " AND is_read = 0"
+    elif filter_type == 'read':
+        query += " AND is_read = 1"
+    query += " ORDER BY created_at DESC"
+
+    notifications = db.execute(query, (user_id,)).fetchall()
+    total = db.execute("SELECT COUNT(*) FROM notifications WHERE user_id =?", (user_id,)).fetchone()[0]
+    unread_count = db.execute("SELECT COUNT(*) FROM notifications WHERE user_id =? AND is_read = 0", (user_id,)).fetchone()[0]
+    db.close()
+    return render_template('student_notifications.html', notifications=notifications, unread_count=unread_count, total=total, filter_type=filter_type)
+
+
+@app.route('/student/notifications/<int:notif_id>/read')
+@login_required
+def mark_student_notification_read(notif_id):
+    db = get_db()
+    # FIX: current.id -> current_user.id
+    db.execute("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?", (notif_id, current_user.id))
+    db.commit()
+    db.close()
+    return redirect(url_for('student_notifications', filter=request.args.get('filter','all')))
+
+@app.route('/student/notifications/mark-all-read')
+@login_required
+def mark_all_read():
+    db = get_db()
+    # FIX: current.id -> current_user.id
+    db.execute("UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0", (current_user.id,))
+    db.commit()
+    db.close()
+    flash('All notifications marked as read', 'success')
+    return redirect(url_for('student_notifications'))
+
+@app.route('/student/notifications/<int:notif_id>/delete')
+@login_required
+def delete_notification(notif_id):
+    db = get_db()
+    db.execute("DELETE FROM notifications WHERE id = ? AND user_id = ?", (notif_id, current_user.id))
+    db.commit()
+    db.close()
+    flash('Notification deleted', 'info')
+    return redirect(url_for('student_notifications'))
 
 @app.errorhandler(404)
 def page_not_found(e):

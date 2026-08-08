@@ -8,6 +8,7 @@ DB_PATH = os.path.join(BASE_DIR, 'myproject.db')
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON") # foreign key on kela
     return conn
 
 def init_db():
@@ -52,6 +53,8 @@ def init_db():
             incident_district TEXT,
             incident_city TEXT,
             photos TEXT,
+            videos TEXT, -- add kele
+            audios TEXT, -- add kele
             urgency_score INTEGER DEFAULT 0,
             ai_summary TEXT,
             category TEXT,
@@ -61,7 +64,7 @@ def init_db():
         )
     ''')
 
-    # Settings Table - Navin for Admin Panel
+    # Settings Table
     c.execute('''CREATE TABLE IF NOT EXISTS settings (
                     id INTEGER PRIMARY KEY,
                     ai_model TEXT DEFAULT 'llama-3.1-8b-instant',
@@ -71,16 +74,28 @@ def init_db():
                 )''')
     c.execute("INSERT OR IGNORE INTO settings (id) VALUES (1)")
 
-    # Notifications Table
+    # Notifications Table - FIXED
     c.execute('''CREATE TABLE IF NOT EXISTS notifications (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title TEXT NOT NULL,
                     type TEXT,
                     message TEXT,
                     link TEXT,
                     is_read INTEGER DEFAULT 0,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES users(id)
                 )''')
-    
+
+    # Entry_files Table - tuza code madhe use aahe
+    c.execute('''CREATE TABLE IF NOT EXISTS entry_files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entry_id INTEGER NOT NULL,
+                    filename TEXT NOT NULL,
+                    file_type TEXT,
+                    FOREIGN KEY(entry_id) REFERENCES entries(id)
+                )''')
+
     # Admin user
     admin_exists = c.execute("SELECT * FROM users WHERE username = 'admin'").fetchone()
     if not admin_exists:
@@ -93,3 +108,4 @@ def init_db():
     conn.commit()
     conn.close()
     print("✅ Database ready!")
+   

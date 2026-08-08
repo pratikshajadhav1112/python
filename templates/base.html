@@ -6,25 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ExamShield · Leak Detection & Transparency{% endblock %}</title>
     
-    <!-- Bootstrap 5.3.0 (lightweight, kept for backend compatibility) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap 5.3.0 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome 6.4.0 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font (Inter) for modern look -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ===== RESET & BASE (modern, premium) ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: #f4f7fc;
             color: #0b1e2f;
             line-height: 1.6;
@@ -33,53 +26,66 @@
             flex-direction: column;
         }
 
-        /* ===== NAVBAR (glassmorphism / premium) ===== */
+        /* ===== NAVBAR FIX ===== */
         .navbar {
-            background: rgba(22, 48, 84, 0.92) !important;
+            background: rgba(22, 48, 84, 0.95) !important;
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0, 20, 40, 0.12);
             padding: 14px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            position: sticky;
-            top: 0;
-            z-index: 1050 !important;
+            position: relative; /* IMPORTANT */
+            z-index: 1030; /* IMPORTANT */
+            overflow: visible !important; /* IMPORTANT - dropdown ke liye */
         }
 
         .navbar-brand {
             font-weight: 700;
             font-size: 1.4rem;
-            letter-spacing: -0.02em;
             color: white !important;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
-        .navbar-brand i {
-            color: #7aa9ff;
-            font-size: 1.6rem;
-        }
+        .navbar-brand i { color: #7aa9ff; }
 
         .nav-link {
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.8) !important;
+            color: rgba(255, 255, 255, 0.85) !important;
             padding: 8px 18px !important;
             border-radius: 40px;
             transition: all 0.2s ease;
             margin: 0 3px;
         }
-
         .nav-link:hover, .nav-link.active {
             background: rgba(255, 255, 255, 0.12);
             color: white !important;
-            transform: translateY(-1px);
         }
 
-        .nav-link i {
-            margin-right: 8px;
+        /* ===== USER DROPDOWN FIX ===== */
+        .dropdown-menu {
+            border-radius: 16px;
+            border: 1px solid #eaf0f6;
+            box-shadow: 0 12px 40px rgba(0, 20, 40, 0.15);
+            padding: 8px 0;
+            margin-top: 10px;
+            z-index: 9999 !important; /* SABSE UPAR */
+            min-width: 260px;
+        }
+        .dropdown-item {
+            padding: 10px 20px;
+            font-weight: 500;
+            border-radius: 10px;
+            margin: 0 6px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+        }
+        .dropdown-item:hover {
+            background: #eef5fb;
+            color: #1a3a5e;
         }
 
+        /* ===== OTHER STYLES ===== */
         .search-input {
             border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.25);
@@ -88,13 +94,8 @@
             padding: 8px 18px;
             font-size: 0.9rem;
             min-width: 200px;
-            transition: all 0.2s;
         }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
+        .search-input::placeholder { color: rgba(255, 255, 255, 0.6); }
         .search-input:focus {
             background: white;
             color: #1a3a5e;
@@ -102,59 +103,20 @@
             box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.15);
         }
 
-        .btn-light.btn-sm {
+        .btn-light.btn-sm, .btn-success.btn-sm {
             border-radius: 40px;
             padding: 8px 18px;
             font-weight: 600;
-            background: white;
-            color: #1e3a8a;
-            border: none;
-            transition: all 0.2s;
         }
-
-        .btn-light.btn-sm:hover {
-            background: #e8f0fe;
-            transform: scale(1.02);
+        
+        .main-content {
+            max-width: 1400px;
+            margin: 32px auto;
+            padding: 0 30px;
+            flex: 1;
+            width: 100%;
         }
-
-        .btn-success.btn-sm {
-            border-radius: 40px;
-            padding: 8px 22px;
-            font-weight: 600;
-            background: #0f973d;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .btn-success.btn-sm:hover {
-            background: #0b7a31;
-            transform: scale(1.02);
-        }
-
-        .dropdown-menu {
-            border-radius: 20px;
-            border: 1px solid #eaf0f6;
-            box-shadow: 0 12px 40px rgba(0, 20, 40, 0.08);
-            padding: 8px 0;
-            margin-top: 10px;
-            z-index: 1060 important;
-            position: absolute;
-        }
-
-        .dropdown-item {
-            padding: 10px 22px;
-            font-weight: 500;
-            border-radius: 12px;
-            margin: 0 6px;
-            transition: all 0.15s;
-        }
-
-        .dropdown-item:hover {
-            background: #eef5fb;
-            color: #1a3a5e;
-        }
-
-        /* ===== FLASH MESSAGES ===== */
+         /* ===== FLASH MESSAGES ===== */
         .alert {
             border-radius: 20px;
             border: none;
@@ -180,8 +142,6 @@
             padding: 0 30px;
             flex: 1;
             width: 100%;
-            position: relative;
-            z-index: index 1;
         }
 
         /* ===== BACK BUTTON ===== */
@@ -235,6 +195,10 @@
             .nav-link {
                 padding: 10px 14px !important;
             }
+            .notif-bell-wrapper .btn-bell {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -244,6 +208,12 @@
             .btn-light.btn-sm, .btn-success.btn-sm {
                 padding: 6px 14px;
                 font-size: 0.8rem;
+            }
+            .notif-bell-wrapper .btn-bell .bell-label {
+                display: none;
+            }
+            .notif-bell-wrapper .btn-bell {
+                padding: 6px 10px;
             }
         }
 
@@ -317,8 +287,6 @@
             padding: 24px 28px;
             box-shadow: 0 6px 20px rgba(0, 20, 40, 0.02);
             transition: all 0.2s ease;
-            position: relative;
-            z-index: 1;
         }
 
         .card-premium:hover {
@@ -336,10 +304,8 @@
             font-size: 0.75rem;
         }
 
-        /* ============================================================ */
-        /* ================ PREMIUM FOOTER STYLES ====================== */
-        /* ============================================================ */
-        .premium-footer {
+        /* Footer CSS same as yours... */
+       .premium-footer {
             background: linear-gradient(180deg, #0b1e2f 0%, #0a1a28 100%);
             color: rgba(255, 255, 255, 0.85);
             padding: 50px 0 0 0;
@@ -677,7 +643,7 @@
             <i class="fas fa-shield-alt"></i> ExamShield
         </a>
         
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
             <span class="navbar-toggler-icon"></span>
         </button>
         
@@ -713,30 +679,49 @@
                     <input class="form-control form-control-sm search-input me-2" 
                            type="search" 
                            name="search" 
-                           placeholder="Quick Search..." 
-                           style="min-width: 180px;">
-                    <button class="btn btn-light btn-sm" type="submit" title="Search">
-                        <i class="fas fa-search"></i>
-                    </button>
+                           placeholder="Quick Search...">
+                    <button class="btn btn-light btn-sm" type="submit"><i class="fas fa-search"></i></button>
                 </form>
                 {% endif %}
 
                 {% if current_user.is_authenticated %}
+                    <!-- ===== USER DROPDOWN ===== -->
                     <div class="dropdown">
-                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i> {{ current_user.username }}
+                        <button class="btn btn-light btn-sm rounded-pill dropdown-toggle d-flex align-items-center px-3" 
+                                type="button" 
+                                id="userDropdown"
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                            <i class="fas fa-user-circle me-2"></i> {{ current_user.name }}
+                            {% if unread_count > 0 %}
+                                <span class="badge bg-danger rounded-pill ms-2">{{ unread_count }}</span>
+                            {% endif %}
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ url_for('home') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg">
+                            <li class="px-3 py-3 border-bottom bg-light">
+                                <div class="fw-bold">{{ current_user.name }}</div>
+                                <small class="text-muted text-capitalize">{{ current_user.role }}</small>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('student_notifications') }}">
+                                    <i class="fas fa-bell me-2 text-warning"></i> Notifications
+                                    {% if unread_count > 0 %}
+                                        <span class="badge bg-danger rounded-pill ms-auto">{{ unread_count }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard') }}"><i class="fas fa-home me-2 text-primary"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('report_list') }}"><i class="fas fa-file-alt me-2 text-info"></i> My Reports</a></li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li><a class="dropdown-item text-danger fw-bold" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                         </ul>
                     </div>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="btn btn-light btn-sm">
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-sm rounded-pill me-2">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </a>
-                    <a href="{{ url_for('register') }}" class="btn btn-success btn-sm">
+                    <a href="{{ url_for('register') }}" class="btn btn-success btn-sm rounded-pill">
                         <i class="fas fa-user-plus"></i> Register
                     </a>
                 {% endif %}
@@ -744,6 +729,7 @@
         </div>
     </div>
 </nav>
+
 
 <!-- ===== FLASH MESSAGES ===== -->
 <div class="container mt-3" style="max-width: 1400px;">
@@ -870,7 +856,7 @@
                 </p>
                 <p class="footer-version">
                     <i class="fas fa-code-branch"></i> v2.0.1 
-                    <span class="dot-separator">•</span> 
+                    <span class="dot-separator">&bull;</span> 
                     <i class="fas fa-heart" style="color: #e74c3c;"></i> Made with integrity
                 </p>
             </div>
@@ -890,39 +876,49 @@
 <!-- ===== FRONTEND UI ENHANCEMENTS (no backend logic) ===== -->
 <script>
     (function() {
-        // Add subtle animation to flash messages auto-dismiss after 5s
-        document.querySelectorAll('.alert').forEach(el => {
-            setTimeout(() => {
+        'use strict';
+
+        // ===== AUTO-DISMISS FLASH MESSAGES =====
+        document.querySelectorAll('.alert').forEach(function(el) {
+            setTimeout(function() {
                 const closeBtn = el.querySelector('.btn-close');
-                if (closeBtn) closeBtn.click();
+                if (closeBtn) {
+                    closeBtn.click();
+                } else {
+                    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(-10px)';
+                    setTimeout(function() { el.remove(); }, 500);
+                }
             }, 5000);
         });
 
-        // Active nav link highlight (already handled by backend, but we add a small glow)
-        document.querySelectorAll('.nav-link.active').forEach(el => {
+        // ===== ACTIVE NAV LINK GLOW =====
+        document.querySelectorAll('.nav-link.active').forEach(function(el) {
             el.style.boxShadow = 'inset 0 0 0 2px rgba(255,255,255,0.15)';
         });
 
-        // Search input: add micro-interaction
+        // ===== SEARCH INPUT MICRO-INTERACTION =====
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {
             searchInput.addEventListener('focus', function() {
                 this.parentElement.style.transform = 'scale(1.01)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
             });
             searchInput.addEventListener('blur', function() {
                 this.parentElement.style.transform = 'scale(1)';
             });
         }
 
-        // Dropdown hover effect (bootstrap already handles, but we add smoothness)
-        document.querySelectorAll('.dropdown-toggle').forEach(btn => {
+        // ===== DROPDOWN HOVER EFFECT =====
+        document.querySelectorAll('.dropdown-toggle').forEach(function(btn) {
             btn.addEventListener('mouseenter', function() {
                 this.style.transition = 'all 0.2s';
             });
         });
 
-        // Footer: Add smooth scroll for anchor links
-        document.querySelectorAll('.footer-links a[href^="#"]').forEach(anchor => {
+        // ===== FOOTER: SMOOTH SCROLL FOR ANCHOR LINKS =====
+        document.querySelectorAll('.footer-links a[href^="#"]').forEach(function(anchor) {
             anchor.addEventListener('click', function(e) {
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -931,6 +927,13 @@
                 }
             });
         });
+
+        // ===== NOTIFICATION BELL: LIVE COUNTER UPDATE =====
+        // This will update the unread count without page refresh
+        // Can be extended with WebSocket or polling
+
+        console.log('✅ ExamShield base template loaded successfully');
+        console.log('📬 Unread notifications: {{ unread_count|default(0) }}');
     })();
 </script>
 
