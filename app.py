@@ -28,7 +28,8 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "Linkkiwi2026")
 csrf = CSRFProtect(app)
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'myproject.db')
 # Initialize AI clients and API keys
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 HIVE_API_KEY = os.getenv("HIVE_API_KEY")
@@ -951,10 +952,10 @@ def report_list():
 
 
 def get_db():
-    db = sqlite3.connect('myproject.db', timeout=20.0) # timeout add
+    db = sqlite3.connect(DB_PATH, timeout=20.0)
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA foreign_keys = ON")
-    db.execute("PRAGMA journal_mode=WAL") # WAL mode add
+    db.execute("PRAGMA journal_mode=WAL")
     db.execute("PRAGMA busy_timeout = 20000")
     return db
 @app.context_processor
