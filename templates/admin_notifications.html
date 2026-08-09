@@ -4,9 +4,17 @@
 {% block breadcrumb %}Notifications{% endblock %}
 
 {% block content %}
-<!-- ===== STYLES ===== -->
 <style>
-  /* ===== STATS ROW ===== */
+  :root {
+    --navy: #050B1E;
+    --violet: #7C3AED;
+    --blue: #2563EB;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+  }
+
+ /* ===== MINI STATS ===== */
   .stats-mini {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -14,52 +22,47 @@
     margin-bottom: 24px;
   }
   .stats-mini .stat-item {
-    background: white;
-    padding: 16px 18px;
-    border-radius: 16px;
-    border: 1px solid #eef4fa;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    padding: 20px 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(124, 58, 237, 0.18);
     text-align: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 20, 40, 0.02);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.06);
   }
   .stats-mini .stat-item:hover {
-    border-color: #c6d9ed;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px -8px rgba(18, 52, 86, 0.06);
+    border-color: var(--violet);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px -8px rgba(124, 58, 237, 0.15);
   }
   .stats-mini .stat-item .number {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #0b1e2f;
-    line-height: 1.2;
+    font-family: 'Outfit';
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--navy), var(--violet));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
   .stats-mini .stat-item .label {
     font-size: 0.75rem;
-    color: #56718e;
-    font-weight: 500;
+    color: #64748B;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.4px;
   }
-  .stats-mini .stat-item .icon {
-    font-size: 1.4rem;
-    margin-bottom: 4px;
-    display: block;
-  }
-  .stats-mini .stat-item.unread .icon { color: #dc3545; }
-  .stats-mini .stat-item.read .icon { color: #0f8b4e; }
-  .stats-mini .stat-item.total .icon { color: #1a4b7a; }
+  .stats-mini .stat-item .icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
+  .stats-mini .stat-item.unread .icon { color: var(--danger); }
+  .stats-mini .stat-item.read .icon { color: var(--success); }
+  .stats-mini .stat-item.total .icon { color: var(--violet); }
 
   /* ===== NOTIFICATIONS CARD ===== */
   .notifications-card {
-    background: #ffffff;
-    border: 1px solid #eef4fa;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(124, 58, 237, 0.18);
     border-radius: 28px;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.06);
     overflow: hidden;
-  }
-  .notifications-card:hover {
-    border-color: #d5e3f2;
   }
 
   .notifications-card .card-header-custom {
@@ -67,349 +70,144 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 28px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 2px solid #F1F5F9;
     flex-wrap: wrap;
     gap: 12px;
-    background: #fafcff;
+    background: linear-gradient(180deg, #F8FAFC, #F1F5F9);
   }
 
   .notifications-card .card-header-custom h6 {
-    font-weight: 600;
-    color: #0b1e2f;
-    font-size: 1.05rem;
+    font-family: 'Outfit';
+    font-weight: 800;
+    color: var(--navy);
+    font-size: 1.1rem;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 10px;
   }
 
-  .notifications-card .card-header-custom h6 i {
-    color: #1a4b7a;
-  }
-
-  .notifications-card .card-header-custom .badge-total {
-    background: #eaf3fc;
-    color: #1a4b7a;
-    padding: 4px 16px;
+  .badge-total {
+    background: linear-gradient(135deg, var(--violet), var(--blue));
+    color: white;
+    padding: 6px 16px;
     border-radius: 40px;
     font-size: 0.8rem;
-    font-weight: 600;
-  }
-
-  .notifications-card .card-header-custom .actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+    font-weight: 700;
   }
 
   .btn-mark-read {
-    border-radius: 40px;
-    padding: 6px 18px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #eaf3fc;
-    color: #1a4b7a;
-    border: 1.5px solid #c6d9ed;
-    transition: all 0.2s ease;
+    border-radius: 12px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #F1F5F9;
+    color: #475569;
+    border: 2px solid #E2E8F0;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
-
-  .btn-mark-read:hover {
-    background: #d7e6fc;
-    border-color: #1a4b7a;
-    transform: translateY(-2px);
-    color: #0b2a4a;
-  }
+  .btn-mark-read:hover { background: white; border-color: var(--violet); transform: translateY(-2px); }
 
   .btn-mark-all-read {
-    border-radius: 40px;
-    padding: 6px 18px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #1a4b7a;
+    border-radius: 12px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--violet), var(--blue));
     color: white;
     border: none;
-    transition: all 0.2s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
-
-  .btn-mark-all-read:hover {
-    background: #0b2a4a;
-    transform: translateY(-2px);
-    color: white;
-  }
+  .btn-mark-all-read:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -6px rgba(124, 58, 237, 0.3); color: white; }
 
   /* ===== NOTIFICATION LIST ===== */
-  .notification-list {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-
+  .notification-list { padding: 0; margin: 0; list-style: none; }
   .notification-item {
-    padding: 18px 28px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 20px 28px;
+    border-bottom: 1px solid #F1F5F9;
     transition: all 0.2s ease;
     cursor: pointer;
     display: flex;
     gap: 16px;
     align-items: flex-start;
     text-decoration: none;
-    color: #0b1e2f;
+    color: var(--navy);
   }
-
-  .notification-item:hover {
-    background: #f8fbff;
-  }
-
-  .notification-item:last-child {
-    border-bottom: none;
-  }
-
+  .notification-item:hover { background: #F8FAFC; }
   .notification-item.unread {
-    background: #f8fbff;
-    border-left: 4px solid #1a4b7a;
-  }
-
-  .notification-item.unread:hover {
-    background: #f0f6fe;
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.05), transparent);
+    border-left: 4px solid var(--violet);
   }
 
   .notification-item .notif-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     flex-shrink: 0;
-    margin-top: 2px;
   }
+  .notif-icon.report { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); color: var(--blue); }
+  .notif-icon.user { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: var(--success); }
+  .notif-icon.alert { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: var(--danger); }
+  .notif-icon.system { background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: var(--warning); }
 
-  .notification-item .notif-icon.report {
-    background: #eaf3fc;
-    color: #1a4b7a;
-  }
-
-  .notification-item .notif-icon.user {
-    background: #ecf8f0;
-    color: #0f8b4e;
-  }
-
-  .notification-item .notif-icon.alert {
-    background: #fde8e8;
-    color: #b02a37;
-  }
-
-  .notification-item .notif-icon.system {
-    background: #fef7ec;
-    color: #9e6b2b;
-  }
-
-  .notification-item .notif-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .notification-item .notif-content .notif-title {
-    font-weight: 600;
+  .notification-item .notif-content { flex: 1; min-width: 0; }
+  .notification-item .notif-title {
+    font-weight: 800;
     font-size: 0.95rem;
-    color: #0b1e2f;
+    color: var(--navy);
     margin-bottom: 4px;
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
   }
-
-  .notification-item .notif-content .notif-title .notif-type {
+  .notif-type {
     font-size: 0.65rem;
-    font-weight: 500;
-    padding: 2px 12px;
+    font-weight: 700;
+    padding: 3px 10px;
     border-radius: 40px;
-    background: #eef4fa;
-    color: #56718e;
   }
+  .notif-type.report { background: #DBEAFE; color: var(--blue); }
+  .notif-type.user { background: #D1FAE5; color: var(--success); }
+  .notif-type.alert { background: #FEE2E2; color: var(--danger); }
+  .notif-type.system { background: #FEF3C7; color: var(--warning); }
 
-  .notification-item .notif-content .notif-title .notif-type.report {
-    background: #eaf3fc;
-    color: #1a4b7a;
-  }
+  .notification-item .notif-message { font-size: 0.88rem; color: #64748B; margin: 0 0 4px 0; line-height: 1.5; }
+  .notification-item .notif-time { font-size: 0.72rem; color: #94A3B8; display: flex; align-items: center; gap: 6px; }
 
-  .notification-item .notif-content .notif-title .notif-type.user {
-    background: #ecf8f0;
-    color: #0f8b4e;
-  }
-
-  .notification-item .notif-content .notif-title .notif-type.alert {
-    background: #fde8e8;
-    color: #b02a37;
-  }
-
-  .notification-item .notif-content .notif-title .notif-type.system {
-    background: #fef7ec;
-    color: #9e6b2b;
-  }
-
-  .notification-item .notif-content .notif-message {
-    font-size: 0.88rem;
-    color: #56718e;
-    margin: 0 0 4px 0;
-    line-height: 1.5;
-  }
-
-  .notification-item .notif-content .notif-time {
-    font-size: 0.72rem;
-    color: #94a3b8;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .notification-item .notif-content .notif-time i {
-    font-size: 0.65rem;
-  }
-
-  .notification-item .notif-unread-dot {
+  .notif-unread-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #1a4b7a;
+    background: var(--violet);
     flex-shrink: 0;
     margin-top: 14px;
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7);
     animation: pulse-dot 2s infinite;
   }
-
   @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
+    0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
   }
-
-  .notification-item.read .notif-unread-dot {
-    display: none;
-  }
+  .notification-item.read .notif-unread-dot { display: none; }
 
   /* ===== EMPTY STATE ===== */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #94a3b8;
-  }
-
+  .empty-state { text-align: center; padding: 60px 20px; }
   .empty-state i {
-    font-size: 3.6rem;
-    color: #c6d9ed;
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .empty-state h5 {
-    color: #1a334a;
-    font-weight: 600;
-    font-size: 1.2rem;
-    margin-bottom: 6px;
-  }
-
-  .empty-state p {
-    color: #94a3b8;
-    font-size: 0.95rem;
-  }
-
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 768px) {
-    .notifications-card .card-header-custom {
-      padding: 16px 18px;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .notifications-card .card-header-custom .actions {
-      width: 100%;
-      flex-wrap: wrap;
-    }
-    .btn-mark-read, .btn-mark-all-read {
-      flex: 1;
-      justify-content: center;
-      padding: 6px 12px;
-      font-size: 0.7rem;
-    }
-    .notification-item {
-      padding: 14px 16px;
-      gap: 12px;
-    }
-    .notification-item .notif-icon {
-      width: 36px;
-      height: 36px;
-      font-size: 1rem;
-    }
-    .notification-item .notif-content .notif-title {
-      font-size: 0.85rem;
-    }
-    .notification-item .notif-content .notif-message {
-      font-size: 0.82rem;
-    }
-    .stats-mini {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .stats-mini {
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .stats-mini .stat-item {
-      padding: 12px 10px;
-    }
-    .stats-mini .stat-item .number {
-      font-size: 1.4rem;
-    }
-    .notification-item {
-      padding: 12px 14px;
-      gap: 10px;
-    }
-    .notification-item .notif-icon {
-      width: 32px;
-      height: 32px;
-      font-size: 0.85rem;
-    }
-    .notification-item .notif-content .notif-title {
-      font-size: 0.8rem;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-    }
-    .notification-item .notif-content .notif-message {
-      font-size: 0.78rem;
-    }
-  }
-
-  /* ===== ANIMATIONS ===== */
-  .stats-mini .stat-item {
-    animation: fadeUp 0.5s ease forwards;
-  }
-  .stats-mini .stat-item:nth-child(2) { animation-delay: 0.05s; }
-  .stats-mini .stat-item:nth-child(3) { animation-delay: 0.10s; }
-
-  .notification-item {
-    animation: fadeUp 0.4s ease forwards;
-    opacity: 0;
-  }
-  .notification-item:nth-child(1) { animation-delay: 0.04s; }
-  .notification-item:nth-child(2) { animation-delay: 0.08s; }
-  .notification-item:nth-child(3) { animation-delay: 0.12s; }
-  .notification-item:nth-child(4) { animation-delay: 0.16s; }
-  .notification-item:nth-child(5) { animation-delay: 0.20s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    font-size: 4rem;
+    background: linear-gradient(135deg, var(--violet), var(--blue));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
 </style>
 
@@ -435,10 +233,7 @@
 <!-- ===== NOTIFICATIONS LIST ===== -->
 <div class="notifications-card">
   <div class="card-header-custom">
-    <h6>
-      <i class="bi bi-bell-fill"></i> All Notifications
-      <span class="badge-total">{{ notes|length }} total</span>
-    </h6>
+    <h6><i class="bi bi-bell-fill" style="color: var(--violet);"></i> All Notifications <span class="badge-total">{{ notes|length }} total</span></h6>
     <div class="actions">
       {% if notes|selectattr('is_read', 'equalto', 0)|list|length > 0 %}
         <a href="{{ url_for('mark_all_read') }}" class="btn-mark-all-read">
@@ -455,24 +250,17 @@
     <div class="notification-list">
       {% for n in notes %}
       <a href="{{ n['link'] }}" class="notification-item {% if n['is_read'] == 0 %}unread{% else %}read{% endif %}">
-        <!-- Icon -->
         <div class="notif-icon 
           {% if n['type'] == 'New Report' %}report
           {% elif n['type'] == 'New User' %}user
           {% elif n['type'] == 'Alert' %}alert
           {% else %}system{% endif %}">
-          {% if n['type'] == 'New Report' %}
-            <i class="bi bi-file-text"></i>
-          {% elif n['type'] == 'New User' %}
-            <i class="bi bi-person-plus"></i>
-          {% elif n['type'] == 'Alert' %}
-            <i class="bi bi-exclamation-triangle"></i>
-          {% else %}
-            <i class="bi bi-info-circle"></i>
-          {% endif %}
+          {% if n['type'] == 'New Report' %}<i class="bi bi-file-text"></i>
+          {% elif n['type'] == 'New User' %}<i class="bi bi-person-plus"></i>
+          {% elif n['type'] == 'Alert' %}<i class="bi bi-exclamation-triangle"></i>
+          {% else %}<i class="bi bi-info-circle"></i>{% endif %}
         </div>
 
-        <!-- Content -->
         <div class="notif-content">
           <div class="notif-title">
             <span>{{ n['type']|default('Notification') }}</span>
@@ -485,13 +273,9 @@
             </span>
           </div>
           <p class="notif-message">{{ n['message'] }}</p>
-          <div class="notif-time">
-            <i class="bi bi-clock"></i>
-            {{ n['created_at'][:16] if n['created_at'] else 'Just now' }}
-          </div>
+          <div class="notif-time"><i class="bi bi-clock"></i> {{ n['created_at'][:16] if n['created_at'] else 'Just now' }}</div>
         </div>
 
-        <!-- Unread Dot -->
         {% if n['is_read'] == 0 %}
           <div class="notif-unread-dot" title="Unread"></div>
         {% endif %}
@@ -501,38 +285,13 @@
   {% else %}
     <div class="empty-state">
       <i class="bi bi-bell-slash"></i>
-      <h5>No Notifications</h5>
+      <h5 class="mt-3" style="font-family: 'Outfit'; font-weight: 800; color: var(--navy);">No Notifications</h5>
       <p>You're all caught up! Check back later for updates.</p>
     </div>
   {% endif %}
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script>
-  // ===== MARK NOTIFICATION AS READ ON CLICK =====
-  document.querySelectorAll('.notification-item').forEach(function(item) {
-    item.addEventListener('click', function(e) {
-      // If it's unread, mark it as read via AJAX (optional)
-      if (this.classList.contains('unread')) {
-        // You can implement AJAX call here if needed
-        // For now, we just let the link navigation happen
-      }
-    });
-  });
-
-  
-  // ===== KEYBOARD SHORTCUTS =====
-  document.addEventListener('keydown', function(e) {
-    // 'R' key to refresh
-    if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
-      // Let browser handle refresh
-    }
-  });
-
-  // ===== SOUND NOTIFICATION (optional) =====
-  // You can add a subtle notification sound for new notifications
-  // This would require WebSocket or polling implementation
-
   console.log('📬 Notifications loaded. Unread: {{ notes|selectattr("is_read", "equalto", 0)|list|length }}');
 </script>
 {% endblock %}

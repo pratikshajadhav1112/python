@@ -2,76 +2,206 @@
 {% block title %}Manage Users{% endblock %}
 
 {% block content %}
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary">All Students: {{ users|length }}</h6>
-        <input type="text" id="searchUser" class="form-control w-25" placeholder="Search by Name/Email/Mobile">
+<style>
+  :root {
+    --navy: #050B1E;
+    --violet: #7C3AED;
+    --blue: #2563EB;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+  }
+
+ .user-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(124, 58, 237, 0.18);
+    border-radius: 28px;
+    box-shadow: 0 10px 40px rgba(124, 58, 237, 0.10);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+ .user-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--violet), var(--blue), #FBBF24);
+  }
+
+ .user-card .card-header {
+    background: transparent; border: none; padding: 0 0 24px 0;
+    display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    flex-wrap: wrap;
+  }
+ .user-card .card-header h5 { 
+    font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.5rem; 
+    background: linear-gradient(90deg, var(--navy), var(--violet));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    margin: 0; 
+  }
+ .user-count { 
+    background: linear-gradient(135deg, var(--violet), var(--blue)); 
+    color: white; padding: 8px 20px; border-radius: 50px; 
+    font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  }
+
+ /* ===== SEARCH BAR ===== */
+ .search-wrapper { position: relative; width: 320px; }
+ .search-wrapper input {
+    border: 2px solid #E2E8F0; border-radius: 14px; padding: 10px 14px 10px 42px;
+    font-weight: 600; width: 100%; transition: all 0.2s;
+ }
+ .search-wrapper input:focus { border-color: var(--violet); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); outline: none; }
+ .search-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94A3B8; }
+
+ /* ===== TABLE ===== */
+ .table-wrapper { border-radius: 20px; overflow: hidden; border: 1px solid #F1F5F9; }
+ .table-premium { width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
+ .table-premium thead th {
+    background: linear-gradient(180deg, #F8FAFC, #F1F5F9); color: var(--navy);
+    font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px;
+    border: none; padding: 18px 16px; white-space: nowrap;
+  }
+ .table-premium tbody td { 
+    padding: 18px 16px; vertical-align: middle; 
+    border-bottom: 1px solid #F1F5F9; font-size: 0.9rem;
+  }
+ .table-premium tbody tr { transition: all 0.2s ease; }
+ .table-premium tbody tr:hover { 
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.04), rgba(37, 99, 235, 0.04)); 
+  }
+
+ .badge-id { 
+    background: linear-gradient(135deg, #EEF2FF, #E0E7FF); 
+    color: var(--violet); padding: 6px 14px; border-radius: 50px; 
+    font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(124, 58, 237, 0.2);
+  }
+
+ /* ===== BADGES ===== */
+ .badge-verify { padding: 5px 12px; border-radius: 50px; font-weight: 700; font-size: 0.7rem; margin-right: 4px; }
+ .badge-email { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: var(--success); }
+ .badge-mobile { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); color: var(--blue); }
+ .badge-status-active { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: var(--success); padding: 6px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+ .badge-status-blocked { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: var(--danger); padding: 6px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+
+ /* ===== BUTTONS ===== */
+ .btn-action { 
+    padding: 8px 14px; border-radius: 12px; font-weight: 700; font-size: 0.8rem; 
+    border: none; text-decoration: none; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+ .btn-block { background: linear-gradient(135deg, var(--warning), #D97706); color: white; }
+ .btn-block:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4); color: white; }
+ .btn-unblock { background: linear-gradient(135deg, var(--success), #059669); color: white; }
+ .btn-unblock:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); color: white; }
+ .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+ .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
+
+ /* ===== ALERT ===== */
+ .alert { border-radius: 14px; border: none; font-weight: 600; }
+ .alert-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+ .alert-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+ .user-card { animation: fadeUp 0.5s ease forwards; }
+ @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+ @media (max-width: 768px) {
+    .search-wrapper { width: 100%; }
+  }
+</style>
+
+<div class="user-card">
+    <div class="card-header">
+        <h5><i class="fas fa-users me-2"></i>All Students</h5>
+        <div class="d-flex align-items-center gap-3">
+          <span class="user-count"><i class="fas fa-user-check me-1"></i> Total: {{ users|length }}</span>
+          <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchUser" placeholder="Search Name / Email / Mobile...">
+          </div>
+        </div>
     </div>
-    <div class="card-body">
+    
+    <div class="card-body" style="padding: 0;">
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ 'danger' if category=='error' else 'success' }}">{{ message }}</div>
+              <div class="alert alert-{{ 'danger' if category=='error' else 'success' }} mb-4">
+                <i class="fas fa-{{ 'exclamation-circle' if category=='error' else 'check-circle' }} me-2"></i>{{ message }}
+              </div>
             {% endfor %}
           {% endif %}
         {% endwith %}
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped" id="userTable">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>#ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Mobile</th>
-                        <th>Verified</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in users %}
-                    <tr>
-                        <td>USR{{ '%03d'|format(u.id) }}</td>
-                        <td>{{ u.name }}</td>
-                        <td>{{ u.email }}</td>
-                        <td>{{ u.mobile }}</td>
-                        <td>
-                            {% if u.is_email_verified %}<span class="badge badge-success">Email</span>{% endif %}
-                            {% if u.is_mobile_verified %}<span class="badge badge-info">Mobile</span>{% endif %}
-                        </td>
-                        <td>
-                            {% if u.is_blocked %}<span class="badge badge-danger">Blocked</span>
-                            {% else %}<span class="badge badge-success">Active</span>{% endif %}
-                        </td>
-                        <td>
-                            {% if u.id!= user.id %}
-                                <a href="{{ url_for('toggle_block', user_id=u.id) }}"
-                                   class="btn btn-sm {{ 'btn-success' if u.is_blocked else 'btn-warning' }}"
-                                   onclick="return confirm('Are you sure?')">
-                                   {{ 'Unblock' if u.is_blocked else 'Block' }}
-                                </a>
-                                <a href="{{ url_for('delete_user', user_id=u.id) }}"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Delete this user permanently?')">
-                                   Delete
-                                </a>
-                            {% else %}
-                                <span class="text-muted">This is you</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="7" class="text-center">No students found</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="table-wrapper">
+            <div class="table-responsive">
+                <table class="table table-premium" id="userTable">
+                    <thead>
+                        <tr>
+                            <th>#ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>Verified</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td><span class="badge-id">USR{{ '%03d'|format(u.id) }}</span></td>
+                            <td class="fw-bold">{{ u.name }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.mobile }}</td>
+                            <td>
+                                {% if u.is_email_verified %}<span class="badge-verify badge-email"><i class="fas fa-envelope me-1"></i>Email</span>{% endif %}
+                                {% if u.is_mobile_verified %}<span class="badge-verify badge-mobile"><i class="fas fa-phone me-1"></i>Mobile</span>{% endif %}
+                                {% if not u.is_email_verified and not u.is_mobile_verified %}<span class="text-muted">-</span>{% endif %}
+                            </td>
+                            <td>
+                                {% if u.is_blocked %}
+                                  <span class="badge-status-blocked"><i class="fas fa-ban me-1"></i>Blocked</span>
+                                {% else %}
+                                  <span class="badge-status-active"><i class="fas fa-check-circle me-1"></i>Active</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if u.id!= user.id %}
+                                    <div class="d-flex gap-2">
+                                      <a href="{{ url_for('toggle_block', user_id=u.id) }}"
+                                         class="btn-action {{ 'btn-unblock' if u.is_blocked else 'btn-block' }}"
+                                         onclick="return confirm('Are you sure?')">
+                                         <i class="fas fa-{{ 'lock-open' if u.is_blocked else 'lock' }}"></i>
+                                         {{ 'Unblock' if u.is_blocked else 'Block' }}
+                                      </a>
+                                      <a href="{{ url_for('delete_user', user_id=u.id) }}"
+                                         class="btn-action btn-delete"
+                                         onclick="return confirm('Delete this user permanently?')">
+                                         <i class="fas fa-trash"></i>Delete
+                                      </a>
+                                    </div>
+                                {% else %}
+                                    <span class="badge-id"><i class="fas fa-user-shield me-1"></i>You</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                          <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-users-slash" style="font-size: 4rem; background: linear-gradient(135deg, var(--violet), var(--blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                            <p class="mt-3 text-muted fw-semibold">No students found</p>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-// Live Search
+// Live Search - Pro
 document.getElementById('searchUser').addEventListener('keyup', function() {
     let filter = this.value.toLowerCase();
     let rows = document.querySelectorAll("#userTable tbody tr");

@@ -1,44 +1,172 @@
-{% extends "base.html" %}
-{% block title %}Admin Settings · ExamShield{% endblock %}
+{% extends "admin_base.html" %}  <!-- base.html se admin_base.html kiya -->
+{% block title %}Admin Settings · Prashan{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<style>
+  :root {
+    --navy: #050B1E;
+    --violet: #7C3AED;
+    --blue: #2563EB;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+  }
+
+  .settings-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(124, 58, 237, 0.18);
+    border-radius: 28px;
+    padding: 28px;
+    box-shadow: 0 10px 40px rgba(124, 58, 237, 0.10);
+    height: 100%;
+  }
+
+  .settings-card .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #F1F5F9;
+  }
+  .settings-card .card-header h4 {
+    font-family: 'Outfit';
+    font-weight: 800;
+    color: var(--navy);
+    margin: 0;
+  }
+  .badge-free {
+    background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+    color: #065F46;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .toggle-row {
+    background: linear-gradient(135deg, #EEF2FF, #E0E7FF);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(124, 58, 237, 0.2);
+  }
+  .toggle-row .form-label {
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0;
+  }
+  .toggle-row p {
+    font-size: 0.8rem;
+    color: #64748B;
+    margin: 0;
+  }
+  .form-switch .form-check-input {
+    width: 3em;
+    height: 1.6em;
+  }
+  .form-switch .form-check-input:checked {
+    background-color: var(--violet);
+    border-color: var(--violet);
+  }
+
+  .form-label {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 0.9rem;
+  }
+  .form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid #E2E8F0;
+    padding: 12px 16px;
+    font-weight: 600;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: var(--violet);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
+
+  .btn-save {
+    border-radius: 14px;
+    padding: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--violet), var(--blue));
+    color: white;
+    border: none;
+  }
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(124, 58, 237, 0.3);
+    color: white;
+  }
+
+  .btn-pass {
+    border-radius: 14px;
+    padding: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--warning), #D97706);
+    color: white;
+    border: none;
+  }
+  .btn-pass:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.3);
+    color: white;
+  }
+
+  .alert-warning-subtle { 
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A); 
+    color: #92400E; 
+    border: 1px solid rgba(245, 158, 11, 0.3); 
+    border-radius: 12px;
+  }
+  .page-header h1 {
+    font-family: 'Outfit';
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--navy), var(--violet));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4 page-header">
     <div>
-        <h1 class="fw-bold mb-1"><i class="bi bi-gear-fill text-primary me-2"></i>Admin Settings</h1>
+        <h1 class="mb-1"><i class="bi bi-gear-fill me-2"></i>Admin Settings</h1>
         <p class="text-muted">Manage platform controls, security, and limits.</p>
     </div>
-    <a href="{{ url_for('export_csv') }}" class="btn btn-success btn-lg">
-        <i class="bi bi-download me-2"></i>Export All Data
+    <a href="{{ url_for('export_csv') }}" class="btn-save d-flex align-items-center gap-2 px-4">
+        <i class="bi bi-download"></i>Export All Data
     </a>
 </div>
 
 <div class="row g-4">
     <!-- Column 1: Site Settings -->
     <div class="col-lg-6">
-        <div class="card-premium h-100">
-            <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-sliders fs-4 text-primary me-2"></i>
-                <h4 class="mb-0 fw-semibold">Platform Controls</h4>
-                <span class="badge bg-success-subtle text-success ms-auto">Free Plan</span>
+        <div class="settings-card">
+            <div class="card-header">
+                <i class="bi bi-sliders fs-4 me-2" style="color: var(--violet);"></i>
+                <h4>Platform Controls</h4>
+                <span class="badge-free ms-auto">Free Plan</span>
             </div>
             
-            <form method="POST"> <!-- SAME FORM -->
+            <!-- FIX 1: form_type add kiya -->
+            <form method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="hidden" name="form_type" value="settings"/> 
 
-                <div class="d-flex justify-content-between align-items-center p-3 mb-3 rounded-3 bg-soft-blue">
+                <div class="d-flex justify-content-between align-items-center toggle-row">
                     <div>
-                        <label class="form-check-label fw-semibold" for="maintenance">Maintenance Mode</label>
-                        <p class="text-muted small mb-0">Disable public access during updates</p>
+                        <label class="form-label" for="maintenance">Maintenance Mode</label>
+                        <p>Disable public access during updates</p>
                     </div>
                     <div class="form-check form-switch fs-4">
                         <input class="form-check-input" type="checkbox" name="maintenance_mode" id="maintenance" {% if settings.maintenance_mode %}checked{% endif %}>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center p-3 mb-3 rounded-3 bg-soft-blue">
+                <div class="d-flex justify-content-between align-items-center toggle-row">
                     <div>
-                        <label class="form-check-label fw-semibold" for="registration">New Registrations</label>
-                        <p class="text-muted small mb-0">Allow new students to sign up</p>
+                        <label class="form-label" for="registration">New Registrations</label>
+                        <p>Allow new students to sign up</p>
                     </div>
                     <div class="form-check form-switch fs-4">
                         <input class="form-check-input" type="checkbox" name="registration_open" id="registration" {% if settings.registration_open %}checked{% endif %}>
@@ -47,7 +175,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">AI Model</label>
-                    <select name="ai_model" class="form-select"> <!-- NAME SAME -->
+                    <select name="ai_model" class="form-select">
                         <option value="llama-3.1-8b-instant" {% if settings.ai_model == 'llama-3.1-8b-instant' %}selected{% endif %}>Llama 3.1 8B - Fast & Free</option>
                     </select>
                     <small class="text-muted">Currently locked to free tier model</small>
@@ -55,11 +183,11 @@
 
                 <div class="mb-4">
                     <label class="form-label">Max Complaints Per Student / Day</label>
-                    <input type="number" name="max_daily_complaints" class="form-control" value="{{ settings.max_daily_complaints }}" min="1"> <!-- NAME SAME -->
+                    <input type="number" name="max_daily_complaints" class="form-control" value="{{ settings.max_daily_complaints }}" min="1">
                     <small class="text-muted">Prevents spam and abuse</small>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">
+                <button type="submit" class="btn-save w-100">
                     <i class="bi bi-check-circle me-2"></i>Save Settings
                 </button>
             </form>
@@ -68,22 +196,24 @@
 
     <!-- Column 2: Change Password -->
     <div class="col-lg-6">
-        <div class="card-premium h-100">
-            <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-shield-lock fs-4 text-warning me-2"></i>
-                <h4 class="mb-0 fw-semibold">Security</h4>
+        <div class="settings-card">
+            <div class="card-header">
+                <i class="bi bi-shield-lock fs-4 me-2" style="color: var(--warning);"></i>
+                <h4>Security</h4>
             </div>
             
-            <form method="POST"> <!-- SAME FORM -->
+            <!-- FIX 2: form_type add kiya -->
+            <form method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="hidden" name="form_type" value="password"/>
                 
                 <div class="mb-3">
-                    <label class="form-label">Current Password</label> <!-- label improved -->
-                    <input type="password" name="old_password" class="form-control" placeholder="Enter current password" required> <!-- NAME SAME -->
+                    <label class="form-label">Current Password</label>
+                    <input type="password" name="old_password" class="form-control" placeholder="Enter current password" required>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">New Password</label>
-                    <input type="password" name="new_password" class="form-control" placeholder="Enter new password" required> <!-- NAME SAME -->
+                    <input type="password" name="new_password" class="form-control" placeholder="Enter new password" required>
                 </div>
                 
                 <div class="alert alert-warning-subtle d-flex align-items-center" role="alert">
@@ -91,20 +221,11 @@
                     <small>Choose a strong password with 8+ characters</small>
                 </div>
 
-                <button type="submit" class="btn btn-warning w-100 text-white fw-semibold">
+                <button type="submit" class="btn-pass w-100">
                     <i class="bi bi-key-fill me-2"></i>Update Password
                 </button>
             </form>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.bg-soft-blue { background: #F0F6FE; }
-.alert-warning-subtle { background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; }
-.badge.bg-success-subtle { background: #D1FAE5; color: #065F46; }
-.form-check-input:checked { background-color: var(--accent); border-color: var(--accent); }
-</style>
 {% endblock %}

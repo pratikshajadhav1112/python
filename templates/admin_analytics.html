@@ -16,20 +16,21 @@
   }
 
   .stat-card-premium {
-    background: #ffffff;
-    border: 1px solid #eef4fa;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(124, 58, 237, 0.18);
     border-radius: 24px;
     padding: 22px 24px 20px;
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.06);
   }
 
   .stat-card-premium:hover {
-    border-color: #c6d9ed;
+    border-color: #7C3AED;
     transform: translateY(-4px);
-    box-shadow: 0 16px 40px -12px rgba(18, 52, 86, 0.08);
+    box-shadow: 0 16px 40px -12px rgba(124, 58, 237, 0.15);
   }
 
   .stat-card-premium .stat-icon-wrapper {
@@ -44,43 +45,39 @@
   }
 
   .stat-card-premium .stat-icon-wrapper.blue {
-    background: #eaf3fc;
-    color: #1a4b7a;
+    background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+    color: #2563EB;
   }
 
   .stat-card-premium .stat-icon-wrapper.green {
-    background: #ecf8f0;
-    color: #0f8b4e;
+    background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+    color: #10B981;
   }
 
   .stat-card-premium .stat-icon-wrapper.orange {
-    background: #fef7ec;
-    color: #9e6b2b;
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    color: #F59E0B;
   }
 
   .stat-card-premium .stat-icon-wrapper.red {
-    background: #fde8e8;
-    color: #b02a37;
-  }
-
-  .stat-card-premium .stat-icon-wrapper.purple {
-    background: #f0ecf8;
-    color: #6b4b9e;
+    background: linear-gradient(135deg, #FEE2E2, #FECACA);
+    color: #EF4444;
   }
 
   .stat-card-premium .stat-number {
+    font-family: 'Outfit', sans-serif;
     font-size: 2.2rem;
-    font-weight: 700;
-    color: #0b1e2f;
+    font-weight: 900;
+    background: linear-gradient(90deg, #050B1E, #7C3AED);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     line-height: 1.2;
     margin-bottom: 2px;
-    letter-spacing: -0.02em;
   }
 
   .stat-card-premium .stat-label {
     font-size: 0.8rem;
-    color: #56718e;
-    font-weight: 500;
+    color: #64748B;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.4px;
   }
@@ -90,25 +87,25 @@
     align-items: center;
     gap: 4px;
     font-size: 0.7rem;
-    font-weight: 600;
-    padding: 2px 12px;
+    font-weight: 700;
+    padding: 4px 12px;
     border-radius: 40px;
     margin-top: 8px;
   }
 
   .stat-card-premium .stat-trend.up {
-    background: #ecf8f0;
-    color: #0f8b4e;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
   }
 
   .stat-card-premium .stat-trend.down {
-    background: #fde8e8;
-    color: #b02a37;
+    background: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
   }
 
   .stat-card-premium .stat-trend.neutral {
-    background: #eef4fa;
-    color: #56718e;
+    background: #F1F5F9;
+    color: #64748B;
   }
 
   .stat-card-premium .stat-bg-icon {
@@ -116,24 +113,26 @@
     right: 12px;
     bottom: 12px;
     font-size: 4rem;
-    opacity: 0.04;
-    color: #1a4b7a;
+    opacity: 0.06;
+    color: #7C3AED;
     pointer-events: none;
   }
 
   /* ===== CHART CARD ===== */
   .chart-card-premium {
-    background: #ffffff;
-    border: 1px solid #eef4fa;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(124, 58, 237, 0.18);
     border-radius: 28px;
     padding: 28px 32px 24px;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.06);
     transition: all 0.25s ease;
+    margin-bottom: 24px;
   }
 
   .chart-card-premium:hover {
-    border-color: #d5e3f2;
-    box-shadow: 0 8px 28px -10px rgba(18, 52, 86, 0.04);
+    border-color: #7C3AED;
+    box-shadow: 0 8px 28px -10px rgba(124, 58, 237, 0.12);
   }
 
   .chart-card-premium .chart-header {
@@ -146,26 +145,27 @@
   }
 
   .chart-card-premium .chart-header h5 {
-    font-weight: 600;
-    color: #0b1e2f;
+    font-family: 'Outfit';
+    font-weight: 800;
+    color: #050B1E;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
   }
 
   .chart-card-premium .chart-header h5 i {
-    color: #1a4b7a;
+    color: #7C3AED;
   }
 
   .chart-card-premium .chart-header .chart-badge {
-    background: #eaf3fc;
-    color: #1a4b7a;
-    padding: 4px 16px;
+    background: linear-gradient(135deg, #7C3AED, #2563EB);
+    color: white;
+    padding: 5px 16px;
     border-radius: 40px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .chart-card-premium .chart-container {
@@ -182,29 +182,31 @@
   }
 
   .quick-stat-item {
-    background: #f8faff;
+    background: linear-gradient(180deg, #F8FAFC, #F1F5F9);
     border-radius: 16px;
     padding: 14px 16px;
     text-align: center;
-    border: 1px solid #eef4fa;
+    border: 1px solid #E2E8F0;
     transition: all 0.2s ease;
   }
 
   .quick-stat-item:hover {
-    background: #f0f6fe;
-    border-color: #c6d9ed;
+    background: white;
+    border-color: #7C3AED;
+    transform: translateY(-2px);
   }
 
   .quick-stat-item .qs-number {
+    font-family: 'Outfit';
     font-size: 1.4rem;
-    font-weight: 700;
-    color: #0b1e2f;
+    font-weight: 900;
+    color: #050B1E;
   }
 
   .quick-stat-item .qs-label {
     font-size: 0.7rem;
-    color: #56718e;
-    font-weight: 500;
+    color: #64748B;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
   }
@@ -214,88 +216,6 @@
     font-size: 1.2rem;
     margin-bottom: 4px;
   }
-
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 992px) {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .chart-card-premium {
-      padding: 20px 18px 18px;
-      border-radius: 20px;
-    }
-    .chart-card-premium .chart-container {
-      height: 220px;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .stats-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .stat-card-premium {
-      padding: 16px 14px 14px;
-      border-radius: 18px;
-    }
-    .stat-card-premium .stat-number {
-      font-size: 1.6rem;
-    }
-    .stat-card-premium .stat-icon-wrapper {
-      width: 40px;
-      height: 40px;
-      font-size: 1.2rem;
-    }
-    .chart-card-premium {
-      padding: 16px 12px 14px;
-      border-radius: 16px;
-    }
-    .chart-card-premium .chart-container {
-      height: 180px;
-    }
-    .quick-stats {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-    .quick-stat-item {
-      padding: 10px 8px;
-    }
-    .quick-stat-item .qs-number {
-      font-size: 1.1rem;
-    }
-  }
-
-  /* ===== ANIMATIONS ===== */
-  .stat-card-premium {
-    animation: fadeUp 0.5s ease forwards;
-    opacity: 0;
-  }
-  .stat-card-premium:nth-child(1) { animation-delay: 0.04s; }
-  .stat-card-premium:nth-child(2) { animation-delay: 0.08s; }
-  .stat-card-premium:nth-child(3) { animation-delay: 0.12s; }
-  .stat-card-premium:nth-child(4) { animation-delay: 0.16s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .chart-card-premium {
-    animation: fadeUp 0.5s ease forwards;
-    animation-delay: 0.20s;
-    opacity: 0;
-  }
-
-  .quick-stat-item {
-    animation: fadeUp 0.4s ease forwards;
-    opacity: 0;
-  }
-  .quick-stat-item:nth-child(1) { animation-delay: 0.24s; }
-  .quick-stat-item:nth-child(2) { animation-delay: 0.28s; }
-  .quick-stat-item:nth-child(3) { animation-delay: 0.32s; }
-  .quick-stat-item:nth-child(4) { animation-delay: 0.36s; }
-  .quick-stat-item:nth-child(5) { animation-delay: 0.40s; }
-  .quick-stat-item:nth-child(6) { animation-delay: 0.44s; }
 </style>
 
 <!-- ===== STATS GRID ===== -->
@@ -352,86 +272,82 @@
     </span>
   </div>
   <div class="chart-container">
-    <canvas id="entriesChart"></canvas>
+    <canvas id="entriesChart"></canvas> <!-- ID FIXED -->
   </div>
 </div>
 
 <!-- ===== QUICK STATS ===== -->
 <div class="quick-stats">
   <div class="quick-stat-item">
-    <span class="qs-icon"><i class="bi bi-clock-history text-primary"></i></span>
+    <span class="qs-icon"><i class="bi bi-clock-history" style="color:#F59E0B;"></i></span>
     <div class="qs-number">{{ pending_reports|default(0) }}</div>
     <div class="qs-label">Pending Reports</div>
   </div>
   <div class="quick-stat-item">
-    <span class="qs-icon"><i class="bi bi-check-circle text-success"></i></span>
+    <span class="qs-icon"><i class="bi bi-check-circle" style="color:#10B981;"></i></span>
     <div class="qs-number">{{ resolved_reports|default(0) }}</div>
     <div class="qs-label">Resolved Reports</div>
   </div>
   <div class="quick-stat-item">
-    <span class="qs-icon"><i class="bi bi-exclamation-triangle text-warning"></i></span>
+    <span class="qs-icon"><i class="bi bi-exclamation-triangle" style="color:#EF4444;"></i></span>
     <div class="qs-number">{{ urgent_reports|default(0) }}</div>
     <div class="qs-label">Urgent Reports</div>
   </div>
   <div class="quick-stat-item">
-    <span class="qs-icon"><i class="bi bi-file-earmark-image text-info"></i></span>
+    <span class="qs-icon"><i class="bi bi-file-earmark-image" style="color:#2563EB;"></i></span>
     <div class="qs-number">{{ image_files|default(0) }}</div>
     <div class="qs-label">Images</div>
   </div>
   <div class="quick-stat-item">
-    <span class="qs-icon"><i class="bi bi-file-earmark-pdf text-danger"></i></span>
+    <span class="qs-icon"><i class="bi bi-file-earmark-pdf" style="color:#EF4444;"></i></span>
     <div class="qs-number">{{ pdf_files|default(0) }}</div>
     <div class="qs-label">PDFs</div>
   </div>
   <div class="quick-stat-item">
-    <span class="qs-icon"><i class="bi bi-film text-success"></i></span>
+    <span class="qs-icon"><i class="bi bi-film" style="color:#10B981;"></i></span>
     <div class="qs-number">{{ media_files|default(0) }}</div>
     <div class="qs-label">Media Files</div>
   </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     
-    // Chart 1: Monthly Complaints
-    const ctx1 = document.getElementById('complaintsChart');
-    if(ctx1){
-        const complaintsLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-        const complaintsData = [10, 20, 30, 25, 40, 35];
+    const ctx = document.getElementById('entriesChart');
+    const dataDiv = document.getElementById('chart-data');
+    
+    if(ctx && dataDiv){
+        const chartLabels = JSON.parse(dataDiv.dataset.labels);
+        const chartData = JSON.parse(dataDiv.dataset.values);
         
-        new Chart(ctx1, {
+        new Chart(ctx, {
             type: 'line',
             data: {
-                labels: complaintsLabels,
+                labels: chartLabels,
                 datasets: [{
-                    label: 'Complaints',
-                    data: complaintsData,
-                    borderColor: '#00A3FF',
-                    backgroundColor: 'rgba(0, 163, 255, 0.1)',
+                    label: 'Entries',
+                    data: chartData,
+                    borderColor: '#7C3AED',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#7C3AED',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
                 }]
-            }
-        });
-    }
-
-    // Chart 2: Complaint Types
-    const ctx2 = document.getElementById('typeChart');
-    if(ctx2){
-        const typeLabels = ['Paper Leak', 'Cheating', 'Center Issue', 'Other'];
-        const typeData = [5, 12, 3, 8];
-        
-        new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: typeLabels, // alag naam
-                datasets: [{
-                    label: 'Types',
-                    data: typeData, // alag naam
-                    backgroundColor: ['#0A2540', '#00A3FF', '#10B981', '#F59E0B']
-                }]
+            },
+            
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(124,58,237,0.1)' } },
+                    x: { grid: { display: false }
+                }
             }
         });
     }

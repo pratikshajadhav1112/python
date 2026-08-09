@@ -3,219 +3,156 @@
 {% block page_title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<!-- ===== STYLES ===== -->
 <style>
-  .stat-card {
-    background: #ffffff;
-    border: 1px solid #eef4fa;
-    border-radius: 24px;
-    padding: 20px 16px 18px;
-    transition: all 0.25s ease;
+  :root {
+    --navy: #050B1E;
+    --violet: #7C3AED;
+    --blue: #2563EB;
+    --gold: #FBBF24;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+  }
+
+  /* ===== GLASS CARDS WITH GLOW ===== */
+ .stat-card, .chart-card, .table-card, .empty-state {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(124, 58, 237, 0.18);
+    border-radius: 28px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(124, 58, 237, 0.10);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
   }
-  .stat-card:hover {
-    border-color: #c6d9ed;
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px -12px rgba(18, 52, 86, 0.08);
+ .stat-card::before, .chart-card::before, .table-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--violet), var(--blue), var(--gold));
+    opacity: 0; transition: opacity 0.3s;
   }
-  .stat-card .stat-icon-bg {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    font-size: 2.4rem;
-    opacity: 0.06;
-    color: #1a4b7a;
+ .stat-card:hover::before, .chart-card:hover::before, .table-card:hover::before { opacity: 1; }
+ .stat-card:hover, .chart-card:hover, .table-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(124, 58, 237, 0.25);
+    border-color: var(--violet);
   }
-  .stat-card h6 {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-    color: #56718e;
-    margin-bottom: 6px;
+
+  /* ===== STAT CARDS ===== */
+ .stat-card { padding: 24px 20px; }
+ .stat-card .stat-icon-bg {
+    position: absolute; right: 16px; top: 16px; font-size: 3.2rem;
+    opacity: 0.08; color: var(--violet); transition: all 0.4s;
   }
-  .stat-card h2 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: -0.02em;
-  }
-  .stat-card .stat-trend {
-    display: inline-block;
-    margin-top: 6px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 2px 12px;
-    border-radius: 40px;
-  }
-  .stat-card .stat-trend.up { background: #ecf8f0; color: #0f8b4e; }
-  .stat-card .stat-trend.down { background: #fde8e8; color: #b02a37; }
-  
-  .chart-card {
-    background: #ffffff;
-    border: 1px solid #eef4fa;
-    border-radius: 28px;
-    padding: 24px 24px 20px;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
-    transition: all 0.25s ease;
-  }
-  .chart-card:hover {
-    border-color: #d5e3f2;
-    box-shadow: 0 8px 28px -10px rgba(18, 52, 86, 0.04);
-  }
-  .chart-card h6 {
-    font-weight: 600;
-    color: #0b1e2f;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-  }
-  .chart-card h6 i { color: #1a4b7a; }
-  
-  .table-card {
-    background: #ffffff;
-    border: 1px solid #eef4fa;
-    border-radius: 28px;
-    padding: 24px 24px 20px;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
-    transition: all 0.25s ease;
-  }
-  .table-card:hover { border-color: #d5e3f2; }
-  .table-card h6 {
-    font-weight: 600;
-    color: #0b1e2f;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1rem;
-  }
-  .table-card h6 i { color: #1a4b7a; }
-  .table-card h6 .badge-ai {
-    background: linear-gradient(135deg, #1a4b7a, #7bb3ff);
-    color: white;
-    font-size: 0.6rem;
-    padding: 4px 14px;
-    border-radius: 40px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    margin-left: 6px;
-  }
-  
-  .table thead th {
-    background: #f8faff;
-    color: #1a334a;
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    border: none;
-    padding: 12px 14px;
-    border-bottom: 2px solid #eef4fa;
-  }
-  .table tbody td {
-    padding: 14px 14px;
-    vertical-align: middle;
-    border-color: #f1f5f9;
-    color: #0b1e2f;
-    font-size: 0.9rem;
-  }
-  .table tbody tr:hover { background: #f8fbff; }
-  
-  .badge-category {
-    background: #eaf3fc;
-    color: #1a4b7a;
-    padding: 4px 14px;
-    border-radius: 40px;
-    font-weight: 500;
-    font-size: 0.75rem;
-  }
-  .badge-urgency-high { background: #fde8e8; color: #b02a37; padding: 4px 12px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  .badge-urgency-med { background: #fef7ec; color: #9e6b2b; padding: 4px 12px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  .badge-urgency-low { background: #eef4fa; color: #56718e; padding: 4px 12px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  .badge-sentiment-neg { background: #fde8e8; color: #b02a37; padding: 4px 14px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  .badge-sentiment-pos { background: #ecf8f0; color: #0f8b4e; padding: 4px 14px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  .badge-sentiment-neu { background: #eef4fa; color: #56718e; padding: 4px 14px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  .badge-status-pending { background: #fef7ec; color: #9e6b2b; padding: 4px 14px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  .badge-status-resolved { background: #ecf8f0; color: #0f8b4e; padding: 4px 14px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; }
-  
+ .stat-card:hover .stat-icon-bg { transform: scale(1.2) rotate(8deg); opacity: 0.15; }
+ .stat-card h6 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; color: #64748B; margin-bottom: 8px; display: flex; align-items: center; }
+ .stat-card h2 { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 900; margin: 0; letter-spacing: -0.03em; }
+ .text-primary.counter { background: linear-gradient(90deg, var(--navy), var(--violet)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+ .text-success.counter { background: linear-gradient(90deg, var(--success), #059669); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+ .text-warning.counter { background: linear-gradient(90deg, var(--warning), #D97706); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+ .text-danger.counter { background: linear-gradient(90deg, var(--danger), #DC2626); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+ .text-info.counter { background: linear-gradient(90deg, var(--blue), #1D4ED8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+ .stat-trend { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 50px; }
+ .stat-trend.up { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+ .stat-trend.down { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+ .live-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block; animation: blink 2s infinite; margin-right: 6px; }
+ @keyframes blink { 0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--success); } 50% { opacity: 0.3; } }
+
+  /* ===== CHART & TABLE CARDS ===== */
+ .chart-card, .table-card { padding: 28px; }
+ .chart-card h6, .table-card h6 { font-family: 'Outfit'; font-weight: 800; font-size: 1.1rem; color: var(--navy); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+ .chart-card h6 i, .table-card h6 i { background: linear-gradient(135deg, var(--violet), var(--blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+ .badge-ai { background: linear-gradient(135deg, var(--violet), var(--blue)); color: white; font-size: 0.65rem; padding: 5px 16px; border-radius: 50px; font-weight: 700; letter-spacing: 0.3px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+
+  /* ===== TABLE PREMIUM ===== */
+ .table thead th { background: linear-gradient(180deg, #F8FAFC, #F1F5F9); color: var(--navy); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.6px; border: none; padding: 14px; border-bottom: 2px solid rgba(124, 58, 237, 0.1); }
+ .table tbody td { padding: 16px 14px; border-color: #F1F5F9; transition: all 0.2s; }
+ .table tbody tr { transition: all 0.2s; }
+ .table tbody tr:hover { background: linear-gradient(90deg, rgba(124, 58, 237, 0.05), rgba(37, 99, 235, 0.05)); transform: scale(1.005); }
+ 
+ .badge-category { background: linear-gradient(135deg, #EEF2FF, #E0E7FF); color: var(--violet); padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(124, 58, 237, 0.2); }
+ .badge-urgency-high { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: var(--danger); padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(239, 68, 68, 0.3); }
+ .badge-urgency-med { background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #92400E; padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(245, 158, 11, 0.3); }
+ .badge-urgency-low { background: linear-gradient(135deg, #F1F5F9, #E2E8F0); color: #475569; padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+ .badge-sentiment-neg { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: var(--danger); padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+ .badge-sentiment-pos { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: var(--success); padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+ .badge-sentiment-neu { background: linear-gradient(135deg, #F1F5F9, #E2E8F0); color: #475569; padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+ .badge-status-pending { background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #92400E; padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+ .badge-status-resolved { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: var(--success); padding: 5px 14px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; }
+
+  /* ===== EMPTY STATE ===== */
+ .empty-state { padding: 60px 20px; text-align: center; }
+ .empty-state i { font-size: 5rem; background: linear-gradient(135deg, var(--violet), var(--blue)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+ .empty-state h5 { font-family: 'Outfit'; font-weight: 800; color: var(--navy); }
+
+  /* ===== SKELETON LOADING ===== */
+ .skeleton { background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px; }
+ @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* ===== ANIMATIONS ===== */
+ .stat-card { animation: fadeUp 0.6s ease forwards; }
+ .stat-card:nth-child(2) { animation-delay: 0.1s; }
+ .stat-card:nth-child(3) { animation-delay: 0.2s; }
+ .stat-card:nth-child(4) { animation-delay: 0.3s; }
+ .stat-card:nth-child(5) { animation-delay: 0.4s; }
+ .stat-card:nth-child(6) { animation-delay: 0.5s; }
+ @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+ .chart-card { animation: fadeUp 0.6s ease forwards; animation-delay: 0.3s; opacity: 0; }
+ .chart-card:nth-child(2) { animation-delay: 0.4s; }
+ .table-card, .empty-state { animation: fadeUp 0.6s ease forwards; animation-delay: 0.5s; opacity: 0; }
+
   @media (max-width: 768px) {
-    .stat-card h2 { font-size: 1.6rem; }
-    .stat-card { padding: 16px 12px; }
-    .chart-card, .table-card { padding: 18px 16px; }
-    .table thead th { font-size: 0.65rem; padding: 8px 6px; }
-    .table tbody td { padding: 10px 6px; font-size: 0.8rem; }
+    .stat-card h2 { font-size: 1.8rem; }
+    .chart-card, .table-card { padding: 20px 16px; }
   }
-  @media (max-width: 480px) {
-    .stat-card h2 { font-size: 1.3rem; }
-    .stat-card .stat-icon-bg { font-size: 1.8rem; right: 8px; top: 8px; }
-  }
-  
-  .stat-card { animation: fadeUp 0.5s ease forwards; }
-  .stat-card:nth-child(2) { animation-delay: 0.05s; }
-  .stat-card:nth-child(3) { animation-delay: 0.10s; }
-  .stat-card:nth-child(4) { animation-delay: 0.15s; }
-  .stat-card:nth-child(5) { animation-delay: 0.20s; }
-  .stat-card:nth-child(6) { animation-delay: 0.25s; }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .chart-card { animation: fadeUp 0.5s ease forwards; animation-delay: 0.15s; opacity: 0; }
-  .chart-card:nth-child(2) { animation-delay: 0.20s; }
-  .table-card { animation: fadeUp 0.5s ease forwards; animation-delay: 0.25s; opacity: 0; }
 </style>
 
 <!-- ===== STATS ===== -->
 <div class="row g-4 mb-4">
-  <div class="col-6 col-md-2">
+  <div class="col-6 col-lg-2">
     <div class="stat-card text-center">
       <span class="stat-icon-bg"><i class="fas fa-users"></i></span>
-      <h6><i class="fas fa-users me-1" style="color:#1a4b7a;"></i> Total Users</h6>
+      <h6><span class="live-dot"></span><i class="fas fa-users me-1"></i> Total Users</h6>
       <h2 class="text-primary counter">{{ stats.total_users }}</h2>
       <span class="stat-trend up"><i class="fas fa-arrow-up"></i> +8%</span>
     </div>
   </div>
-  <div class="col-6 col-md-2">
+  <div class="col-6 col-lg-2">
     <div class="stat-card text-center">
       <span class="stat-icon-bg"><i class="fas fa-file-alt"></i></span>
-      <h6><i class="fas fa-file-alt me-1" style="color:#1a4b7a;"></i> Total Reports</h6>
+      <h6><span class="live-dot"></span><i class="fas fa-file-alt me-1"></i> Total Reports</h6>
       <h2 class="text-primary counter">{{ stats.total_reports }}</h2>
       <span class="stat-trend up"><i class="fas fa-arrow-up"></i> +12%</span>
     </div>
   </div>
-  <div class="col-6 col-md-2">
+  <div class="col-6 col-lg-2">
     <div class="stat-card text-center">
       <span class="stat-icon-bg"><i class="fas fa-clock"></i></span>
-      <h6><i class="fas fa-clock me-1" style="color:#e67e22;"></i> Pending</h6>
+      <h6><i class="fas fa-clock me-1"></i> Pending</h6>
       <h2 class="text-warning counter">{{ stats.pending }}</h2>
       <span class="stat-trend down"><i class="fas fa-arrow-down"></i> -3%</span>
     </div>
   </div>
-  <div class="col-6 col-md-2">
+  <div class="col-6 col-lg-2">
     <div class="stat-card text-center">
       <span class="stat-icon-bg"><i class="fas fa-check-circle"></i></span>
-      <h6><i class="fas fa-check-circle me-1" style="color:#0f8b4e;"></i> Resolved</h6>
+      <h6><i class="fas fa-check-circle me-1"></i> Resolved</h6>
       <h2 class="text-success counter">{{ stats.resolved }}</h2>
       <span class="stat-trend up"><i class="fas fa-arrow-up"></i> +18%</span>
     </div>
   </div>
-  <div class="col-6 col-md-2">
+  <div class="col-6 col-lg-2">
     <div class="stat-card text-center">
       <span class="stat-icon-bg"><i class="fas fa-ban"></i></span>
-      <h6><i class="fas fa-ban me-1" style="color:#b02a37;"></i> Blocked</h6>
+      <h6><i class="fas fa-ban me-1"></i> Blocked</h6>
       <h2 class="text-danger counter">{{ stats.blocked }}</h2>
       <span class="stat-trend down"><i class="fas fa-arrow-down"></i> -5%</span>
     </div>
   </div>
-  <div class="col-6 col-md-2">
+  <div class="col-6 col-lg-2">
     <div class="stat-card text-center">
       <span class="stat-icon-bg"><i class="fas fa-calendar-day"></i></span>
-      <h6><i class="fas fa-calendar-day me-1" style="color:#1a4b7a;"></i> Today</h6>
+      <h6><i class="fas fa-calendar-day me-1"></i> Today</h6>
       <h2 class="text-info counter">{{ stats.today_reports }}</h2>
       <span class="stat-trend up"><i class="fas fa-arrow-up"></i> +4</span>
     </div>
@@ -238,7 +175,14 @@
   </div>
 </div>
 
-<!-- ===== RECENT REPORTS ===== -->
+<!-- ===== RECENT REPORTS WITH EMPTY STATE ===== -->
+{% if not recent_reports %}
+<div class="empty-state">
+  <i class="fas fa-inbox"></i>
+  <h5>No Reports Yet</h5>
+  <p class="text-muted">Jab students report submit karenge, yaha AI analysis ke saath dikhenge</p>
+</div>
+{% else %}
 <div class="table-card">
   <h6>
     <i class="fas fa-robot"></i> Recent Reports — AI Analysis
@@ -248,15 +192,8 @@
     <table class="table table-hover align-middle">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Student</th>
-          <th>Exam</th>
-          <th>Category</th>
-          <th>AI Summary</th>
-          <th>Urgency</th>
-          <th>Sentiment</th>
-          <th>Status</th>
-          <th>Date</th>
+          <th>ID</th><th>Student</th><th>Exam</th><th>Category</th><th>AI Summary</th>
+          <th>Urgency</th><th>Sentiment</th><th>Status</th><th>Date</th>
         </tr>
       </thead>
       <tbody>
@@ -266,41 +203,29 @@
           <td class="fw-semibold">{{ r.name }}</td>
           <td>{{ r.exam_name }}</td>
           <td><span class="badge-category">{{ r.category }}</span></td>
-          <td style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ r.ai_summary }}">
-            {{ r.ai_summary }}
+          <td style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ r.ai_summary }}">{{ r.ai_summary }}</td>
+          <td>
+            {% if r.urgency_score >= 8 %}<span class="badge-urgency-high"><i class="fas fa-exclamation-triangle me-1"></i>{{ r.urgency_score }}/10</span>
+            {% elif r.urgency_score >= 5 %}<span class="badge-urgency-med"><i class="fas fa-exclamation-circle me-1"></i>{{ r.urgency_score }}/10</span>
+            {% else %}<span class="badge-urgency-low"><i class="fas fa-info-circle me-1"></i>{{ r.urgency_score }}/10</span>{% endif %}
           </td>
           <td>
-            {% if r.urgency_score >= 8 %}
-              <span class="badge-urgency-high"><i class="fas fa-exclamation-triangle me-1"></i>{{ r.urgency_score }}/10</span>
-            {% elif r.urgency_score >= 5 %}
-              <span class="badge-urgency-med"><i class="fas fa-exclamation-circle me-1"></i>{{ r.urgency_score }}/10</span>
-            {% else %}
-              <span class="badge-urgency-low"><i class="fas fa-info-circle me-1"></i>{{ r.urgency_score }}/10</span>
-            {% endif %}
+            {% if r.sentiment == 'Negative' %}<span class="badge-sentiment-neg"><i class="fas fa-frown me-1"></i>{{ r.sentiment }}</span>
+            {% elif r.sentiment == 'Positive' %}<span class="badge-sentiment-pos"><i class="fas fa-smile me-1"></i>{{ r.sentiment }}</span>
+            {% else %}<span class="badge-sentiment-neu"><i class="fas fa-meh me-1"></i>{{ r.sentiment }}</span>{% endif %}
           </td>
           <td>
-            {% if r.sentiment == 'Negative' %}
-              <span class="badge-sentiment-neg"><i class="fas fa-frown me-1"></i>{{ r.sentiment }}</span>
-            {% elif r.sentiment == 'Positive' %}
-              <span class="badge-sentiment-pos"><i class="fas fa-smile me-1"></i>{{ r.sentiment }}</span>
-            {% else %}
-              <span class="badge-sentiment-neu"><i class="fas fa-meh me-1"></i>{{ r.sentiment }}</span>
-            {% endif %}
+            {% if r.status == 'Pending' %}<span class="badge-status-pending"><i class="fas fa-hourglass-half me-1"></i>Pending</span>
+            {% else %}<span class="badge-status-resolved"><i class="fas fa-check-circle me-1"></i>Resolved</span>{% endif %}
           </td>
-          <td>
-            {% if r.status == 'Pending' %}
-              <span class="badge-status-pending"><i class="fas fa-hourglass-half me-1"></i>Pending</span>
-            {% else %}
-              <span class="badge-status-resolved"><i class="fas fa-check-circle me-1"></i>Resolved</span>
-            {% endif %}
-          </td>
-          <td><span style="font-size:0.8rem; color:#56718e;">{{ r.created_at[:10] }}</span></td>
+          <td><span style="font-size:0.85rem; color:#64748B; font-weight: 600;">{{ r.created_at[:10] }}</span></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -315,19 +240,18 @@
   if (labelsUsers.length === 0) { labelsUsers.push('No Data'); dataUsers.push(0); }
 
   document.querySelectorAll('.counter').forEach(counter => {
-    const target = parseInt(counter.innerText);
-    let count = 0;
-    const inc = target / 80;
+    const target = parseInt(counter.innerText) || 0;
+    let count = 0; const inc = target / 80;
     const update = () => {
       count += inc;
       if (count < target) {
-        counter.innerText = Math.ceil(count);
+        counter.innerText = Math.ceil(count).toLocaleString();
         requestAnimationFrame(update);
       } else {
-        counter.innerText = target;
+        counter.innerText = target.toLocaleString();
       }
     };
-    update();
+    if(target > 0) update();
   });
 
   new Chart(document.getElementById('reportChart'), {
@@ -337,18 +261,16 @@
       datasets: [{
         label: 'Reports',
         data: dataReports,
-        backgroundColor: ['#1a4b7a', '#2d6ea0', '#4a8bc2', '#7bb3ff', '#b7cee5'],
-        borderRadius: 8,
-        barPercentage: 0.65,
+        backgroundColor: 'rgba(124, 58, 237, 0.85)',
+        borderColor: '#7C3AED', borderRadius: 12, borderWidth: 2, barPercentage: 0.65,
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: true,
+      responsive: true, maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+        y: { beginAtZero: true, grid: { color: 'rgba(124,58,237,0.1)' }, ticks: { font: { size: 11, weight: 600 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 11, weight: 600 } } }
       }
     }
   });
@@ -358,27 +280,19 @@
     data: {
       labels: labelsUsers,
       datasets: [{
-        label: 'Users',
-        data: dataUsers,
-        borderColor: '#0f8b4e',
-        backgroundColor: 'rgba(15, 139, 78, 0.06)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#0f8b4e',
-        pointBorderColor: 'white',
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        borderWidth: 2.5
+        label: 'Users', data: dataUsers,
+        borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        fill: true, tension: 0.4, pointBackgroundColor: '#10B981',
+        pointBorderColor: 'white', pointBorderWidth: 2, pointRadius: 5,
+        pointHoverRadius: 7, borderWidth: 3
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: true,
+      responsive: true, maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+        y: { beginAtZero: true, grid: { color: 'rgba(16,185,129,0.1)' }, ticks: { font: { size: 11, weight: 600 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 11, weight: 600 } } }
       }
     }
   });

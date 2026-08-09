@@ -5,12 +5,14 @@ from werkzeug.security import generate_password_hash
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'myproject.db')
 
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON") # foreign key on kela
-    return conn
 
+def get_db():
+    db = sqlite3.connect(DB_PATH, timeout=20.0)
+    db.row_factory = sqlite3.Row
+    db.execute("PRAGMA foreign_keys = ON")
+    db.execute("PRAGMA journal_mode=WAL")
+    db.execute("PRAGMA busy_timeout = 20000")
+    return db
 def init_db():
     conn = get_db()
     c = conn.cursor()
