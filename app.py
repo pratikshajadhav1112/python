@@ -591,15 +591,18 @@ def admin_notifications():
     conn.close()
     return render_template('admin_notifications.html', notes=notes)
 
+
 @app.context_processor
 def inject_notifications():
-    if current_user.is_authenticated: # FIX: session ki jagah current_user
-        conn = get_db()
-        count = conn.execute("SELECT COUNT(*) FROM notifications WHERE is_read = 0").fetchone()[0]
-        conn.close()
+    if current_user.is_authenticated:
+        db = get_db()
+        if current_user.role == 'admin':
+            count = db.execute("SELECT COUNT(*) FROM notifications WHERE is_read = 0").fetchone()[0]
+        else: # student
+            count = db.execute("SELECT COUNT(*) FROM notifications WHERE user_id =? AND is_read = 0", (current_user.id,)).fetchone()[0]
+        db.close()
         return dict(unread_count=count)
     return dict(unread_count=0)
-
 # FIX 3: YE DONO FUNCTION REPLACE KARO
 @app.route('/admin/notifications/mark_all_read')
 @admin_required
@@ -634,40 +637,56 @@ def check_maintenance():
             if not current_user.is_authenticated or current_user.role!= 'admin':
                 return render_template('maintenance.html'), 503
 
+
 @app.route('/admin/settings', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def admin_settings():
     conn = get_db()
-    settings = conn.execute("SELECT * FROM settings WHERE id=1").fetchone()
-    admin = conn.execute("SELECT * FROM users WHERE id =?", (current_user.id,)).fetchone()
+    try:
+        settings = conn.execute("SELECT * FROM settings WHERE id=1").fetchone()
+        admin = conn.execute("SELECT * FROM users WHERE id =?", (current_user.id,)).fetchone()
 
-    if request.method == 'POST':
-        if 'change_password' in request.form:
-            old_pass = request.form['old_password']
-            new_pass = request.form['new_password']
-            if check_password_hash(admin['password'], old_pass):
-                hashed = generate_password_hash(new_pass)
-                conn.execute("UPDATE users SET password =? WHERE id =?", (hashed, current_user.id))
+        if request.method == 'POST':
+            form_type = request.form.get('form_type') # YE LINE NEW
+
+            # 1. PASSWORD CHANGE
+            if form_type == 'password': # <- Yaha change kiya
+                old_pass = request.form['old_password']
+                new_pass = request.form['new_password']
+                
+                if len(new_pass) < 8:
+                    flash('New password must be 8+ characters', 'danger')
+                elif check_password_hash(admin['password'], old_pass):
+                    hashed = generate_password_hash(new_pass)
+                    conn.execute("UPDATE users SET password =? WHERE id =?", (hashed, current_user.id))
+                    conn.commit()
+                    flash('Password updated successfully', 'success')
+                else:
+                    flash('Old password is wrong', 'danger')
+
+            # 2. SETTINGS SAVE
+            elif form_type == 'settings': # <- Yaha change kiya
+                ai_model = request.form.get('ai_model', 'llama-3.1-8b-instant')
+                maintenance_mode = 1 if request.form.get('maintenance_mode') else 0
+                registration_open = 1 if request.form.get('registration_open') else 0
+                max_daily = request.form.get('max_daily_complaints', 6)
+                
+                try:
+                    max_daily = int(max_daily)
+                except ValueError:
+                    max_daily = 6
+
+                conn.execute("""UPDATE settings SET
+                                ai_model=?, maintenance_mode=?, registration_open=?, max_daily_complaints=?
+                                WHERE id=1""",
+                             (ai_model, maintenance_mode, registration_open, max_daily))
                 conn.commit()
-                flash('Password updated successfully', 'success')
-            else:
-                flash('Old password is wrong', 'danger')
+                flash('Settings updated successfully!', 'success')
 
-        elif 'save_settings' in request.form:
-            ai_model = request.form['ai_model']
-            maintenance_mode = 1 if request.form.get('maintenance_mode') else 0
-            registration_open = 1 if request.form.get('registration_open') else 0
-            max_daily = int(request.form['max_daily_complaints'])
-
-            conn.execute("""UPDATE settings SET
-                            ai_model=?, maintenance_mode=?, registration_open=?, max_daily_complaints=?
-                            WHERE id=1""",
-                         (ai_model, maintenance_mode, registration_open, max_daily))
-            conn.commit()
-            flash('Settings updated successfully!', 'success')
-
-    conn.close()
+    finally:
+        conn.close()
+    
     return render_template('admin_settings.html', admin=admin, settings=settings)
 
 @app.route('/admin/export_csv')
@@ -675,18 +694,24 @@ def admin_settings():
 @admin_required
 def export_csv():
     conn = get_db()
-    data = conn.execute("SELECT e.*, u.name, u.username FROM entries e JOIN users u ON e.user_id = u.id").fetchall()
-    conn.close()
+    try:
+        data = conn.execute("SELECT e.*, u.name, u.username FROM entries e JOIN users u ON e.user_id = u.id").fetchall()
+        
+        si = io.StringIO()
+        cw = csv.writer(si)
+        cw.writerow(['ID', 'Student Name', 'Username', 'Exam', 'College', 'Status', 'Category', 'Urgency', 'Date'])
+        for row in data:
+            cw.writerow([
+                row['id'], row['name'], row['username'], row['exam_name'], 
+                row['college_name'], row['status'], row['category'], 
+                row['urgency_score'], row['created_at']
+            ])
 
-    si = io.StringIO()
-    cw = csv.writer(si)
-    cw.writerow(['ID', 'Student Name', 'Username', 'Exam', 'College', 'Status', 'Category', 'Urgency', 'Date'])
-    for row in data:
-        cw.writerow([row['id'], row['name'], row['username'], row['exam_name'], row['college_name'], row['status'], row['category'], row['urgency_score'], row['created_at']])
-
-    output = si.getvalue()
-    return Response(output, mimetype="text/csv", headers={"Content-disposition": "attachment; filename=complaints.csv"})
-
+        output = si.getvalue()
+        return Response(output, mimetype="text/csv", headers={"Content-disposition": "attachment; filename=complaints.csv"})
+    
+    finally:
+        conn.close()
 @app.route('/dashboard')
 @login_required
 def dashboard():
