@@ -1,487 +1,249 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- About page – modern, premium, enterprise-grade design -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-  /* ===== WRAPPER ===== */
+  :root {
+    --primary: #0052CC;
+    --primary-dark: #003A8C;
+    --accent: #FF6B35;
+    --bg: #F7F9FC;
+    --text: #1A202C;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+  }
+
   .about-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 10px 0 20px;
+    padding: 40px 20px 80px;
   }
 
-  /* ===== HERO SECTION ===== */
+  /* ===== HERO ===== */
   .about-hero {
     text-align: center;
-    padding: 30px 20px 60px;
-    position: relative;
+    padding: 60px 20px 80px;
+    background: radial-gradient(circle at 50% 0%, rgba(0,82,204,0.06) 0%, transparent 60%);
   }
-
   .about-hero .hero-badge {
-    display: inline-block;
-    background: #eaf3fc;
-    color: #1a4b7a;
-    padding: 6px 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,82,204,0.1);
+    color: var(--primary);
+    padding: 8px 20px;
     border-radius: 40px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 20px;
-    border: 1px solid #c6d9ed;
+    margin-bottom: 24px;
+    border: 1px solid rgba(0,82,204,0.2);
   }
-
   .about-hero h1 {
-    font-size: 3.2rem;
+    font-size: 3.5rem;
     font-weight: 700;
-    color: #0b1e2f;
+    color: var(--text);
     margin-bottom: 20px;
     letter-spacing: -0.02em;
-    position: relative;
-    display: inline-block;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text; /* FIX for VS Code warning */
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
-
-  .about-hero h1::after {
-    content: '';
-    position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background: linear-gradient(90deg, #1a4b7a, #7bb3ff);
-    border-radius: 10px;
-  }
-
   .about-hero p {
-    font-size: 1.15rem;
-    color: #506a84;
+    font-size: 1.2rem;
+    color: var(--text-muted);
     max-width: 720px;
-    margin: 32px auto 0;
+    margin: 0 auto;
     line-height: 1.8;
-    font-weight: 400;
   }
 
-  /* ===== MISSION CARD – premium gradient ===== */
+  /* ===== MISSION CARD ===== */
   .mission-card {
-    background: linear-gradient(145deg, #0b2a4a 0%, #1a4b7a 100%);
+    background: linear-gradient(145deg, var(--primary-dark) 0%, var(--primary) 100%);
     color: white;
-    padding: 52px 56px;
-    border-radius: 40px;
-    margin: 40px 0 56px;
-    box-shadow: 0 20px 60px -12px rgba(26, 75, 122, 0.25);
+    padding: 60px;
+    border-radius: 24px;
+    margin: 60px 0;
+    box-shadow: 0 20px 60px -12px rgba(0, 82, 204, 0.25);
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.06);
   }
-
-  .mission-card::before {
-    content: '';
-    position: absolute;
-    top: -40%;
-    right: -20%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  .mission-card::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -10%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(123, 179, 255, 0.06) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
   .mission-card h3 {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 18px;
-    position: relative;
-    z-index: 2;
     display: flex;
     align-items: center;
     gap: 14px;
   }
-
-  .mission-card h3 i {
-    color: #7bb3ff;
-    font-size: 1.8rem;
-  }
-
-  .mission-card p {
-    font-size: 1.05rem;
-    line-height: 1.9;
-    opacity: 0.92;
-    position: relative;
-    z-index: 2;
-    max-width: 800px;
-  }
+  .mission-card h3 i { color: var(--accent); }
+  .mission-card p { font-size: 1.1rem; line-height: 1.9; opacity: 0.92; max-width: 850px; }
 
   /* ===== FEATURES GRID ===== */
   .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 28px;
-    margin: 56px 0 60px;
+    margin: 60px 0;
   }
-
   .feature-card {
     background: #ffffff;
-    padding: 38px 28px 34px;
-    border-radius: 32px;
+    padding: 40px 30px;
+    border-radius: 20px;
     text-align: center;
-    border: 1px solid #eef4fa;
+    border: 1px solid var(--border);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.03);
   }
-
-  .feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #1a4b7a, #7bb3ff);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s ease;
-  }
-
   .feature-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 48px -12px rgba(18, 52, 86, 0.08);
-    border-color: #c6d9ed;
+    box-shadow: 0 20px 48px -12px rgba(0, 82, 204, 0.12);
+    border-color: var(--primary);
   }
-
-  .feature-card:hover::before {
-    transform: scaleX(1);
-  }
-
   .feature-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #ecf3fc, #dbe8f5);
-    border-radius: 24px;
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, rgba(0,82,204,0.1), rgba(255,107,53,0.1));
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 22px;
-    font-size: 2.2rem;
-    color: #1a4b7a;
+    margin: 0 auto 24px;
+    font-size: 2rem;
+    color: var(--primary);
     transition: all 0.35s ease;
   }
-
   .feature-card:hover .feature-icon {
-    background: linear-gradient(135deg, #1a4b7a, #0b2a4a);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
-    transform: rotateY(360deg) scale(1.02);
+    transform: scale(1.1);
   }
+  .feature-card h4 { font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+  .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
 
-  .feature-card h4 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #0b1e2f;
-    margin-bottom: 10px;
-    letter-spacing: -0.01em;
-  }
-
-  .feature-card p {
-    color: #56718e;
-    font-size: 0.95rem;
-    line-height: 1.7;
-    margin: 0;
-  }
-
-  /* ===== STATS SECTION ===== */
+  /* ===== STATS ===== */
   .stats-section {
-    background: linear-gradient(135deg, #f4f8fe, #ecf3fa);
-    padding: 56px 40px;
-    border-radius: 40px;
-    margin: 56px 0;
-    border: 1px solid #dde7f0;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.01);
+    background: #ffffff;
+    padding: 60px 40px;
+    border-radius: 24px;
+    margin: 60px 0;
+    border: 1px solid var(--border);
   }
-
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 32px;
     text-align: center;
   }
-
-  .stat-item {
-    padding: 8px 0;
-  }
-
   .stat-item h2 {
-    font-size: 3.2rem;
+    font-size: 3rem;
     font-weight: 700;
-    color: #1a4b7a;
-    margin: 0 0 6px 0;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text; /* FIX */
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
+  .stat-item p { color: var(--text-muted); font-weight: 500; }
 
-  .stat-item p {
-    color: #56718e;
-    font-size: 0.95rem;
-    font-weight: 500;
-    margin: 0;
-    letter-spacing: 0.3px;
-  }
-
-  .stat-item .stat-icon {
-    display: block;
-    font-size: 1.8rem;
-    color: #7bb3ff;
-    margin-bottom: 6px;
-  }
-
-  /* ===== CTA SECTION ===== */
+  /* ===== CTA ===== */
   .cta-section {
     text-align: center;
-    padding: 56px 40px 52px;
-    background: #ffffff;
-    border-radius: 40px;
-    border: 1px solid #eef4fa;
-    margin: 56px 0 20px;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
-    transition: all 0.3s ease;
-  }
-
-  .cta-section:hover {
-    border-color: #c6d9ed;
-    box-shadow: 0 12px 40px -12px rgba(18, 52, 86, 0.06);
-  }
-
-  .cta-section h3 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #0b1e2f;
-    margin-bottom: 12px;
-    letter-spacing: -0.02em;
-  }
-
-  .cta-section p {
-    color: #56718e;
-    font-size: 1.05rem;
-    margin-bottom: 28px;
-  }
-
-  .cta-btn {
-    background: linear-gradient(135deg, #0b2a4a, #1a4b7a);
+    padding: 60px 40px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 24px;
     color: white;
-    padding: 16px 44px;
+  }
+  .cta-section h3 { font-size: 2.2rem; font-weight: 700; margin-bottom: 12px; }
+  .cta-section p { opacity: 0.9; font-size: 1.1rem; margin-bottom: 28px; }
+  .cta-btn {
+    background: white;
+    color: var(--primary);
+    padding: 16px 40px;
     border-radius: 60px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 1rem;
     display: inline-flex;
     align-items: center;
     gap: 12px;
     transition: all 0.25s ease;
-    box-shadow: 0 8px 28px -8px rgba(26, 75, 122, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 28px -8px rgba(0,0,0,0.2);
   }
-
   .cta-btn:hover {
-    background: linear-gradient(135deg, #0f2d4a, #1a4b7a);
     transform: translateY(-3px);
-    box-shadow: 0 16px 40px -12px rgba(26, 75, 122, 0.35);
-    color: white;
+    box-shadow: 0 16px 40px -12px rgba(0,0,0,0.3);
   }
 
-  .cta-btn i {
-    font-size: 1.1rem;
-  }
-
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 768px) {
-    .about-hero h1 {
-      font-size: 2.4rem;
-    }
-    .about-hero p {
-      font-size: 1rem;
-    }
-    .mission-card {
-      padding: 34px 24px;
-      border-radius: 28px;
-    }
-    .mission-card h3 {
-      font-size: 1.6rem;
-    }
-    .mission-card p {
-      font-size: 0.95rem;
-    }
-    .features-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-    .feature-card {
-      padding: 28px 18px 24px;
-    }
-    .stats-section {
-      padding: 40px 20px;
-      border-radius: 28px;
-    }
-    .stat-item h2 {
-      font-size: 2.6rem;
-    }
-    .cta-section {
-      padding: 40px 24px 36px;
-      border-radius: 28px;
-    }
-    .cta-section h3 {
-      font-size: 1.8rem;
-    }
-    .cta-btn {
-      padding: 14px 32px;
-      font-size: 0.95rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .about-hero h1 {
-      font-size: 1.8rem;
-    }
-    .about-hero .hero-badge {
-      font-size: 0.7rem;
-      padding: 4px 16px;
-    }
-    .features-grid {
-      grid-template-columns: 1fr;
-    }
-    .stats-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .stat-item h2 {
-      font-size: 2rem;
-    }
-    .mission-card {
-      padding: 26px 18px;
-    }
-    .cta-section h3 {
-      font-size: 1.5rem;
-    }
-    .cta-btn {
-      width: 100%;
-      justify-content: center;
-      padding: 14px 20px;
-    }
-  }
-
-  /* ===== ANIMATIONS ===== */
-  .feature-card {
-    animation: fadeUp 0.6s ease forwards;
-    opacity: 0;
-  }
-  .feature-card:nth-child(2) { animation-delay: 0.08s; }
-  .feature-card:nth-child(3) { animation-delay: 0.16s; }
-  .feature-card:nth-child(4) { animation-delay: 0.24s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .stat-item {
-    animation: fadeUp 0.6s ease forwards;
-    opacity: 0;
-  }
-  .stat-item:nth-child(2) { animation-delay: 0.1s; }
-  .stat-item:nth-child(3) { animation-delay: 0.2s; }
-  .stat-item:nth-child(4) { animation-delay: 0.3s; }
+  /* Animations */
+  .feature-card, .stat-item { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+  .feature-card:nth-child(2) { animation-delay: 0.1s; }
+  .feature-card:nth-child(3) { animation-delay: 0.2s; }
+  .feature-card:nth-child(4) { animation-delay: 0.3s; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <div class="about-wrapper">
-  <!-- ===== HERO ===== -->
+  <!-- HERO -->
   <div class="about-hero">
-    
-    <h1>About Us</h1>
+    <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Prashan Platform</div>
+    <h1>About Prashan</h1>
     <p>
-      Exam Leak Detection &amp; Transparency Platform is designed to improve fairness and transparency in examinations
-      using advanced AI technology and community participation.
+      Prashan is an Exam Leak Detection & Transparency Platform designed to ensure fairness in examinations
+      using AI-powered analytics and secure community reporting.
     </p>
   </div>
 
-  <!-- ===== MISSION CARD ===== -->
+  <!-- MISSION -->
   <div class="mission-card">
     <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
     <p>
-      We are committed to creating a corruption‑free examination ecosystem where every student gets equal opportunity.
-      Our platform empowers citizens to report exam irregularities anonymously while leveraging AI to detect patterns,
-      prevent future leaks, and ensure complete transparency in the education system.
+      We are committed to building a corruption-free examination ecosystem. Prashan empowers students to report 
+      irregularities anonymously while our AI detects patterns to prevent future leaks and ensures 100% transparency.
     </p>
   </div>
 
-  <!-- ===== FEATURES GRID ===== -->
+  <!-- FEATURES -->
   <div class="features-grid">
     <div class="feature-card">
       <div class="feature-icon"><i class="fas fa-file-shield"></i></div>
-      <h4>Report Exam Issues</h4>
-      <p>Submit detailed reports about exam leaks or irregularities with complete anonymity and security.</p>
+      <h4>Secure Reporting</h4>
+      <p>Submit complaints about exam leaks with end-to-end encryption and complete anonymity.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-      <h4>Track Report Status</h4>
-      <p>Monitor your submitted reports in real‑time from Pending to Resolved with full transparency.</p>
+      <h4>Real-time Tracking</h4>
+      <p>Track your complaint status from Pending to Resolved with live updates.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon"><i class="fas fa-magnifying-glass-chart"></i></div>
-      <h4>Maintain Transparency</h4>
-      <p>AI‑powered analytics detect patterns and help authorities take preventive measures against leaks.</p>
+      <div class="feature-icon"><i class="fas fa-brain"></i></div>
+      <h4>AI Detection</h4>
+      <p>Advanced AI analyzes patterns to flag potential leaks before they spread.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><i class="fas fa-lock"></i></div>
-      <h4>Secure Record Management</h4>
-      <p>All data is encrypted and stored securely. Your identity remains completely confidential.</p>
+      <h4>Data Security</h4>
+      <p>Enterprise-grade security. Your identity and evidence are always protected.</p>
     </div>
   </div>
 
-  <!-- ===== STATS SECTION ===== -->
+  <!-- STATS -->
   <div class="stats-section">
     <div class="stats-grid">
-      <div class="stat-item">
-        <span class="stat-icon"><i class="fas fa-file-alt"></i></span>
-        <h2>500+</h2>
-        <p>Reports Submitted</p>
-      </div>
-      <div class="stat-item">
-        <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
-        <h2>95%</h2>
-        <p>Resolution Rate</p>
-      </div>
-      <div class="stat-item">
-        <span class="stat-icon"><i class="fas fa-clock"></i></span>
-        <h2>24/7</h2>
-        <p>Monitoring System</p>
-      </div>
-      <div class="stat-item">
-        <span class="stat-icon"><i class="fas fa-user-secret"></i></span>
-        <h2>100%</h2>
-        <p>Anonymous &amp; Secure</p>
-      </div>
+      <div class="stat-item"><h2>1200+</h2><p>Reports Submitted</p></div>
+      <div class="stat-item"><h2>96%</h2><p>Resolution Rate</p></div>
+      <div class="stat-item"><h2>48H</h2><p>Avg Response Time</p></div>
+      <div class="stat-item"><h2>100%</h2><p>Anonymous & Secure</p></div>
     </div>
   </div>
 
-  <!-- ===== CTA SECTION ===== -->
+  <!-- CTA -->
   <div class="cta-section">
-    <h3>Ready to Make a Difference?</h3>
-    <p>Join thousands of students fighting for fair examinations</p>
+    <h3>Ready to Protect Exam Integrity?</h3>
+    <p>Join the movement for transparent and fair examinations</p>
     <a href="{{ url_for('form') }}" class="cta-btn">
-      <i class="fas fa-rocket"></i> Submit Your First Report
+      <i class="fas fa-paper-plane"></i> Submit a Report
     </a>
   </div>
 </div>

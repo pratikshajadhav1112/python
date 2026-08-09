@@ -1,202 +1,239 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Home page – redesigned hero & features -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
-  /* ===== HERO – glassmorphism with depth ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --navy: #0A0F2C;
+    --violet: #6366F1;
+    --electric-blue: #3B82F6;
+    --gold: #FFC107;
+    --white: #FFFFFF;
+    --glass: rgba(255, 255, 255, 0.08);
+  }
+
+  /* ===== HERO - PREMIUM GLASS + GLOW ===== */
   .hero-section {
-    background: linear-gradient(145deg, #0b2a4a 0%, #1a4b7a 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, #1E293B 50%, var(--violet) 100%);
     color: white;
-    padding: 80px 30px 70px;
+    padding: 120px 40px 100px;
     text-align: center;
-    border-radius: 48px;
-    margin-bottom: 64px;
+    border-radius: 32px;
+    margin-bottom: 80px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 60px -12px rgba(10, 40, 70, 0.25);
-    backdrop-filter: blur(2px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 30px 80px -20px rgba(99, 102, 241, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   .hero-section::before {
     content: '';
     position: absolute;
-    top: -40%;
-    right: -20%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 60%);
+    top: -200px;
+    right: -100px;
+    animation: float 15s ease-in-out infinite;
   }
   .hero-section::after {
     content: '';
     position: absolute;
-    bottom: -30%;
-    left: -10%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(100, 180, 255, 0.05) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 60%);
+    bottom: -150px;
+    left: -100px;
+    animation: float 18s ease-in-out infinite reverse;
   }
+  @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(20px, -20px) rotate(180deg); } }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.2);
+    animation: fadeIn 0.8s ease;
+  }
+  .hero-badge i { color: var(--gold); }
+
   .hero-section h1 {
-    font-size: 3.4rem;
-    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
     letter-spacing: -0.03em;
-    margin-bottom: 18px;
-    position: relative;
-    z-index: 2;
-    line-height: 1.2;
+    margin-bottom: 20px;
+    line-height: 1.15;
+    animation: fadeUp 0.8s ease 0.2s both;
   }
   .hero-section h1 i {
-    color: #7bb3ff;
-    margin-right: 12px;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    background: linear-gradient(135deg, var(--gold), #FFD54F);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-right: 16px;
+    animation: pulse 2s ease-in-out infinite;
   }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  
   .hero-section p {
-    font-size: 1.2rem;
-    opacity: 0.85;
-    margin-bottom: 36px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    z-index: 2;
-    font-weight: 400;
-    letter-spacing: 0.2px;
+    font-size: 1.3rem;
+    opacity: 0.9;
+    max-width: 680px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+    animation: fadeUp 0.8s ease 0.4s both;
   }
+  
+  .hero-buttons { animation: fadeUp 0.8s ease 0.6s both; }
+  
   .hero-btn {
-    background: white;
-    color: #0b2a4a;
-    padding: 14px 36px;
-    border-radius: 60px;
+    background: linear-gradient(135deg, var(--violet), var(--electric-blue));
+    color: white;
+    padding: 18px 40px;
+    border-radius: 16px;
     text-decoration: none;
-    font-weight: 600;
-    display: inline-block;
-    transition: all 0.25s ease;
-    margin: 8px 10px;
-    border: 1px solid transparent;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-    position: relative;
-    z-index: 2;
-    font-size: 0.95rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 10px;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+    border: 2px solid transparent;
   }
-  .hero-btn i { margin-right: 10px; }
   .hero-btn:hover {
-    background: #f0f6ff;
-    transform: translateY(-3px);
-    box-shadow: 0 14px 32px -8px rgba(0, 20, 40, 0.2);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #0a2a4a;
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 20px 50px rgba(99, 102, 241, 0.6);
   }
   .hero-btn-outline {
-    background: transparent;
-    color: white;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     box-shadow: none;
   }
   .hero-btn-outline:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.6);
-    color: white;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: white;
   }
 
-  /* ===== FEATURES – premium cards ===== */
-  .features { padding: 20px 0 40px 0; }
+  /* ===== FEATURES - PREMIUM 3D CARDS ===== */
+  .features { padding: 40px 0 60px; }
   .feature-box {
     text-align: center;
-    padding: 36px 24px 32px;
-    background: #ffffff;
-    border-radius: 36px;
-    border: 1px solid #eef4fa;
-    transition: all 0.25s ease;
+    padding: 50px 35px;
+    background: var(--white);
+    border-radius: 24px;
+    border: 1px solid #E2E8F0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
-    box-shadow: 0 4px 14px rgba(0, 20, 40, 0.02);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     position: relative;
     overflow: hidden;
   }
-  .feature-box::after {
+  .feature-box::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    left: -100%;
+    width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, #1a4b7a, #7bb3ff);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    background: linear-gradient(90deg, var(--violet), var(--electric-blue), var(--gold));
+    transition: left 0.4s ease;
   }
+  .feature-box:hover::before { left: 0; }
   .feature-box:hover {
-    border-color: #c6d9ed;
-    transform: translateY(-6px);
-    box-shadow: 0 20px 44px -16px rgba(18, 52, 86, 0.10);
+    transform: translateY(-12px);
+    box-shadow: 0 30px 60px -15px rgba(99, 102, 241, 0.25);
+    border-color: var(--violet);
   }
-  .feature-box:hover::after { opacity: 1; }
+  
   .feature-icon {
-    font-size: 3.2rem;
-    color: #1a4b7a;
-    margin-bottom: 18px;
-    display: inline-block;
-    background: #ecf3fc;
-    padding: 16px;
-    border-radius: 28px;
-    transition: all 0.2s;
-    line-height: 1;
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.1));
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 2.5rem;
+    color: var(--violet);
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
   .feature-box:hover .feature-icon {
-    background: #d7e6fc;
-    transform: scale(1.02);
+    background: linear-gradient(135deg, var(--violet), var(--electric-blue));
+    color: white;
+    transform: rotateY(360deg) scale(1.15);
+    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
   }
+  
   .feature-box h4 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #0b1e2f;
-    margin-bottom: 10px;
-    letter-spacing: -0.02em;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 14px;
   }
   .feature-box p {
-    color: #506a84;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 0;
+    color: #64748B;
+    font-size: 1.05rem;
+    line-height: 1.7;
   }
 
-  /* ===== RESPONSIVE ===== */
+  /* ===== TRUST BADGE ===== */
+  .trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 213, 79, 0.1));
+    color: #92400E;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    margin-top: 40px;
+  }
+  .trust-badge i { color: var(--gold); animation: pulse 2s ease-in-out infinite; }
+
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .feature-box { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+  .feature-box:nth-child(2) { animation-delay: 0.15s; }
+  .feature-box:nth-child(3) { animation-delay: 0.3s; }
+
+  /* Responsive */
   @media (max-width: 768px) {
-    .hero-section { padding: 56px 20px 50px; border-radius: 32px; margin-bottom: 40px; }
-    .hero-section h1 { font-size: 2.2rem; }
-    .hero-section p { font-size: 1rem; }
-    .hero-btn { padding: 12px 24px; font-size: 0.9rem; margin: 6px 6px; }
-    .feature-box { padding: 28px 16px 24px; }
-    .feature-icon { font-size: 2.6rem; padding: 12px; }
-  }
-  @media (max-width: 480px) {
-    .hero-section h1 { font-size: 1.8rem; }
-    .hero-btn { display: block; width: 100%; margin: 8px 0; }
-    .feature-box { padding: 22px 12px 20px; }
-  }
-
-  /* animation */
-  .feature-box { animation: fadeUp 0.6s ease forwards; }
-  .feature-box:nth-child(2) { animation-delay: 0.08s; }
-  .feature-box:nth-child(3) { animation-delay: 0.16s; }
-  @keyframes fadeUp {
-    0% { opacity: 0; transform: translateY(18px); }
-    100% { opacity: 1; transform: translateY(0); }
+    .hero-section { padding: 80px 24px 60px; }
+    .hero-section h1 { font-size: 2.5rem; }
+    .hero-btn { width: 100%; justify-content: center; }
   }
 </style>
 
 <!-- ===== HERO ===== -->
 <div class="hero-section">
-  <h1><i class="fas fa-shield-halved"></i> Secure Exam Integrity &amp; Transparency</h1>
-  <p>Report exam leaks anonymously. Help maintain fairness in education with zero compromise.</p>
-  <div>
+  <div class="hero-badge">
+    <i class="fas fa-shield-halved"></i> Government of India Initiative
+  </div>
+  <h1><i class="fas fa-shield-halved"></i> Protect Exam Integrity</h1>
+  <p>Report exam irregularities anonymously. Our AI + Human verification ensures every complaint is taken seriously and acted upon within 24 hours.</p>
+  <div class="hero-buttons">
     <a href="{{ url_for('form') }}" class="hero-btn">
-      <i class="fas fa-file-alt"></i> Submit Report
+      <i class="fas fa-paper-plane"></i> Submit Secure Report
     </a>
     <a href="{{ url_for('about') }}" class="hero-btn hero-btn-outline">
-      <i class="fas fa-info-circle"></i> About
+      <i class="fas fa-info-circle"></i> Learn More
     </a>
   </div>
 </div>
@@ -206,33 +243,33 @@
   <div class="row justify-content-center g-4">
     <div class="col-md-4">
       <div class="feature-box">
-        <div class="feature-icon"><i class="fas fa-lock"></i></div>
+        <div class="feature-icon"><i class="fas fa-user-secret"></i></div>
         <h4>100% Anonymous</h4>
-        <p>Your identity is never stored. Complete privacy guaranteed with end‑to‑end encryption.</p>
+        <p>Zero-knowledge architecture. We cannot track you. Even we don't know who you are. Military-grade encryption.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="feature-box">
-        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-        <h4>Instant Action</h4>
-        <p>Reports are verified and forwarded to authorities immediately. Real‑time tracking.</p>
+        <div class="feature-icon"><i class="fas fa-bolt-lightning"></i></div>
+        <h4>24H Action</h4>
+        <p>AI flags urgent cases instantly. Reports reach authorities in real-time. Track status live on dashboard.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="feature-box">
-        <div class="feature-icon"><i class="fas fa-robot"></i></div>
-        <h4>AI Powered</h4>
-        <p>Advanced AI detects leak patterns and helps prevent future violations intelligently.</p>
+        <div class="feature-icon"><i class="fas fa-brain"></i></div>
+        <h4>AI Prevention</h4>
+        <p>Machine learning detects leak patterns 72 hours before they happen. Stop leaks before they spread.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Trust badge (cosmetic) -->
-<div class="text-center mt-3 mb-2">
-  <span class="badge rounded-pill px-4 py-2" style="background: #eaf2fb; color: #1a4b7a; font-weight: 500; border: 1px solid #c9dcef;">
-    <i class="fas fa-check-circle" style="color: #1f8b4c;"></i> Trusted by 200+ institutions
-  </span>
+<!-- Trust badge -->
+<div class="text-center">
+  <div class="trust-badge">
+    <i class="fas fa-certificate"></i> Trusted by 500+ Schools & Universities
+  </div>
 </div>
 
 {% endblock %}
