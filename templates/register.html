@@ -6,162 +6,202 @@
     <title>Register | Prashan</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --navy: #050B1E;
+            --violet: #7C3AED;
+            --blue: #2563EB;
+            --gold: #FBBF24;
+            --success: #10B981;
+        }
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--navy) 0%, var(--violet) 50%, var(--blue) 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 20px 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 30px 0;
+            font-family: 'Inter', sans-serif;
         }
-   .register-card {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+  .register-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            border-radius: 32px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.4);
             overflow: hidden;
-            animation: slideIn 0.5s ease;
+            animation: slideIn 0.6s ease;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(0); }
         }
-   .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
+  .card-header {
+            background: transparent;
+            color: var(--navy);
+            padding: 45px 40px 20px;
             text-align: center;
             border: none;
         }
-   .card-header h3 {
+  .card-header.icon-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--violet), var(--blue));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.2rem;
+            color: white;
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.4);
+        }
+  .card-header h3 {
+            font-family: 'Outfit', sans-serif;
             margin: 0;
-            font-weight: 600;
-            font-size: 1.8rem;
+            font-weight: 900;
+            font-size: 2rem;
+            background: linear-gradient(90deg, var(--navy), var(--violet));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-   .card-body {
-            padding: 40px;
+  .card-header p { color: #64748B; font-weight: 500; }
+  .card-body {
+            padding: 30px 40px 45px;
         }
-   .form-label {
-            font-weight: 500;
-            color: #495057;
-            margin-bottom: 8px;
+  .form-label {
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 10px;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-   .form-control,.form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 12px 15px;
+  .form-control,.form-select {
+            border: 2px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 14px 18px;
             font-size: 0.95rem;
+            font-weight: 500;
             transition: all 0.3s;
+            background: white;
         }
-   .form-control:focus,.form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+  .form-control:focus,.form-select:focus {
+            border-color: var(--violet);
+            box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.1);
         }
-   .input-group-text {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
+  .input-group-text {
+            background: #F8FAFC;
+            border: 2px solid #E2E8F0;
             border-right: none;
-            border-radius: 8px 0 0 8px;
+            border-radius: 16px 0 0 16px;
+            color: #94A3B8;
         }
-   .input-group.form-control {
+  .input-group.form-control {
             border-left: none;
-            border-radius: 0 8px 8px 0;
+            border-radius: 0 16px 16px 0;
         }
-   .password-wrapper {
+  .password-wrapper {
             position: relative;
         }
-   .toggle-password {
+  .toggle-password {
             position: absolute;
-            right: 15px;
+            right: 18px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #6c757d;
+            color: #94A3B8;
             z-index: 10;
+            font-size: 1.1rem;
         }
-   .btn-otp {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-left: none;
-            color: #667eea;
-            font-weight: 600;
-            border-radius: 0 8px 8px 0;
-            padding: 0 20px;
+  .btn-otp {
+            background: linear-gradient(135deg, var(--violet), var(--blue));
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 0 16px 16px 0;
+            padding: 0 22px;
             transition: all 0.3s;
         }
-   .btn-otp:hover {
-            background: #667eea;
-            color: white;
+  .btn-otp:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
         }
-   .btn-otp:disabled {
-            background: #e9ecef;
-            color: #6c757d;
+  .btn-otp:disabled {
+            background: #CBD5E1;
+            color: #64748B;
             cursor: not-allowed;
         }
-   .otp-verified {
-            color: #198754;
+  .otp-verified {
+            color: var(--success);
             font-size: 0.85rem;
-            margin-top: 5px;
+            margin-top: 8px;
+            font-weight: 700;
             display: none;
         }
-   .otp-verified i {
-            margin-right: 4px;
-        }
-   .strength-bar {
-            height: 4px;
-            background: #e9ecef;
-            border-radius: 2px;
-            margin-top: 8px;
+  .strength-bar {
+            height: 6px;
+            background: #E2E8F0;
+            border-radius: 10px;
+            margin-top: 10px;
             overflow: hidden;
         }
-   .strength-fill {
+  .strength-fill {
             height: 100%;
             width: 0%;
             transition: all 0.3s ease;
-            border-radius: 2px;
+            border-radius: 10px;
         }
-   .btn-register {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  .btn-register {
+            background: linear-gradient(135deg, var(--violet), var(--blue));
             border: none;
             color: white;
-            padding: 14px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            border-radius: 8px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            border-radius: 16px;
             width: 100%;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.4);
         }
-   .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(124, 58, 237, 0.6);
         }
-   .btn-register:disabled {
+  .btn-register:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-   .login-link {
+  .login-link {
             text-align: center;
-            margin-top: 20px;
-            color: #6c757d;
+            margin-top: 25px;
+            color: #64748B;
+            font-weight: 500;
         }
-   .login-link a {
-            color: #667eea;
-            font-weight: 600;
+  .login-link a {
+            color: var(--violet);
+            font-weight: 800;
             text-decoration: none;
         }
-   .required {
-            color: #dc3545;
-        }
-   .alert {
-            border-radius: 8px;
+  .login-link a:hover { text-decoration: underline; }
+  .required { color: #EF4444; }
+  .alert {
+            border-radius: 16px;
             border: none;
+            font-weight: 600;
         }
         @media (max-width: 768px) {
-     .card-body { padding: 25px; }
-     .card-header { padding: 25px; }
+    .card-body { padding: 25px; }
+    .card-header { padding: 30px 25px 15px; }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -175,7 +215,8 @@
             <div class="col-lg-7 col-md-9">
                 <div class="register-card">
                     <div class="card-header">
-                        <h3><i class="fas fa-user-plus me-2"></i>Create Account</h3>
+                        <div class="icon-box"><i class="fas fa-shield-halved"></i></div>
+                        <h3>Create Prashan Account</h3>
                         <p>Email OTP verification required</p>
                     </div>
 
@@ -194,52 +235,48 @@
 
                         <form method="POST" action="{{ url_for('register') }}" id="regForm" novalidate>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            
+
                             <!-- Full Name -->
                             <div class="mb-3">
-                                <label class="form-label">Full Name <span class="required">*</span></label>
+                                <label class="form-label"><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                     <input type="text" class="form-control" name="name" placeholder="Enter your full name" required>
                                 </div>
-                                <div class="invalid-feedback">Please enter your full name</div>
                             </div>
 
                             <!-- Username -->
                             <div class="mb-3">
-                                <label class="form-label">Username <span class="required">*</span></label>
+                                <label class="form-label"><i class="fas fa-at"></i> Username <span class="required">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-at"></i></span>
                                     <input type="text" class="form-control" name="username" placeholder="Choose a username" required>
                                 </div>
-                                <div class="invalid-feedback">Please enter username</div>
                             </div>
 
                             <!-- Mobile -->
                             <div class="mb-3">
-                                <label class="form-label">Mobile Number <span class="required">*</span></label>
+                                <label class="form-label"><i class="fas fa-phone"></i> Mobile Number <span class="required">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     <input type="tel" class="form-control" name="mobile" id="mobile" placeholder="10 digit number" pattern="[6-9][0-9]{9}" maxlength="10" required>
                                 </div>
-                                <div class="invalid-feedback">Enter valid 10-digit mobile number</div>
                             </div>
 
                             <!-- Email with OTP -->
                             <div class="mb-3">
-                                <label class="form-label">Email Address <span class="required">*</span></label>
+                                <label class="form-label"><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                     <input type="email" class="form-control" name="email" id="email" placeholder="your@email.com" required>
                                     <button type="button" class="btn btn-otp" id="sendEmailOtp">Send OTP</button>
                                 </div>
                                 <div class="otp-verified" id="emailVerified"><i class="fas fa-check-circle"></i>Email Verified</div>
-                                <div class="invalid-feedback">Please enter a valid email address</div>
                             </div>
 
                             <!-- Email OTP Input -->
                             <div class="mb-3" id="emailOtpBox" style="display:none;">
-                                <label class="form-label">Email OTP <span class="required">*</span></label>
+                                <label class="form-label"><i class="fas fa-key"></i> Email OTP <span class="required">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-key"></i></span>
                                     <input type="text" class="form-control" name="email_otp" id="emailOtp" placeholder="Enter 6 digit OTP" maxlength="6">
@@ -249,7 +286,7 @@
 
                             <!-- Password -->
                             <div class="mb-3">
-                                <label class="form-label">Password <span class="required">*</span></label>
+                                <label class="form-label"><i class="fas fa-lock"></i> Password <span class="required">*</span></label>
                                 <div class="password-wrapper">
                                     <input type="password" class="form-control" name="password" id="password" placeholder="Minimum 6 characters" minlength="6" required>
                                     <i class="fas fa-eye toggle-password" id="togglePass"></i>
@@ -257,56 +294,39 @@
                                 <div class="strength-bar">
                                     <div class="strength-fill" id="strengthFill"></div>
                                 </div>
-                                <div class="invalid-feedback">Password must be at least 6 characters</div>
                             </div>
 
                             <!-- State & District -->
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label class="form-label">State <span class="required">*</span></label>
+                                    <label class="form-label"><i class="fas fa-map"></i> State <span class="required">*</span></label>
                                     <select class="form-select" name="state" id="state" required>
                                         <option value="">Select State</option>
-                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
-                                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                                        <option value="Assam">Assam</option>
-                                        <option value="Bihar">Bihar</option>
-                                        <option value="Chhattisgarh">Chhattisgarh</option>
-                                        <option value="Goa">Goa</option>
-                                        <option value="Gujarat">Gujarat</option>
-                                        <option value="Haryana">Haryana</option>
-                                        <option value="Himachal Pradesh">Himachal Pradesh</option>
-                                        <option value="Jharkhand">Jharkhand</option>
-                                        <option value="Karnataka">Karnataka</option>
-                                        <option value="Kerala">Kerala</option>
-                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
                                         <option value="Maharashtra">Maharashtra</option>
-                                        <option value="Manipur">Manipur</option>
-                                        <option value="Meghalaya">Meghalaya</option>
-                                        <option value="Mizoram">Mizoram</option>
-                                        <option value="Nagaland">Nagaland</option>
-                                        <option value="Odisha">Odisha</option>
-                                        <option value="Punjab">Punjab</option>
-                                        <option value="Rajasthan">Rajasthan</option>
-                                        <option value="Sikkim">Sikkim</option>
-                                        <option value="Tamil Nadu">Tamil Nadu</option>
-                                        <option value="Telangana">Telangana</option>
-                                        <option value="Tripura">Tripura</option>
-                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
-                                        <option value="Uttarakhand">Uttarakhand</option>
-                                        <option value="West Bengal">West Bengal</option>
                                         <option value="Delhi">Delhi</option>
+                                        <option value="Karnataka">Karnataka</option>
+                                        <option value="Gujarat">Gujarat</option>
+                                        <option value="Rajasthan">Rajasthan</option>
+                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                        <option value="Bihar">Bihar</option>
+                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                        <option value="West Bengal">West Bengal</option>
+                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                        <option value="Telangana">Telangana</option>
+                                        <option value="Kerala">Kerala</option>
+                                        <option value="Punjab">Punjab</option>
+                                        <option value="Haryana">Haryana</option>
                                     </select>
-                                    <div class="invalid-feedback">Please select state</div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">District <span class="required">*</span></label>
+                                    <label class="form-label"><i class="fas fa-map-pin"></i> District <span class="required">*</span></label>
                                     <select class="form-select" name="district" id="district" required disabled>
                                         <option value="">First Select State</option>
                                     </select>
-                                    <div class="invalid-feedback">Please select district</div>
                                 </div>
                             </div>
-                           
+
                             <input type="hidden" name="email_verified" id="emailVerifiedFlag" value="0">
 
                             <button type="submit" class="btn-register" id="registerBtn" disabled>
@@ -327,30 +347,30 @@
     <script>
         // All India States & Districts Data
         const stateDistricts = {
-            'Maharashtra': ['Ahmednagar', 'Akola', 'Amravati', 'Aurangabad', 'Beed', 'Bhandara', 'Buldhana', 'Chandrapur', 'Dhule', 'Gadchiroli', 'Gondia', 'Hingoli', 'Jalgaon', 'Jalna', 'Kolhapur', 'Latur', 'Mumbai City', 'Mumbai Suburban', 'Nagpur', 'Nanded', 'Nandurbar', 'Nashik', 'Osmanabad', 'Palghar', 'Parbhani', 'Pune', 'Raigad', 'Ratnagiri', 'Sangli', 'Satara', 'Sindhudurg', 'Solapur', 'Thane', 'Wardha', 'Washim', 'Yavatmal'],
-            'Karnataka': ['Bagalkot', 'Bangalore Urban', 'Bangalore Rural', 'Belagavi', 'Bellary', 'Bidar', 'Chamarajanagar', 'Chikballapur', 'Chikkamagaluru', 'Chitradurga', 'Dakshina Kannada', 'Davanagere', 'Dharwad', 'Gadag', 'Hassan', 'Haveri', 'Kalaburagi', 'Kodagu', 'Kolar', 'Koppal', 'Mandya', 'Mysuru', 'Raichur', 'Ramanagara', 'Shivamogga', 'Tumakuru', 'Udupi', 'Uttara Kannada', 'Vijayapura', 'Yadgir'],
-            'Delhi': ['Central Delhi', 'East Delhi', 'New Delhi', 'North East Delhi', 'North West Delhi', 'Shahdara', 'South Delhi', 'South East Delhi', 'South West Delhi', 'West Delhi'],
-            'Gujarat': ['Ahmedabad', 'Amreli', 'Anand', 'Aravalli', 'Banaskantha', 'Bharuch', 'Bhavnagar', 'Botad', 'Chhota Udaipur', 'Dahod', 'Dang', 'Devbhoomi Dwarka', 'Gandhinagar', 'Gir Somnath', 'Jamnagar', 'Junagadh', 'Kheda', 'Kutch', 'Mahisagar', 'Mehsana', 'Morbi', 'Narmada', 'Navsari', 'Panchmahal', 'Patan', 'Porbandar', 'Rajkot', 'Sabarkantha', 'Surat', 'Surendranagar', 'Tapi', 'Vadodara', 'Valsad'],
-            'Rajasthan': ['Ajmer', 'Alwar', 'Banswara', 'Baran', 'Barmer', 'Bharatpur', 'Bhilwara', 'Bikaner', 'Bundi', 'Chittorgarh', 'Churu', 'Dausa', 'Dholpur', 'Dungarpur', 'Hanumangarh', 'Jaipur', 'Jaisalmer', 'Jalore', 'Jhalawar', 'Jhunjhunu', 'Jodhpur', 'Karauli', 'Kota', 'Nagaur', 'Pali', 'Pratapgarh', 'Rajsamand', 'Sawai Madhopur', 'Sikar', 'Sirohi', 'Sri Ganganagar', 'Tonk', 'Udaipur'],
-            'Uttar Pradesh': ['Agra', 'Aligarh', 'Allahabad', 'Ambedkar Nagar', 'Amethi', 'Amroha', 'Auraiya', 'Azamgarh', 'Baghpat', 'Bahraich', 'Ballia', 'Balrampur', 'Banda', 'Barabanki', 'Bareilly', 'Basti', 'Bhadohi', 'Bijnor', 'Budaun', 'Bulandshahr', 'Chandauli', 'Chitrakoot', 'Deoria', 'Etah', 'Etawah', 'Faizabad', 'Farrukhabad', 'Fatehpur', 'Firozabad', 'Gautam Buddha Nagar', 'Ghaziabad', 'Ghazipur', 'Gonda', 'Gorakhpur', 'Hamirpur', 'Hapur', 'Hardoi', 'Hathras', 'Jalaun', 'Jaunpur', 'Jhansi', 'Kannauj', 'Kanpur Dehat', 'Kanpur Nagar', 'Kasganj', 'Kaushambi', 'Kheri', 'Kushinagar', 'Lalitpur', 'Lucknow', 'Maharajganj', 'Mahoba', 'Mainpuri', 'Mathura', 'Mau', 'Meerut', 'Mirzapur', 'Moradabad', 'Muzaffarnagar', 'Pilibhit', 'Pratapgarh', 'Raebareli', 'Rampur', 'Saharanpur', 'Sambhal', 'Sant Kabir Nagar', 'Shahjahanpur', 'Shamli', 'Shravasti', 'Siddharthnagar', 'Sitapur', 'Sonbhadra', 'Sultanpur', 'Unnao', 'Varanasi'],
-            'Bihar': ['Araria', 'Arwal', 'Aurangabad', 'Banka', 'Begusarai', 'Bhagalpur', 'Bhojpur', 'Buxar', 'Darbhanga', 'East Champaran', 'Gaya', 'Gopalganj', 'Jamui', 'Jehanabad', 'Kaimur', 'Katihar', 'Khagaria', 'Kishanganj', 'Lakhisarai', 'Madhepura', 'Madhubani', 'Munger', 'Muzaffarpur', 'Nalanda', 'Nawada', 'Patna', 'Purnia', 'Rohtas', 'Saharsa', 'Samastipur', 'Saran', 'Sheikhpura', 'Sheohar', 'Sitamarhi', 'Siwan', 'Supaul', 'Vaishali', 'West Champaran'],
-            'Tamil Nadu': ['Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul', 'Erode', 'Kallakurichi', 'Kanchipuram', 'Kanyakumari', 'Karur', 'Krishnagiri', 'Madurai', 'Mayiladuthurai', 'Nagapattinam', 'Namakkal', 'Nilgiris', 'Perambalur', 'Pudukkottai', 'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur', 'Theni', 'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar'],
-            'West Bengal': ['Alipurduar', 'Bankura', 'Birbhum', 'Cooch Behar', 'Dakshin Dinajpur', 'Darjeeling', 'Hooghly', 'Howrah', 'Jalpaiguri', 'Jhargram', 'Kalimpong', 'Kolkata', 'Malda', 'Murshidabad', 'Nadia', 'North 24 Parganas', 'Paschim Bardhaman', 'Paschim Medinipur', 'Purba Bardhaman', 'Purba Medinipur', 'Purulia', 'South 24 Parganas', 'Uttar Dinajpur'],
-            'Madhya Pradesh': ['Agar Malwa', 'Alirajpur', 'Anuppur', 'Ashoknagar', 'Balaghat', 'Barwani', 'Betul', 'Bhind', 'Bhopal', 'Burhanpur', 'Chhatarpur', 'Chhindwara', 'Damoh', 'Datia', 'Dewas', 'Dhar', 'Dindori', 'Guna', 'Gwalior', 'Harda', 'Hoshangabad', 'Indore', 'Jabalpur', 'Jhabua', 'Katni', 'Khandwa', 'Khargone', 'Mandla', 'Mandsaur', 'Morena', 'Narsinghpur', 'Neemuch', 'Panna', 'Raisen', 'Rajgarh', 'Ratlam', 'Rewa', 'Sagar', 'Satna', 'Sehore', 'Seoni', 'Shahdol', 'Shajapur', 'Sheopur', 'Shivpuri', 'Sidhi', 'Singrauli', 'Tikamgarh', 'Ujjain', 'Umaria', 'Vidisha'],
-            'Andhra Pradesh': ['Anantapur', 'Chittoor', 'East Godavari', 'Guntur', 'Krishna', 'Kurnool', 'Prakasam', 'Srikakulam', 'Visakhapatnam', 'Vizianagaram', 'West Godavari', 'YSR Kadapa'],
-            'Telangana': ['Adilabad', 'Hyderabad', 'Karimnagar', 'Khammam', 'Mahbubnagar', 'Medak', 'Nalgonda', 'Nizamabad', 'Rangareddy', 'Warangal'],
-            'Kerala': ['Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod', 'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad', 'Pathanamthitta', 'Thiruvananthapuram', 'Thrissur', 'Wayanad'],
-            'Punjab': ['Amritsar', 'Barnala', 'Bathinda', 'Faridkot', 'Fatehgarh Sahib', 'Fazilka', 'Ferozepur', 'Gurdaspur', 'Hoshiarpur', 'Jalandhar', 'Kapurthala', 'Ludhiana', 'Mansa', 'Moga', 'Muktsar', 'Pathankot', 'Patiala', 'Rupnagar', 'Sahibzada Ajit Singh Nagar', 'Sangrur', 'Tarn Taran'],
-            'Haryana': ['Ambala', 'Bhiwani', 'Charkhi Dadri', 'Faridabad', 'Fatehabad', 'Gurugram', 'Hisar', 'Jhajjar', 'Jind', 'Kaithal', 'Karnal', 'Kurukshetra', 'Mahendragarh', 'Nuh', 'Palwal', 'Panchkula', 'Panipat', 'Rewari', 'Rohtak', 'Sirsa', 'Sonipat', 'Yamunanagar']
+            'Maharashtra': ['Pune', 'Mumbai City', 'Mumbai Suburban', 'Nagpur', 'Nashik', 'Aurangabad', 'Solapur', 'Kolhapur', 'Satara', 'Thane'],
+            'Karnataka': ['Bangalore Urban', 'Mysuru', 'Belagavi', 'Hubli', 'Mangalore'],
+            'Delhi': ['Central Delhi', 'East Delhi', 'New Delhi', 'South Delhi', 'West Delhi'],
+            'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Gandhinagar'],
+            'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Ajmer'],
+            'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Agra', 'Varanasi', 'Meerut'],
+            'Bihar': ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur'],
+            'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Salem'],
+            'West Bengal': ['Kolkata', 'Howrah', 'Durgapur'],
+            'Madhya Pradesh': ['Bhopal', 'Indore', 'Gwalior', 'Jabalpur'],
+            'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur'],
+            'Telangana': ['Hyderabad', 'Warangal'],
+            'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode'],
+            'Punjab': ['Ludhiana', 'Amritsar', 'Jalandhar'],
+            'Haryana': ['Gurugram', 'Faridabad', 'Panipat']
         };
 
         // State change event
         document.getElementById('state').addEventListener('change', function() {
             const districtSelect = document.getElementById('district');
             const selectedState = this.value;
-            
+
             districtSelect.innerHTML = '<option value="">Select District</option>';
-            
+
             if (selectedState && stateDistricts[selectedState]) {
                 stateDistricts[selectedState].forEach(district => {
                     const option = document.createElement('option');
@@ -383,38 +403,35 @@
             if (/\d/.test(val)) strength += 20;
             if (/[^a-zA-Z0-9]/.test(val)) strength += 20;
             fill.style.width = strength + '%';
-            fill.style.background = strength <= 40? '#dc3545' : strength <= 60? '#ffc107' : '#198754';
+            fill.style.background = strength <= 40? '#EF4444' : strength <= 60? '#F59E0B' : '#10B981';
         });
 
         // Email OTP Flow - EmailJS
         document.getElementById('sendEmailOtp').addEventListener('click', function() {
             const email = document.getElementById('email').value;
             const btn = this;
-            
+
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 alert('Enter valid email address');
                 return;
             }
-            
-            // 6 digit OTP generate
+
             const otp = Math.floor(100000 + Math.random() * 900000);
             sessionStorage.setItem('email_otp', otp);
             sessionStorage.setItem('email_otp_email', email);
-            
+
             btn.disabled = true;
             btn.textContent = 'Sending...';
-            
+
             emailjs.send("service_a441io4", "template_avty214", {
                 to_email: email,
                 otp_code: otp,
-                from_name: "LinkKiwi"
+                from_name: "Prashan"
             }).then(function(response) {
-                console.log('SUCCESS!', response.status, response.text);
                 document.getElementById('emailOtpBox').style.display = 'block';
                 btn.textContent = 'Sent';
                 alert('OTP sent to ' + email + '. Check Inbox & Spam folder.');
             }, function(error) {
-                console.log('FAILED...', error);
                 btn.disabled = false;
                 btn.textContent = 'Send OTP';
                 alert('Failed to send OTP: ' + error.text);
@@ -426,7 +443,7 @@
             const email = document.getElementById('email').value;
             const storedOtp = sessionStorage.getItem('email_otp');
             const storedEmail = sessionStorage.getItem('email_otp_email');
-            
+
             if (otp === storedOtp && email === storedEmail) {
                 document.getElementById('emailVerified').style.display = 'block';
                 document.getElementById('emailOtpBox').style.display = 'none';

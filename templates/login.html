@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- Login page – premium glass‑style, all backend logic intact -->
+<!-- Login page – Prashan Premium Glass Style -->
 <style>
+  :root {
+      --navy: #050B1E;
+      --violet: #7C3AED;
+      --blue: #2563EB;
+      --gold: #FBBF24;
+  }
   .login-page-wrapper {
-    background: linear-gradient(145deg, #eef4fa 0%, #dce6f2 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, var(--violet) 50%, var(--blue) 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
     min-height: calc(100vh - 120px);
     display: flex;
     align-items: center;
@@ -13,268 +21,200 @@
     position: relative;
     overflow: hidden;
   }
+  @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
   .login-page-wrapper::before {
     content: '';
     position: absolute;
     top: -30%;
     right: -15%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(60, 110, 180, 0.06) 0%, transparent 70%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
+    animation: float 8s ease-in-out infinite;
   }
-  .login-page-wrapper::after {
-    content: '';
-    position: absolute;
-    bottom: -20%;
-    left: -10%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(40, 80, 140, 0.04) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
   .login-card {
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-radius: 48px;
-    box-shadow: 0 25px 60px -16px rgba(18, 52, 86, 0.12), 0 8px 24px rgba(0, 0, 0, 0.02);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-radius: 40px;
+    box-shadow: 0 40px 100px -20px rgba(124, 58, 237, 0.4);
     overflow: hidden;
-    animation: slideUp 0.6s ease;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    transition: box-shadow 0.3s ease;
+    animation: slideUp 0.7s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     max-width: 480px;
     width: 100%;
   }
-  .login-card:hover { box-shadow: 0 32px 72px -20px rgba(18, 52, 86, 0.16); }
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(36px) scale(0.98); }
+    from { opacity: 0; transform: translateY(40px) scale(0.96); }
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
   .login-header {
-    background: linear-gradient(135deg, #0b2a4a 0%, #1a4b7a 100%);
-    padding: 44px 30px 36px;
+    background: linear-gradient(135deg, var(--violet) 0%, var(--blue) 100%);
+    padding: 50px 30px 40px;
     text-align: center;
     color: white;
     position: relative;
-    overflow: hidden;
-  }
-  .login-header::after {
-    content: '';
-    position: absolute;
-    top: -60%;
-    right: -30%;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
-    border-radius: 50%;
   }
   .login-header .icon-wrapper {
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
+    margin: 0 auto 20px;
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.12);
-    font-size: 2.2rem;
-    position: relative;
-    z-index: 2;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    font-size: 2.5rem;
     transition: all 0.3s;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
   }
-  .login-header .icon-wrapper i { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); }
+  .login-header .icon-wrapper i { 
+    background: linear-gradient(135deg, var(--gold), #FDE047);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
   .login-header h2 {
+    font-family: 'Outfit', sans-serif;
     margin: 0;
-    font-weight: 700;
-    font-size: 2rem;
-    letter-spacing: -0.02em;
-    position: relative;
-    z-index: 2;
+    font-weight: 900;
+    font-size: 2.2rem;
   }
   .login-header p {
-    margin: 8px 0 0 0;
-    opacity: 0.75;
-    font-size: 0.95rem;
-    font-weight: 400;
-    position: relative;
-    z-index: 2;
+    margin: 10px 0 0 0;
+    opacity: 0.85;
+    font-size: 1rem;
+    font-weight: 500;
   }
   .login-header .badge-soft {
-    position: relative;
-    z-index: 2;
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.7);
-    padding: 4px 16px;
-    border-radius: 40px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--gold);
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid rgba(251, 191, 36, 0.3);
     display: inline-block;
-    margin-top: 8px;
+    margin-top: 12px;
   }
 
-  .login-body { padding: 40px 36px 44px; }
+  .login-body { padding: 45px 40px 50px; }
   .form-label {
-    font-weight: 600;
-    color: #1a334a;
-    margin-bottom: 8px;
-    font-size: 0.85rem;
-    letter-spacing: 0.3px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    font-size: 0.9rem;
   }
   .login-card .input-group {
-    margin-bottom: 4px;
-    border-radius: 60px;
+    margin-bottom: 6px;
+    border-radius: 20px;
     overflow: hidden;
-    transition: all 0.2s;
-    background: #f8fbff;
-    border: 1.5px solid #e3ebf5;
+    transition: all 0.3s;
+    background: white;
+    border: 2px solid #E2E8F0;
   }
   .login-card .input-group:focus-within {
-    border-color: #1a4b7a;
-    box-shadow: 0 0 0 4px rgba(26, 75, 122, 0.06);
-    background: #ffffff;
+    border-color: var(--violet);
+    box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.1);
   }
   .login-card .input-group-text {
     background: transparent;
     border: none;
-    padding: 0 18px;
-    color: #6a86a2;
-    font-size: 1rem;
+    padding: 0 20px;
+    color: #94A3B8;
+    font-size: 1.1rem;
   }
   .login-card .input-group-text.toggle-eye {
     cursor: pointer;
-    background: transparent;
-    border: none;
     transition: all 0.2s;
-    padding: 0 18px;
   }
-  .login-card .input-group-text.toggle-eye:hover { color: #1a4b7a; }
+  .login-card .input-group-text.toggle-eye:hover { color: var(--violet); }
   .login-card .form-control {
     border: none;
     border-radius: 0;
-    padding: 16px 10px 16px 0;
+    padding: 16px 12px 16px 0;
     font-size: 0.95rem;
     background: transparent;
-    transition: all 0.2s;
-    color: #0b1e2f;
-  }
-  .login-card .form-control:focus { box-shadow: none; background: transparent; }
-  .login-card .form-control::placeholder { color: #9bb1c7; font-weight: 400; }
-
-  .login-card .form-check { margin: 20px 0 16px; }
-  .login-card .form-check-input {
-    width: 1.1rem;
-    height: 1.1rem;
-    cursor: pointer;
-    border: 2px solid #c9d8e8;
-    border-radius: 6px;
-    background: white;
-    transition: all 0.15s;
-  }
-  .login-card .form-check-input:checked {
-    background-color: #1a4b7a;
-    border-color: #1a4b7a;
-  }
-  .login-card .form-check-label {
-    cursor: pointer;
-    user-select: none;
-    margin-left: 8px;
-    color: #1f3a57;
-    font-size: 0.9rem;
     font-weight: 500;
   }
-  .forgot-link {
-    color: #1a4b7a;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-    opacity: 0.75;
+  .login-card .form-control:focus { box-shadow: none; }
+  .login-card .form-control::placeholder { color: #94A3B8; }
+
+  .form-check-input {
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 2px solid #CBD5E1;
+    border-radius: 8px;
   }
-  .forgot-link:hover { color: #0b2a4a; opacity: 1; text-decoration: underline; }
+  .form-check-input:checked {
+    background-color: var(--violet);
+    border-color: var(--violet);
+  }
+  .form-check-label {
+    color: var(--navy);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .forgot-link {
+    color: var(--violet);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  .forgot-link:hover { color: var(--blue); text-decoration: underline; }
 
   .btn-login {
-    background: linear-gradient(135deg, #0b2a4a 0%, #1a4b7a 100%);
+    background: linear-gradient(135deg, var(--violet), var(--blue));
     border: none;
     color: white;
-    padding: 16px 24px;
-    font-size: 1rem;
-    font-weight: 700;
-    border-radius: 60px;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    border-radius: 20px;
     width: 100%;
-    transition: all 0.25s ease;
-    box-shadow: 0 8px 24px -6px rgba(26, 75, 122, 0.25);
-    letter-spacing: 0.3px;
-    margin-top: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 15px 40px -10px rgba(124, 58, 237, 0.5);
+    margin-top: 10px;
   }
   .btn-login:hover:not(:disabled) {
     transform: translateY(-3px);
-    box-shadow: 0 14px 32px -10px rgba(26, 75, 122, 0.35);
-    color: white;
-    background: linear-gradient(135deg, #0f2d4a 0%, #1a4b7a 100%);
+    box-shadow: 0 20px 50px -10px rgba(124, 58, 237, 0.7);
   }
-  .btn-login:active:not(:disabled) { transform: translateY(-1px); }
-  .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
 
   .signup-link {
     text-align: center;
-    margin-top: 28px;
-    color: #56718e;
-    font-size: 0.92rem;
+    margin-top: 30px;
+    color: #64748B;
+    font-weight: 500;
   }
   .signup-link a {
-    color: #1a4b7a;
-    font-weight: 700;
+    color: var(--violet);
+    font-weight: 800;
     text-decoration: none;
-    transition: all 0.2s;
-    border-bottom: 1px solid transparent;
   }
-  .signup-link a:hover {
-    color: #0b2a4a;
-    border-bottom-color: #1a4b7a;
-  }
+  .signup-link a:hover { text-decoration: underline; }
 
   .login-card .alert {
     border-radius: 20px;
     border: none;
-    animation: fadeIn 0.4s ease;
-    font-size: 0.9rem;
-    padding: 14px 20px;
-    background: #fef7f0;
-    color: #9e5f2b;
-    border-left: 4px solid #e67e22;
+    font-weight: 600;
+    padding: 16px 20px;
   }
-  .login-card .alert-success {
-    background: #ecf8f0;
-    color: #0d6b3a;
-    border-left-color: #27ae60;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
+  
   @media (max-width: 576px) {
-    .login-body { padding: 30px 22px 32px; }
-    .login-header { padding: 32px 20px 28px; }
-    .login-header h2 { font-size: 1.6rem; }
-    .login-header .icon-wrapper { width: 64px; height: 64px; font-size: 1.8rem; }
+    .login-body { padding: 30px 25px 35px; }
+    .login-header { padding: 35px 20px 30px; }
     .login-card { border-radius: 32px; }
-    .btn-login { padding: 14px 20px; font-size: 0.95rem; }
-  }
-  @media (max-width: 400px) {
-    .login-body { padding: 24px 16px 28px; }
-    .login-card .input-group-text { padding: 0 12px; }
-    .login-card .form-control { padding: 14px 8px 14px 0; }
   }
 </style>
 
@@ -284,16 +224,15 @@
       <!-- HEADER -->
       <div class="login-header">
         <div class="icon-wrapper">
-          <i class="fas fa-shield-alt"></i>
+          <i class="fas fa-shield-halved"></i>
         </div>
-        <h2>Welcome Back</h2>
-        <p>Secure access to the transparency platform</p>
-        <span class="badge-soft"><i class="fas fa-lock me-1"></i> encrypted</span>
+        <h2>Welcome to Prashan</h2>
+        <p>Secure access to exam integrity platform</p>
+        <span class="badge-soft"><i class="fas fa-lock me-1"></i> 256-bit encrypted</span>
       </div>
 
       <!-- BODY -->
       <div class="login-body">
-        <!-- Flash messages (back-end driven) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
@@ -306,29 +245,26 @@
           {% endif %}
         {% endwith %}
 
-        <!-- FORM – all names, IDs, CSRF untouched -->
         <form method="POST" class="needs-validation" novalidate id="loginForm">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
           <div class="mb-3">
-            <label class="form-label"><i class="fas fa-user me-2" style="color: #5b7f9e;"></i>Username or Email</label>
+            <label class="form-label"><i class="fas fa-user me-2" style="color: var(--violet);"></i>Username or Email</label>
             <div class="input-group">
               <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
               <input type="text" name="username" class="form-control" placeholder="Enter username or email" required autofocus>
             </div>
-            <div class="invalid-feedback">Please enter your username or email</div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label"><i class="fas fa-key me-2" style="color: #5b7f9e;"></i>Password</label>
+            <label class="form-label"><i class="fas fa-key me-2" style="color: var(--violet);"></i>Password</label>
             <div class="input-group">
               <span class="input-group-text"><i class="fas fa-lock"></i></span>
               <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
-              <span class="input-group-text toggle-eye" id="togglePass" role="button" aria-label="Toggle password visibility">
+              <span class="input-group-text toggle-eye" id="togglePass">
                 <i class="fas fa-eye-slash"></i>
               </span>
             </div>
-            <div class="invalid-feedback">Please enter your password</div>
           </div>
 
           <div class="d-flex justify-content-between align-items-center mb-4">
@@ -352,12 +288,10 @@
   </div>
 </div>
 
-<!-- ===== FRONTEND JS (UI only) ===== -->
 <script>
   (function() {
     'use strict';
-
-    // Toggle password visibility
+    // Toggle password
     const toggleBtn = document.getElementById('togglePass');
     const passField = document.getElementById('password');
     if (toggleBtn && passField) {
@@ -365,14 +299,12 @@
         const type = passField.type === 'password' ? 'text' : 'password';
         passField.type = type;
         const icon = this.querySelector('i');
-        if (icon) {
-          icon.classList.toggle('fa-eye-slash');
-          icon.classList.toggle('fa-eye');
-        }
+        icon.classList.toggle('fa-eye-slash');
+        icon.classList.toggle('fa-eye');
       });
     }
 
-    // Form validation + loading state (keeps backend flow)
+    // Form loading state
     const form = document.getElementById('loginForm');
     const btn = document.getElementById('loginBtn');
     if (form && btn) {
@@ -381,32 +313,17 @@
           event.preventDefault();
           event.stopPropagation();
         } else {
-          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing in...';
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
           btn.disabled = true;
         }
         form.classList.add('was-validated');
-      }, false);
+      });
     }
 
-    // Auto-dismiss flash alerts after 5 seconds
+    // Auto-dismiss alerts
     document.querySelectorAll('.alert').forEach(el => {
-      setTimeout(() => {
-        const closeBtn = el.querySelector('.btn-close');
-        if (closeBtn) closeBtn.click();
-      }, 5000);
+      setTimeout(() => { el.querySelector('.btn-close')?.click(); }, 5000);
     });
-
-    // Hover micro‑interaction on the icon wrapper
-    const iconWrap = document.querySelector('.icon-wrapper');
-    if (iconWrap) {
-      iconWrap.addEventListener('mouseenter', function() {
-        this.style.transform = 'scale(1.02)';
-        this.style.transition = 'transform 0.25s ease';
-      });
-      iconWrap.addEventListener('mouseleave', function() {
-        this.style.transform = 'scale(1)';
-      });
-    }
   })();
 </script>
 {% endblock %}

@@ -1,66 +1,302 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Live Search</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Prashan - Live Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --navy: #050B1E;
+            --violet: #7C3AED;
+            --blue: #2563EB;
+            --gold: #FBBF24;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%); 
+            min-height: 100vh;
+        }
+        
+        .search-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 50px 24px;
+        }
+        
+        /* ===== HEADER ===== */
+        .page-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--violet) 50%, var(--blue) 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            padding: 50px 40px;
+            border-radius: 40px;
+            color: white;
+            margin-bottom: 35px;
+            box-shadow: 0 30px 80px -20px rgba(124, 58, 237, 0.4);
+        }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .page-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .page-header h2 i {
+            background: linear-gradient(135deg, var(--gold), #FDE047);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* ===== SEARCH BAR ===== */
+        .search-card {
+            background: white;
+            border-radius: 28px;
+            padding: 30px 35px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            border: 1px solid #E2E8F0;
+            margin-bottom: 35px;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box .form-control {
+            border-radius: 20px;
+            border: 2px solid #E2E8F0;
+            padding: 18px 20px 18px 55px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .search-box .form-control:focus {
+            border-color: var(--violet);
+            box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+            color: #94A3B8;
+        }
+        .result-count {
+            text-align: right;
+            margin-top: 12px;
+            color: #64748B;
+            font-weight: 600;
+        }
+        .result-count span {
+            color: var(--violet);
+            font-weight: 800;
+        }
+        
+        /* ===== TABLE CARD ===== */
+        .table-card {
+            background: white;
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            border: 1px solid #E2E8F0;
+            overflow: hidden;
+        }
+        
+        .table { margin-bottom: 0; }
+        .table thead th {
+            background: #F8FAFC;
+            color: var(--navy);
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            border: none;
+            padding: 18px 15px;
+        }
+        .table tbody td {
+            padding: 20px 15px;
+            border-color: #F1F5F9;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+        .table tbody tr:hover {
+            background: linear-gradient(90deg, #FAF5FF, #EFF6FF);
+            transform: scale(1.002);
+        }
+        
+        /* Hide rows with animation */
+        .table tbody tr.hide {
+            display: none;
+        }
+        
+        /* ===== STATUS BADGE ===== */
+        .status-badge {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .status-pending { background: #FEF3C7; color: #92400E; }
+        .status-review { background: #DBEAFE; color: #1E40AF; }
+        .status-resolved { background: #D1FAE5; color: #065F46; }
+        
+        /* ===== BUTTON ===== */
+        .btn-view {
+            background: linear-gradient(135deg, var(--violet), var(--blue));
+            border: none;
+            color: white;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+            color: white;
+        }
+        
+        /* ===== NO RESULT ===== */
+        .no-result {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+        }
+        .no-result i {
+            font-size: 4rem;
+            color: #CBD5E1;
+            margin-bottom: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header { padding: 30px 20px; }
+            .page-header h2 { font-size: 1.8rem; }
+            .table-card { padding: 15px; }
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-4">
-        <h2 class="fw-bold mb-4">Report Live Search Demo</h2>
+<body>
+    <div class="search-wrapper">
+        <!-- HEADER -->
+        <div class="page-header">
+            <h2><i class="fas fa-magnifying-glass"></i> Prashan Live Search</h2>
+            <p style="opacity: 0.9; font-size: 1.1rem; margin-top: 8px;">Real-time search across all exam reports</p>
+        </div>
 
-        <!-- Search input -->
-        <input type="text"
-               id="searchInput"
-               class="form-control mb-3"
-               placeholder="Type to search exam, subject, college...">
+        <!-- SEARCH -->
+        <div class="search-card">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text"
+                       id="searchInput"
+                       class="form-control"
+                       placeholder="Search by Exam, Subject, College, Status...">
+            </div>
+            <div class="result-count">
+                Showing <span id="resultCount">{{ reports|length }}</span> of {{ reports|length }} records
+            </div>
+        </div>
 
-        <!-- Table -->
-        <table class="table table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Report ID</th>
-                    <th>Exam Name</th>
-                    <th>Subject Name</th>
-                    <th>College Name</th>
-                    <th>Status</th>
-                    <th>Report Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+        <!-- TABLE -->
+        <div class="table-card">
+            <table class="table table-borderless">
+                <thead>
+                    <tr>
+                        <th>REPORT ID</th>
+                        <th>EXAM NAME</th>
+                        <th>SUBJECT</th>
+                        <th>COLLEGE</th>
+                        <th>STATUS</th>
+                        <th>DATE</th>
+                        <th class="text-center">ACTIONS</th>
+                    </tr>
+                </thead>
 
-            <tbody id="tableBody">
-                {% for report in reports %}
-                <tr>
-                    <td>{{ report.display_id or report.id }}</td>
-                    <td>{{ report['exam_name'] }}</td>
-                    <td>{{ report['subject_name'] }}</td>
-                    <td>{{ report['college_name'] }}</td>
-                    <td>{{ report['status'] }}</td>
-                    <td>{{ report['report_date'] }}</td>
-                    <td>
-                        <a href="#" class="btn btn-sm btn-primary">View</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <tbody id="tableBody">
+                    {% for report in reports %}
+                    <tr>
+                        <td><span style="background: rgba(124,58,237,0.1); color: var(--violet); padding: 6px 12px; border-radius: 12px; font-weight: 700;">#{{ report.display_id or report.id }}</span></td>
+                        <td class="fw-bold">{{ report['exam_name'] }}</td>
+                        <td>{{ report['subject_name'] }}</td>
+                        <td>{{ report['college_name'] }}</td>
+                        <td>
+                            {% if report['status'] == 'Pending' %}
+                                <span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>
+                            {% elif report['status'] == 'In Review' %}
+                                <span class="status-badge status-review"><i class="fas fa-eye"></i> In Review</span>
+                            {% elif report['status'] == 'Resolved' %}
+                                <span class="status-badge status-resolved"><i class="fas fa-check"></i> Resolved</span>
+                            {% else %}
+                                <span class="status-badge">{{ report['status'] }}</span>
+                            {% endif %}
+                        </td>
+                        <td><i class="far fa-calendar-alt text-muted me-1"></i>{{ report['report_date'] }}</td>
+                        <td class="text-center">
+                            <a href="#" class="btn btn-view"><i class="fas fa-eye"></i> View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- NO RESULT MESSAGE -->
+            <div class="no-result" id="noResult">
+                <i class="fas fa-search"></i>
+                <h5>No Results Found</h5>
+                <p class="text-muted">Try searching with different keywords</p>
+            </div>
+        </div>
     </div>
 
     <script>
         const searchInput = document.getElementById('searchInput');
         const tableBody = document.getElementById('tableBody');
         const allRows = tableBody.querySelectorAll('tr');
+        const resultCount = document.getElementById('resultCount');
+        const noResult = document.getElementById('noResult');
+        const totalRecords = allRows.length;
 
         // Event: Jab bhi user type kare
         searchInput.addEventListener('keyup', function() {
-            const searchText = this.value.toLowerCase(); // Jo type kiya wo lowercase me
+            const searchText = this.value.toLowerCase();
+            let visibleCount = 0;
 
             allRows.forEach(function(row) {
-                const rowText = row.textContent.toLowerCase(); // Poore row ka text
+                const rowText = row.textContent.toLowerCase();
                 
                 // Check: searchText row me hai ya nahi
-                
+                if (rowText.includes(searchText)) {
+                    row.classList.remove('hide');
+                    visibleCount++;
+                } else {
+                    row.classList.add('hide');
+                }
             });
+            
+            // Update count
+            resultCount.textContent = visibleCount;
+            
+            // Show/Hide no result message
+            if (visibleCount === 0) {
+                noResult.style.display = 'block';
+            } else {
+                noResult.style.display = 'none';
+            }
         });
     </script>
 </body>
